@@ -1,0 +1,383 @@
+/* ==========================================================
+   GLOBAL LAYOUT
+========================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:#f5f5f5;
+    overflow:hidden;
+}
+
+.container{
+    display:flex;
+    min-height:100vh;
+    width:100%;
+}
+
+/* ==========================================================
+   SIDEBAR
+========================================================== */
+
+.sidebar{
+    position:fixed;
+    top:0;
+    left:0;
+
+    width:90px;
+    height:100vh;
+
+    background:#fff;
+    border-right:1px solid #ddd;
+
+    display:flex;
+    flex-direction:column;
+
+    overflow:hidden;
+
+    transition:.30s;
+
+    z-index:1000;
+}
+
+.logo{
+    padding:15px 10px;
+    text-align:center;
+    flex-shrink:0;
+}
+
+.logo img{
+    width:60px;
+    transition:.30s;
+}
+
+.menu{
+    list-style:none;
+
+    flex:1;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    padding:0;
+}
+
+.menu li{
+    margin:0 10px;
+}
+
+.menu li a{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:15px;
+
+    text-decoration:none;
+
+    color:#111827;
+
+    padding:18px 0;
+
+    transition:.25s;
+
+    font-size:18px;
+    font-weight:600;
+}
+
+.menu li i{
+
+    width:24px;
+
+    text-align:center;
+
+    font-size:22px;
+
+    flex-shrink:0;
+
+}
+
+.menu li span{
+
+    display:none;
+
+}
+
+.menu li:hover{
+
+    background:#f4f4f4;
+
+    border-radius:12px;
+
+}
+
+.menu li.active{
+
+    background:#18AEF5;
+
+    border-radius:12px;
+
+}
+
+.menu li.active a{
+
+    color:#fff;
+
+}
+
+.sidebar-footer{
+
+    border-top:1px solid #ddd;
+
+    padding:15px 10px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.user{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:12px;
+
+}
+
+.user img{
+
+    width:42px;
+    height:42px;
+
+    border-radius:50%;
+
+}
+
+.user div,
+
+.sidebar-footer>a{
+
+    display:none;
+
+}
+
+/* ==========================================================
+   EXPANDED SIDEBAR
+========================================================== */
+
+.container.sidebar-open .sidebar{
+
+    width:260px;
+
+    box-shadow:4px 0 20px rgba(0,0,0,.12);
+
+}
+
+.container.sidebar-open .logo img{
+
+    width:220px;
+
+}
+
+.container.sidebar-open .menu li a{
+
+    justify-content:flex-start;
+
+    padding:18px 20px;
+
+}
+
+.container.sidebar-open .menu li span{
+
+    display:inline;
+
+    font-size:16px;
+
+}
+
+.container.sidebar-open .sidebar-footer{
+
+    justify-content:space-between;
+
+    padding:20px;
+
+}
+
+.container.sidebar-open .user{
+
+    justify-content:flex-start;
+
+}
+
+.container.sidebar-open .user div,
+
+.container.sidebar-open .sidebar-footer>a{
+
+    display:block;
+
+}
+
+/* ==========================================================
+   CONTENT
+========================================================== */
+
+.content{
+    margin-left:90px;
+    width:calc(100% - 90px);
+
+    display:flex;
+    flex-direction:column;
+
+    height:100vh;
+    overflow:hidden;
+
+    background:#f5f5f5;
+
+    transition:.3s ease;
+}
+/* ==========================================================
+   TOPBAR
+========================================================== */
+
+.topbar{
+
+    height:75px;
+
+    background:#fff;
+
+    border-radius:12px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 30px;
+
+    margin:30px;
+
+    margin-bottom:20px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+}
+
+.topbar-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+.menu-toggle{
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#f3f4f6;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:18px;
+
+    transition:.25s;
+
+}
+
+.menu-toggle:hover{
+
+    background:#e5e7eb;
+
+}
+
+.topbar h2{
+
+    font-size:38px;
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   OVERLAY
+========================================================== */
+
+.sidebar-overlay{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.25);
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transition:.25s;
+
+    z-index:999;
+
+}
+
+.container.sidebar-open .sidebar-overlay{
+
+    opacity:1;
+
+    visibility:visible;
+
+}
+
+/* ==========================================================
+   PAGE CONTENT
+========================================================== */
+
+.page-content{
+
+    flex:1;
+
+    overflow-y:auto;
+
+    overflow-x:hidden;
+
+    padding:0 30px 30px;
+
+}
+
+.dashboard-content{
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    min-height:0;
+    padding-right:4px;
+}
+
