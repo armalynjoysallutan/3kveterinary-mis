@@ -36,24 +36,28 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
     <main class="content">
 
-    <div class="topbar"> 
+  <div class="topbar-wrapper">
+
+    <div class="topbar">
 
         <div class="topbar-left">
+
             <button id="menu-toggle" class="menu-toggle">
                 <i class="fa-solid fa-bars"></i>
             </button>
+
             <h2>Dashboard</h2>
+
         </div>
 
         <div class="admin-info">
-
             Welcome,
             <strong><?php echo $_SESSION['admin_username']; ?></strong>
-
         </div>
 
     </div>
 
+</div>
     <div class="dashboard-content">
 
     <div class="dashboard-grid">

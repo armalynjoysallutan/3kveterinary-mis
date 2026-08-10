@@ -183,31 +183,81 @@
     background:#fffbea !important;
 }
 
-.fc-event{
-    border:none !important;
-    border-radius:12px !important;
-    padding:6px 8px !important;
-    font-size:12px !important;
-    font-weight:600;
-    box-shadow:none !important;
+/* =========================================
+   WEEKLY CALENDAR - APPOINTMENT CARDS
+========================================= */
+
+.fc-daygrid-event {
+    display: block !important;
+
+    margin: 5px 6px !important;
+    padding: 8px 10px !important;
+
+    border-radius: 10px !important;
+
+    border-width: 1px !important;
+
+
+
+    box-shadow: none !important;
+
+    overflow: hidden !important;
+
+    min-height: 58px !important;
 }
 
-.fc-event-title{
-    font-weight:600;
+/* Remove the little status dot */
+
+.fc-daygrid-event-dot {
+    display: none !important;
 }
 
-.fc-timegrid-event{
-    border-radius:12px !important;
+
+/* Time */
+
+.fc-event-time {
+    display: none !important;
+
+    font-size: 10px !important;
+    font-weight: 700 !important;
+
+    line-height: 1.2 !important;
+
+    margin: 0 0 4px 0 !important;
+
+    color: #374151 !important;
 }
 
-.fc-timegrid-slot{
-    height:48px;
+/* Owner + Service */
+
+.fc-event-title {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 11px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1.4 !important;
+
+    white-space: pre-line !important;
+
+    overflow: hidden !important;
 }
 
-.fc-daygrid-more-link{
-    color:#18AEF5 !important;
-    font-weight:600;
-    text-decoration:none !important;
+
+/* Make owner/service text fit inside card */
+
+.fc-daygrid-event-harness {
+    margin-bottom: 3px !important;
+}
+
+.calendar-card{
+    margin-bottom:30px;
 }
 
 /* table */
@@ -295,6 +345,10 @@
     background:#FEE2E2;
     color:#B91C1C;
 }
+.status-badge.arrived {
+    background-color: #d1fae5;
+    color: #15803d;
+}
 
 /* action buttons */
 .action-group{
@@ -303,6 +357,43 @@
     gap:10px;
 }
 
+.action-wrapper{
+    position:relative;
+}
+
+.action-dropdown{
+    display:none;
+    position:absolute;
+    right:0;
+    top:auto;
+    bottom:100%;
+    margin-bottom:6px;
+    min-width:170px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.12);
+    z-index:100;
+    padding:6px 0;
+}
+
+.action-dropdown.show{
+    display:block;
+}
+
+.action-dropdown button{
+    display:block;
+    width:100%;
+    padding:9px 12px;
+    border:none;
+    background:none;
+    text-align:left;
+    cursor:pointer;
+}
+
+.action-dropdown button:hover{
+    background:#f3f4f6;
+}
 .link-btn{
     border:none;
     background:transparent;
@@ -362,7 +453,10 @@
 }
 
 .large-modal{
-    max-width:900px;
+    width: 100%;
+    max-width:1250px;
+    max-height:90vh;
+    overflow-y:auto;
 }
 
 .modal-header{
@@ -400,8 +494,149 @@
 
 .modal-body{
     padding:26px;
+    max-height:70vh;
+    overflow-y:auto;
 }
 
+/* =========================
+   APPOINTMENT MODAL
+========================= */
+
+.form-section{
+    margin-bottom:22px;
+}
+
+.form-section h4{
+    font-size:18px;
+    font-weight:700;
+    color:#1f2937;
+    margin-bottom:18px;
+    padding-bottom:10px;
+    border-bottom:1px solid #edf2f7;
+}
+
+.client-type{
+    display:flex;
+    justify-content:space-between;
+    gap:30px;
+    align-items:center;
+}
+
+.client-type label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px 22px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+}
+
+.form-group label{
+    font-size:14px;
+    font-weight:600;
+    margin-bottom:8px;
+    color:#374151;
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    height:46px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    padding:0 14px;
+    font-size:14px;
+    transition:.25s;
+    background:#fff;
+}
+
+.form-group input:focus,
+.form-group select:focus{
+    outline:none;
+    border-color:#18AEF5;
+    box-shadow:0 0 0 3px rgba(24,174,245,.15);
+}
+
+.checkbox-grid input{
+    width:18px;
+    height:18px;
+    border:1px solid #d1d5db;
+    border-radius:6px;
+    accent-color:#18AEF5;
+}
+
+.checkbox-grid label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:500;
+    cursor:pointer;
+}
+
+.helper-text{
+    margin-top:6px;
+    color:#6b7280;
+    font-size:12px;
+}
+
+.modal-footer{
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+    padding:20px 28px;
+    border-top:1px solid #edf2f7;
+}
+
+.cancel-btn{
+    background:#f3f4f6;
+    color:#374151;
+    border:none;
+    border-radius:10px;
+    padding:12px 20px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.save-btn{
+    background:#18AEF5;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    padding:12px 24px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.cancel-btn:hover{
+    background:#e5e7eb;
+}
+
+.save-btn:hover{
+    background:#0993d8;
+}
+
+@media(max-width:900px){
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .checkbox-grid{
+        grid-template-columns:1fr;
+    }
+
+}
 .modal-note{
     margin:0;
     font-size:15px;
@@ -463,6 +698,7 @@
 
     .modal-header h3{
         font-size:22px;
+        color:#95b2f0;
     }
 }
 
@@ -556,10 +792,956 @@
     gap:10px;
 }
 
-.appointment-page{
-    flex:1;
-    overflow-y:auto;
-    overflow-x:hidden;
-    min-height:0;
-    padding:0 30px 30px;
+.appointments-content{
+    padding:145px 30px 30px;
+}
+
+.required{
+
+    color:#ef4444;
+
+    font-weight:700;
+
+}
+.client-type{
+
+    display:flex;
+    gap:20px;
+    margin-top:15px;
+
+}
+
+.client-option{
+
+    flex:0 0 48%;
+    cursor:pointer;
+
+}
+
+.client-option input{
+
+    display:none;
+
+}
+
+.client-card{
+
+    display:flex;
+    align-items:center;
+    gap:15px;
+
+    border:2px solid #dbe4ec;
+
+    border-radius:15px;
+
+    padding:18px;
+
+    transition:.25s;
+
+    background:#fff;
+
+}
+
+.client-card i{
+
+    font-size:28px;
+
+    color:#18AEF5;
+
+}
+
+.client-card strong{
+
+    display:block;
+
+    font-size:15px;
+
+    color:#1f2937;
+
+}
+
+.client-card small{
+
+    color:#6b7280;
+
+    font-size:12px;
+
+}
+
+.client-option input:checked + .client-card{
+
+    border-color:#18AEF5;
+
+    background:#eef8ff;
+
+}
+textarea{
+
+    width:100%;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    padding:14px;
+    font-size:14px;
+    resize:none;
+    transition:.25s;
+
+}
+
+textarea:focus{
+
+    outline:none;
+    border-color:#18AEF5;
+    box-shadow:0 0 0 3px rgba(24,174,245,.15);
+
+}
+
+.top-form-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:30px;
+
+    align-items:start;
+
+}
+/* =========================
+SERVICE AVAILABILITY
+========================= */
+
+.availability-card{
+
+    display:flex;
+    gap:15px;
+
+    padding:18px;
+
+    border-radius:14px;
+
+    background:#f8fafc;
+
+    border:1px solid #dbe4ec;
+
+}
+
+.availability-icon{
+
+    font-size:24px;
+
+    color:#18AEF5;
+
+}
+
+.availability-content h5{
+
+    margin:0 0 6px;
+
+    font-size:15px;
+
+    color:#1f2937;
+
+}
+
+.availability-content p{
+
+    margin:0;
+
+    color:#6b7280;
+
+    font-size:13px;
+
+    line-height:1.6;
+
+}
+.input-error{
+
+    border:1px solid #ef4444 !important;
+
+    background:#fef2f2;
+
+}
+
+.error-message{
+
+    display:block;
+
+    color:#ef4444;
+
+    font-size:12px;
+
+    margin-top:5px;
+
+}
+
+/* ===========================
+   APPOINTMENT DETAILS MODAL
+   =========================== */
+
+.details-modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.35);
+    align-items:center;
+    justify-content:center;
+    z-index:99999;
+}
+
+.details-modal-overlay.show{
+    display:flex;
+}
+
+.details-modal{
+    width:520px;
+    max-width:90%;
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.15);
+    overflow:hidden;
+}
+
+.details-modal-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 22px;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.details-modal-header h3{
+    margin:0;
+}
+
+.details-modal-close{
+    border:none;
+    background:none;
+    font-size:24px;
+    cursor:pointer;
+}
+
+.details-modal-body{
+    padding:22px;
+}
+
+.details-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.detail-item{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+.detail-item span{
+    font-size:12px;
+    color:#6b7280;
+}
+
+.detail-item strong{
+    font-size:14px;
+    color:#1f2937;
+}
+
+.full-width{
+    grid-column:1 / -1;
+}
+
+/* =========================================
+   APPOINTMENT CLIENT LAYOUT
+========================================= */
+
+.appointment-client-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 30px;
+    align-items: start;
+}
+
+
+/* -----------------------------------------
+   APPOINTMENT INFORMATION
+----------------------------------------- */
+
+.appointment-client-layout .appointment-section {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+
+/* -----------------------------------------
+   OWNER INFORMATION
+   NEW CLIENT
+----------------------------------------- */
+
+.appointment-client-layout #ownerSection {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+
+/* -----------------------------------------
+   PET INFORMATION
+   NEW CLIENT
+----------------------------------------- */
+
+.appointment-client-layout #petSection {
+    grid-column: 1 / -1;
+    grid-row: 2;
+}
+
+
+/* =========================================
+   EXISTING CLIENT
+========================================= */
+
+.appointment-client-layout.existing-client #ownerSection {
+    display: none;
+}
+
+.appointment-client-layout.existing-client #petSection {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+
+/* =========================================
+   FOOTER SAFETY
+========================================= */
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ===========================
+   APPOINTMENT SUCCESS MODAL
+=========================== */
+
+.success-modal-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 100000;
+}
+
+
+.success-modal-overlay.show {
+
+    display: flex;
+
+}
+
+
+.success-modal {
+
+    width: 420px;
+
+    max-width: 90%;
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    padding: 35px;
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.20);
+
+}
+
+
+.success-icon {
+
+    width: 70px;
+
+    height: 70px;
+
+    margin: 0 auto 20px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #e8f8ef;
+
+    color: #20a464;
+
+    font-size: 32px;
+}
+
+
+.success-modal h3 {
+
+    margin: 0 0 10px;
+
+    font-size: 22px;
+
+    color: #1f2937;
+
+}
+
+
+.success-modal p {
+
+    margin: 0 0 25px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+.success-modal-btn {
+
+    width: 100%;
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 13px 20px;
+
+    background: #159fe3;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.success-modal-btn:hover {
+
+    opacity: 0.9;
+
+}
+
+/* ===========================
+   CANCEL APPOINTMENT MODAL
+=========================== */
+
+.cancel-modal-overlay{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,0.35);
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:100000;
+
+}
+
+
+.cancel-modal-overlay.show{
+
+    display:flex;
+
+}
+
+
+.cancel-modal{
+
+    width:520px;
+
+    max-width:90%;
+
+    background:#fff;
+
+    border-radius:16px;
+
+    box-shadow:0 20px 50px rgba(0,0,0,0.18);
+
+    overflow:hidden;
+
+}
+
+
+.cancel-modal-header{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    justify-content:space-between;
+
+    padding:24px 26px;
+
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+
+.cancel-modal-header h3{
+
+    margin:0 0 6px;
+
+    font-size:20px;
+
+    color:#1f2937;
+
+}
+
+
+.cancel-modal-header p{
+
+    margin:0;
+
+    font-size:13px;
+
+    color:#6b7280;
+
+}
+
+
+.cancel-modal-close{
+
+    border:none;
+
+    background:none;
+
+    font-size:26px;
+
+    color:#6b7280;
+
+    cursor:pointer;
+
+    line-height:1;
+
+}
+
+
+.cancel-modal-body{
+
+    padding:24px 26px;
+
+}
+
+
+.cancel-modal-body label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#374151;
+
+}
+
+
+.cancel-modal-body select,
+.cancel-modal-body textarea{
+
+    width:100%;
+
+    border:1px solid #d1d5db;
+
+    border-radius:10px;
+
+    padding:12px 14px;
+
+    font-size:14px;
+
+    margin-bottom:18px;
+
+    box-sizing:border-box;
+
+}
+
+
+.cancel-modal-body select:focus,
+.cancel-modal-body textarea:focus{
+
+    outline:none;
+
+    border-color:#18AEF5;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(24,174,245,.15);
+
+}
+
+
+.cancel-modal-footer{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:10px;
+
+    padding:18px 26px;
+
+    border-top:1px solid #e5e7eb;
+
+}
+
+
+.cancel-modal-secondary,
+.cancel-modal-danger{
+
+    border:none;
+
+    border-radius:9px;
+
+    padding:11px 18px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+}
+
+
+.cancel-modal-secondary{
+
+    background:#f3f4f6;
+
+    color:#374151;
+
+}
+
+
+.cancel-modal-danger{
+
+    background:#ef4444;
+
+    color:#fff;
+
+}
+
+
+.cancel-modal-secondary:hover{
+
+    background:#e5e7eb;
+
+}
+
+
+.cancel-modal-danger:hover{
+
+    background:#dc2626;
+
+}
+/* ===========================
+   CANCELLATION DETAIL
+=========================== */
+
+.cancellation-detail {
+    grid-column: 1 / -1;
+    width: 100%;
+    display: block;
+}
+
+.cancellation-detail span {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.cancellation-detail strong {
+    display: block;
+}
+
+/* ===========================
+   ADD NEW PET BUTTON
+=========================== */
+
+.add-new-pet-btn {
+
+    margin-top: 8px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #18aef5;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    padding: 4px 0;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+}
+
+
+.add-new-pet-btn:hover {
+
+    color: #0d8ed1;
+
+    text-decoration: underline;
+
+}
+
+
+.add-new-pet-btn.cancel-mode {
+
+    color: #ef4444;
+
+}
+
+
+.add-new-pet-btn.cancel-mode:hover {
+
+    color: #dc2626;
+
+}
+
+/* =========================================
+   WEEKLY CALENDAR APPOINTMENT CARDS
+========================================= */
+
+.calendar-appointment {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: #e8f8ef;
+    border-left: 4px solid #20a464;
+    overflow: hidden;
+    line-height: 1.25;
+}
+
+.calendar-appointment-time {
+    font-size: 11px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 3px;
+}
+
+.calendar-appointment-owner {
+    font-size: 12px;
+    font-weight: 700;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar-appointment-service {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =========================================
+   WEEKLY CALENDAR → APPOINTMENT LIST SPACE
+========================================= */
+
+.weekly-calendar-card {
+    margin-bottom: 28px;
+}
+
+.appointment-list-card {
+    margin-top: 0;
+}
+
+/* =========================================
+   WEEKLY CALENDAR STATUS CARDS
+========================================= */
+
+.weekly-status-card {
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 7px 9px !important;
+    margin: 3px 4px !important;
+    box-shadow: none !important;
+    color: #111827 !important;
+}
+
+
+/* =========================================
+   OWNER NAME
+========================================= */
+
+.weekly-event-owner {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================
+   SERVICE
+========================================= */
+
+.weekly-event-service {
+    font-size: 10px;
+    font-weight: 500;
+    margin-top: 3px;
+    line-height: 1.2;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================
+   PENDING
+========================================= */
+
+.weekly-status-card.status-pending {
+    background: #fff1c7 !important;
+    border: 1px solid #f4d98b !important;
+    &:hover {
+        background: #fff1c7 !important;
+        border: 1px solid #f4d98b !important;
+    }
+}
+
+
+/* =========================================
+   CONFIRMED
+========================================= */
+
+.weekly-status-card.status-confirmed {
+    background: #d9f8e5 !important;
+    border: 1px solid #a9e8c2 !important;
+}
+
+
+/* =========================================
+   ARRIVED
+========================================= */
+
+.weekly-status-card.status-arrived {
+    background: #dceeff !important;
+    border: 1px solid #b5dcff !important;
+}
+
+
+/* =========================================
+   COMPLETED
+========================================= */
+
+.weekly-status-card.status-completed {
+    background: #dbeafe !important;
+    border: 1px solid #b9d5f8 !important;
+}
+
+
+/* =========================================
+   CANCELLED
+========================================= */
+
+.weekly-status-card.status-cancelled {
+    background: #ffe0e0 !important;
+    border: 1px solid #f5bcbc !important;
+}
+
+/* =========================================
+   APPOINTMENT STATUS COLORS
+========================================= */
+
+.fc-daygrid-event.appointment-status-pending {
+    background-color: #FFF1C7 !important;
+    border-color: #F4D98B !important;
+}
+
+.fc-daygrid-event.appointment-status-confirmed {
+    background-color: #D9F8E5 !important;
+    border-color: #A9E8C2 !important;
+}
+
+.fc-daygrid-event.appointment-status-arrived {
+    background-color: #DCEEFF !important;
+    border-color: #B5DCFF !important;
+}
+
+.fc-daygrid-event.appointment-status-completed {
+    background-color: #DBEAFE !important;
+    border-color: #B9D5F8 !important;
+}
+
+.fc-daygrid-event.appointment-status-cancelled {
+    background-color: #FFE0E0 !important;
+    border-color: #F5BCBC !important;
+}
+
+/* =========================================
+   CALENDAR + MORE LINK
+========================================= */
+
+.fc-daygrid-more-link {
+    display: block !important;
+
+    margin: 4px 8px !important;
+
+    padding: 5px 8px !important;
+
+    border-radius: 7px !important;
+
+    background: #f3f4f6 !important;
+
+    color: #2563eb !important;
+
+    font-size: 11px !important;
+
+    font-weight: 700 !important;
+
+    text-align: left !important;
+
+    text-decoration: none !important;
+
+    cursor: pointer;
+}
+
+.fc-daygrid-more-link:hover {
+    background: #e5e7eb !important;
+
+    color: #1d4ed8 !important;
 }
