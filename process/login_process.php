@@ -3,6 +3,7 @@
 session_start();
 
 include("../config/database.php");
+require_once("../config/audit_log.php");
 
 $username = mysqli_real_escape_string($conn, $_POST['username']);
 $password = $_POST['password'];
@@ -24,6 +25,15 @@ if(mysqli_num_rows($result) == 1){
         $_SESSION['admin_id'] = $user['account_id'];
         $_SESSION['admin_username'] = $user['username'];
         $_SESSION['admin_role'] = $user['role'];
+
+
+        logAudit(
+            $conn,
+            "Authentication",
+            "Login",
+            "User logged into the system.",
+            null
+        );
 
         header("Location: ../admin/dashboard.php");
         exit();

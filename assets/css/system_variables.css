@@ -1,0 +1,2132 @@
+/* =====================================================
+   SYSTEM VARIABLES PAGE
+===================================================== */
+
+.system-variables-page {
+
+    padding: 145px 30px 40px;
+    
+
+}
+
+
+/* =====================================================
+   BREADCRUMB
+===================================================== */
+
+.system-breadcrumb {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 16px;
+
+    font-size: 14px;
+
+}
+
+
+.system-breadcrumb a {
+
+    color: #2563eb;
+
+    text-decoration: none;
+
+    font-weight: 500;
+
+}
+
+
+.system-breadcrumb span {
+
+    color: #374151;
+
+    font-weight: 500;
+
+}
+
+
+.system-breadcrumb i {
+
+    font-size: 11px;
+
+    color: #9ca3af;
+
+}
+
+
+/* =====================================================
+   HEADER CARD
+===================================================== */
+
+.system-header-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    border: 1px solid #e5e7eb;
+
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.06);
+
+    min-height: 90px;
+    box-sizing: border-box;
+}
+
+.system-header-info h1 {
+
+    margin: 0 0 6px;
+
+    font-size: 28px;
+
+    font-weight: 700;
+
+    color: #111827;
+
+}
+
+
+.system-header-info p {
+
+    margin: 0;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    color: #6b7280;
+
+}
+
+
+/* =====================================================
+   ADD NEW BUTTON
+===================================================== */
+
+.system-add-btn {
+
+    border: none;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    padding: 11px 18px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+
+    white-space: nowrap;
+
+}
+
+
+.system-add-btn:hover {
+
+    background: #1d4ed8;
+
+}
+
+
+/* =====================================================
+   MAIN TWO-COLUMN AREA
+===================================================== */
+
+.system-variables-layout {
+
+    display: grid;
+
+    grid-template-columns:
+        310px minmax(0, 1fr);
+
+    gap: 14px;
+
+    align-items: stretch;
+
+}
+
+
+/* =====================================================
+   LEFT VARIABLE GROUP CARD
+===================================================== */
+
+.variable-groups-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 6px 20px rgba(15, 23, 42, 0.04);
+
+}
+
+
+/* =====================================================
+   GROUP TITLE
+===================================================== */
+
+.variable-groups-title {
+
+    padding: 18px 18px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: #374151;
+
+    letter-spacing: .3px;
+
+}
+
+
+/* =====================================================
+   VARIABLE GROUP BUTTON
+===================================================== */
+
+.variable-group {
+
+    width: 100%;
+
+    border: none;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    background: #ffffff;
+
+    padding: 16px 14px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition: background .2s ease;
+
+}
+
+
+.variable-group:hover {
+
+    background: #f8fafc;
+
+}
+
+
+/* ACTIVE GROUP */
+
+.variable-group.active {
+
+    background: #eef5ff;
+
+}
+
+
+/* =====================================================
+   GROUP ICON
+===================================================== */
+
+.variable-group-icon {
+
+    flex: 0 0 auto;
+
+    width: 44px;
+
+    height: 44px;
+
+    border-radius: 13px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.variable-group-icon i {
+
+    font-size: 19px;
+
+}
+
+
+/* BLUE */
+
+.variable-group-icon.blue {
+
+    background: #e8f1ff;
+
+    color: #2563eb;
+
+}
+
+
+/* GREEN */
+
+.variable-group-icon.green {
+
+    background: #e7f8ed;
+
+    color: #16a34a;
+
+}
+
+
+/* ORANGE */
+
+.variable-group-icon.orange {
+
+    background: #fff1df;
+
+    color: #f59e0b;
+
+}
+
+
+/* PURPLE */
+
+.variable-group-icon.purple {
+
+    background: #f0e8ff;
+
+    color: #7c3aed;
+
+}
+
+
+/* PINK */
+
+.variable-group-icon.pink {
+
+    background: #ffe8f0;
+
+    color: #ec4899;
+
+}
+
+
+/* BROWN */
+
+.variable-group-icon.brown {
+
+    background: #f5eee7;
+
+    color: #9a6a3a;
+
+}
+
+
+/* =====================================================
+   GROUP INFORMATION
+===================================================== */
+
+.variable-group-info {
+
+    min-width: 0;
+
+    flex: 1;
+
+}
+
+
+.variable-group-info strong {
+
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+}
+
+
+.variable-group-info small {
+
+    display: block;
+
+    color: #6b7280;
+
+    font-size: 12px;
+
+    line-height: 1.45;
+
+}
+
+
+/* =====================================================
+   ARROW
+===================================================== */
+
+.variable-arrow {
+
+    flex: 0 0 auto;
+
+    font-size: 11px;
+
+    color: #6b7280;
+
+}
+
+
+.variable-group.active .variable-arrow {
+
+    color: #2563eb;
+
+}
+
+
+/* =====================================================
+   INFORMATION NOTE
+===================================================== */
+
+.variable-info-note {
+
+    margin: 16px;
+
+    padding: 15px;
+
+    border: 1px solid #bfdbfe;
+
+    border-radius: 12px;
+
+    background: #f8fbff;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+}
+
+
+.variable-info-note > i {
+
+    color: #2563eb;
+
+    margin-top: 2px;
+
+    font-size: 15px;
+
+}
+
+
+.variable-info-note p {
+
+    margin: 0;
+
+    font-size: 12px;
+
+    line-height: 1.55;
+
+    color: #2563eb;
+
+}
+
+
+/* =====================================================
+   RIGHT PANEL
+===================================================== */
+
+.variable-details-card {
+
+    min-height: 650px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 6px 20px rgba(15, 23, 42, 0.04);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.variable-empty-state {
+
+    text-align: center;
+
+    max-width: 340px;
+
+    padding: 30px;
+
+}
+
+
+.empty-state-icon {
+
+    width: 72px;
+
+    height: 72px;
+
+    margin: 0 auto 18px;
+
+    border-radius: 20px;
+
+    background: #eef5ff;
+
+    color: #bfdbfe;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.empty-state-icon i {
+
+    font-size: 30px;
+
+}
+
+
+.variable-empty-state h2 {
+
+    margin: 0 0 8px;
+
+    font-size: 18px;
+
+    color: #111827;
+
+}
+
+
+.variable-empty-state p {
+
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1000px) {
+
+    .system-variables-layout {
+
+        grid-template-columns: 280px minmax(0, 1fr);
+
+    }
+
+}
+
+@media (max-width: 850px) {
+
+    .system-variables-layout {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .variable-details-card {
+
+        min-height: 400px;
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .system-variables-page {
+
+        padding: 20px 16px 25px;
+
+    }
+
+    .system-header-card {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+    .system-add-btn {
+
+        width: 100%;
+
+        justify-content: center;
+
+    }
+
+    .system-header-info h1 {
+
+        font-size: 24px;
+
+    }
+
+}
+
+/* =====================================================
+   VARIABLE DETAILS
+===================================================== */
+
+.billing-variable-content {
+
+    width: 100%;
+
+    display: none;
+
+}
+
+
+.variable-details-card.billing-selected {
+
+    display: block;
+
+    padding: 0;
+
+}
+
+
+/* =====================================================
+   DETAIL HEADER
+===================================================== */
+
+.variable-detail-header {
+
+    padding: 24px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+}
+
+
+.variable-detail-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+}
+
+
+.detail-main-icon {
+
+    width: 52px;
+
+    height: 52px;
+
+    border-radius: 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.detail-main-icon.billing {
+
+    background: #fff1df;
+
+    color: #f59e0b;
+
+}
+
+
+.detail-main-icon i {
+
+    font-size: 21px;
+
+}
+
+
+.variable-detail-title h2 {
+
+    margin: 0 0 4px;
+
+    font-size: 21px;
+
+    color: #111827;
+
+}
+
+
+.variable-detail-title p {
+
+    margin: 0;
+
+    font-size: 13px;
+
+    color: #6b7280;
+
+}
+
+
+.detail-header-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+}
+
+
+/* =====================================================
+   GROUP ACTIONS
+===================================================== */
+
+.group-action {
+
+    padding: 10px 14px;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    cursor: pointer;
+
+}
+
+
+.group-action.edit {
+
+    border: 1px solid #dbe3ee;
+
+    color: #374151;
+
+}
+
+
+.group-action.deactivate {
+
+    border: 1px solid #fecaca;
+
+    color: #dc2626;
+
+    background: #fffafa;
+
+}
+
+
+/* =====================================================
+   TABS
+===================================================== */
+
+.variable-tabs {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    padding: 0 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    overflow-x: auto;
+
+}
+
+
+.variable-tab {
+
+    border: none;
+
+    background: transparent;
+
+    padding: 16px 13px 14px;
+
+    color: #4b5563;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    border-bottom: 2px solid transparent;
+
+    white-space: nowrap;
+
+}
+
+
+.variable-tab:hover {
+
+    color: #2563eb;
+
+}
+
+
+.variable-tab.active {
+
+    color: #2563eb;
+
+    font-weight: 600;
+
+    border-bottom-color: #2563eb;
+
+}
+
+
+/* =====================================================
+   TAB CONTENT
+===================================================== */
+
+.billing-tab-content {
+
+    display: none;
+
+    padding: 22px;
+
+}
+
+
+.billing-tab-content.active {
+
+    display: block;
+
+}
+
+
+/* =====================================================
+   SECTION HEADER
+===================================================== */
+
+.billing-section-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.billing-section-header h3 {
+
+    margin: 0 0 5px;
+
+    font-size: 17px;
+
+    color: #111827;
+
+}
+
+
+.billing-section-header p {
+
+    margin: 0;
+
+    font-size: 13px;
+
+    color: #6b7280;
+
+}
+
+
+/* =====================================================
+   ADD BUTTON
+===================================================== */
+
+.add-variable-btn {
+
+    border: none;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    padding: 10px 14px;
+
+    border-radius: 9px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.variable-table-wrapper {
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    overflow-x: auto;
+
+}
+
+
+.variable-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 700px;
+
+}
+
+
+.variable-table th {
+
+    background: #f8fafc;
+
+    color: #374151;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    text-align: left;
+
+    padding: 13px 14px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+}
+
+
+.variable-table td {
+
+    padding: 13px 14px;
+
+    border-bottom: 1px solid #eef2f7;
+
+    font-size: 13px;
+
+    color: #4b5563;
+
+}
+
+
+.variable-table tbody tr:last-child td {
+
+    border-bottom: none;
+
+}
+
+
+.variable-table td strong {
+
+    color: #111827;
+
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.status {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 5px 9px;
+
+    border-radius: 6px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+}
+
+
+.status.active {
+
+    color: #15803d;
+
+    background: #dcfce7;
+
+}
+
+
+/* =====================================================
+   ACTION BUTTONS
+===================================================== */
+
+.table-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+}
+
+
+.icon-action {
+
+    width: 31px;
+
+    height: 31px;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+
+}
+
+
+.icon-action.edit {
+
+    border: 1px solid #dbe3ee;
+
+    color: #374151;
+
+}
+
+
+.icon-action.delete {
+
+    border: 1px solid #fecaca;
+
+    color: #dc2626;
+
+}
+
+
+/* =====================================================
+   BILLING NOTE
+===================================================== */
+
+.billing-note {
+
+    margin-top: 16px;
+
+    padding: 13px 15px;
+
+    border: 1px solid #bfdbfe;
+
+    background: #f8fbff;
+
+    color: #2563eb;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 9px;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =====================================================
+   PRICING RULE CARDS
+===================================================== */
+
+.pricing-rule-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 22px;
+
+}
+
+
+.pricing-rule-card {
+
+    padding: 16px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+}
+
+
+.pricing-rule-icon {
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+}
+
+
+.pricing-rule-icon.fixed {
+
+    background: #e8f1ff;
+
+    color: #2563eb;
+
+}
+
+
+.pricing-rule-icon.weight {
+
+    background: #e7f8ed;
+
+    color: #16a34a;
+
+}
+
+
+.pricing-rule-icon.manual {
+
+    background: #fff1df;
+
+    color: #f59e0b;
+
+}
+
+
+.pricing-rule-card h4 {
+
+    margin: 0 0 5px;
+
+    font-size: 14px;
+
+    color: #111827;
+
+}
+
+
+.pricing-rule-card p {
+
+    margin: 0;
+
+    font-size: 12px;
+
+    line-height: 1.45;
+
+    color: #6b7280;
+
+}
+
+
+/* =====================================================
+   WEIGHT RULES
+===================================================== */
+
+.weight-pricing-section {
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+}
+
+
+.weight-pricing-section > h4 {
+
+    margin: 0;
+
+    padding: 15px;
+
+    background: #f8fafc;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    font-size: 14px;
+
+    color: #111827;
+
+}
+
+
+.weight-rule-row {
+
+    padding: 13px 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-bottom: 1px solid #eef2f7;
+
+}
+
+
+.weight-rule-row:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.weight-rule-row div {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+}
+
+
+.weight-rule-row strong {
+
+    font-size: 13px;
+
+    color: #111827;
+
+}
+
+
+.weight-rule-row span {
+
+    font-size: 12px;
+
+    color: #6b7280;
+
+}
+
+
+@media (max-width: 1000px) {
+
+    .variable-detail-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+
+    .detail-header-actions {
+
+        width: 100%;
+
+    }
+
+
+    .group-action {
+
+        flex: 1;
+
+        justify-content: center;
+
+    }
+
+
+    .pricing-rule-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+/* =====================================================
+   SERVICE MODAL
+===================================================== */
+
+.service-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 9999;
+}
+
+.service-modal-overlay.show {
+    display: flex;
+}
+
+.service-modal {
+    width: min(520px, 100%);
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+    overflow: hidden;
+    animation: serviceModalIn .18s ease-out;
+}
+
+@keyframes serviceModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.service-modal-header {
+    padding: 20px 22px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.service-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.service-modal-title-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: #e8f1ff;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-modal-title-icon i {
+    font-size: 18px;
+}
+
+.service-modal-title h3 {
+    margin: 0 0 3px;
+    font-size: 18px;
+    color: #111827;
+}
+
+.service-modal-title p {
+    margin: 0;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.service-modal-close {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #6b7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-modal-close:hover {
+    background: #f8fafc;
+    color: #111827;
+}
+
+.service-modal-body {
+    padding: 22px;
+}
+
+.service-form-group {
+    margin-bottom: 17px;
+}
+
+.service-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.service-form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.service-form-group label .required {
+    color: #dc2626;
+}
+
+.service-form-input,
+.service-form-select {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #dbe3ee;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #111827;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.service-form-input:focus,
+.service-form-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
+}
+
+.service-form-help {
+    margin: 6px 0 0;
+    font-size: 11px;
+    line-height: 1.45;
+    color: #6b7280;
+}
+
+.service-price-field.hidden {
+    display: none;
+}
+
+.service-price-wrap {
+    position: relative;
+}
+
+.service-price-symbol {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.service-price-input {
+    padding-left: 29px;
+}
+
+.service-modal-footer {
+    padding: 16px 22px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+}
+
+.service-modal-btn {
+    border-radius: 9px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.service-modal-btn.cancel {
+    border: 1px solid #dbe3ee;
+    background: #ffffff;
+    color: #374151;
+}
+
+.service-modal-btn.cancel:hover {
+    background: #f8fafc;
+}
+
+.service-modal-btn.save {
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.service-modal-btn.save:hover {
+    background: #1d4ed8;
+}
+
+.service-modal-message {
+    display: none;
+    margin-top: 7px;
+    color: #dc2626;
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+    .service-modal-overlay {
+        padding: 14px;
+    }
+
+    .service-modal-header,
+    .service-modal-body,
+    .service-modal-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+/* =========================================================
+   PRICING RULE MODAL - FINAL COMPACT
+========================================================= */
+
+#pricingRuleModalOverlay .service-modal {
+    width: 460px;
+    max-width: 92vw;
+    max-height: none;
+    overflow: visible;
+    border-radius: 14px;
+}
+
+#pricingRuleModalOverlay .service-modal-header {
+    padding: 14px 18px;
+}
+
+#pricingRuleModalOverlay .service-modal-title {
+    gap: 10px;
+}
+
+#pricingRuleModalOverlay .service-modal-title-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 17px;
+}
+
+#pricingRuleModalOverlay .service-modal-header h3 {
+    font-size: 16px;
+    margin: 0 0 2px;
+}
+
+#pricingRuleModalOverlay .service-modal-header p {
+    font-size: 10px;
+    margin: 0;
+}
+
+#pricingRuleModalOverlay .service-modal-body {
+    padding: 14px 18px 8px;
+}
+
+#pricingRuleModalOverlay .service-form-group {
+    margin-bottom: 9px;
+}
+
+#pricingRuleModalOverlay .service-form-group label {
+    display: block;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+#pricingRuleModalOverlay .service-form-input,
+#pricingRuleModalOverlay .service-form-select {
+    width: 100%;
+    height: 36px;
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+#pricingRuleModalOverlay .service-form-help {
+    margin: 3px 0 0;
+    font-size: 9px;
+    line-height: 1.2;
+}
+
+#pricingRuleModalOverlay .pricing-input-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+#pricingRuleModalOverlay .pricing-input-row .service-form-input {
+    flex: 1;
+}
+
+#pricingRuleModalOverlay .pricing-unit {
+    width: 18px;
+    font-size: 10px;
+    color: #6b7280;
+}
+
+
+
+
+#pricingRuleModalOverlay .service-price-input {
+    height: 36px;
+}
+
+#pricingRuleModalOverlay .service-modal-message {
+    margin-top: 5px;
+    font-size: 10px;
+}
+
+#pricingRuleModalOverlay .service-modal-footer {
+    padding: 10px 18px 14px;
+}
+/* =========================================================
+   PRICING RULE - PRICE INPUT FIX
+========================================================= */
+
+#pricingRuleModalOverlay .service-price-wrap {
+    position: relative;
+    width: 100%;
+    height: 36px;
+}
+
+#pricingRuleModalOverlay .service-price-symbol {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+
+    font-size: 12px;
+    line-height: 1;
+    color: #6b7280;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   COMPACT EDIT PRICING RULE MODAL
+========================================================= */
+
+#pricingRuleEditModalOverlay .service-modal {
+    width: 500px;
+    max-width: calc(100vw - 32px);
+    max-height: 82vh;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+
+/* HEADER */
+
+#pricingRuleEditModalOverlay .service-modal-header {
+    padding: 16px 18px;
+}
+
+
+#pricingRuleEditModalOverlay .service-modal-title-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+}
+
+
+#pricingRuleEditModalOverlay .service-modal-title h3 {
+    font-size: 17px;
+    margin-bottom: 2px;
+}
+
+
+#pricingRuleEditModalOverlay .service-modal-title p {
+    font-size: 11px;
+}
+
+
+/* BODY */
+
+#pricingRuleEditModalOverlay .service-modal-body {
+    padding: 16px 18px;
+    max-height: 57vh;
+    overflow-y: auto;
+}
+
+
+/* FORM GROUPS */
+
+#pricingRuleEditModalOverlay .service-form-group {
+    margin-bottom: 12px;
+}
+
+
+#pricingRuleEditModalOverlay .service-form-group label {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+
+/* INPUTS */
+
+#pricingRuleEditModalOverlay .service-form-input {
+    height: 42px;
+    padding: 9px 12px;
+    font-size: 13px;
+    border-radius: 9px;
+}
+
+
+/* HELP TEXT */
+
+#pricingRuleEditModalOverlay .service-form-help {
+    font-size: 10px;
+    margin-top: 4px;
+}
+
+
+/* KG */
+
+#pricingRuleEditModalOverlay .pricing-input-row {
+    gap: 8px;
+}
+
+
+#pricingRuleEditModalOverlay .pricing-unit {
+    font-size: 11px;
+    min-width: 18px;
+}
+
+
+/* PRICE */
+
+#pricingRuleEditModalOverlay .service-price-wrap {
+    height: 42px;
+}
+
+
+#pricingRuleEditModalOverlay .service-price-symbol {
+    font-size: 13px;
+    padding-left: 12px;
+}
+
+
+#pricingRuleEditModalOverlay .service-price-input {
+    height: 42px;
+}
+
+
+/* FOOTER */
+
+#pricingRuleEditModalOverlay .service-modal-footer {
+    padding: 12px 18px;
+    gap: 8px;
+}
+
+
+#pricingRuleEditModalOverlay .service-modal-btn {
+    height: 40px;
+    padding: 0 16px;
+    font-size: 12px;
+    border-radius: 9px;
+}
+/* =========================================================
+   PRICING RULE MODAL - COMPACT
+========================================================= */
+
+.service-modal-overlay {
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.service-modal {
+    width: 520px !important;
+    max-width: calc(100vw - 40px) !important;
+    max-height: 78vh !important;
+    border-radius: 16px !important;
+}
+
+/* Header */
+.service-modal-header {
+    padding: 14px 18px !important;
+}
+
+.service-modal-title-icon {
+    width: 38px !important;
+    height: 38px !important;
+}
+
+.service-modal-title h3 {
+    font-size: 17px !important;
+    margin: 0 !important;
+}
+
+.service-modal-title p {
+    font-size: 11px !important;
+    margin: 2px 0 0 !important;
+}
+
+/* Body */
+.service-modal-body {
+    padding: 14px 18px !important;
+    max-height: 52vh !important;
+    overflow-y: auto !important;
+}
+
+/* Form spacing */
+.service-form-group {
+    margin-bottom: 11px !important;
+}
+
+.service-form-group label {
+    font-size: 12px !important;
+    margin-bottom: 5px !important;
+}
+
+/* Inputs */
+.service-form-input,
+.service-form-select {
+    height: 40px !important;
+    min-height: 40px !important;
+    font-size: 13px !important;
+    padding: 8px 11px !important;
+    border-radius: 9px !important;
+}
+
+/* Help text */
+.service-form-help {
+    font-size: 10px !important;
+    margin-top: 3px !important;
+}
+
+/* Footer */
+.service-modal-footer {
+    padding: 11px 18px !important;
+}
+
+.service-modal-btn {
+    height: 38px !important;
+    padding: 0 15px !important;
+    font-size: 12px !important;
+}
+
+
+/* Remove weird number-input spacing */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    margin: 0;
+}
+
+/* If peso symbol is a separate element */
+.input-with-prefix {
+    position: relative;
+}
+
+.input-with-prefix input {
+    padding-left: 38px !important;
+}
+
+.input-with-prefix .currency-prefix {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+
+
+.service-price-input {
+    width: 100%;
+    padding-left: 42px !important;
+    padding-right: 14px !important;
+    box-sizing: border-box;
+}
+/* =========================================================
+   FINAL FIX - PRICING RULE CURRENCY INPUT
+========================================================= */
+
+.service-price-wrap {
+    position: relative !important;
+    width: 100% !important;
+}
+
+.service-price-wrap .service-price-symbol {
+    position: absolute !important;
+    left: 14px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10 !important;
+    pointer-events: none !important;
+    font-size: 13px !important;
+    line-height: 1 !important;
+    color: #6b7280 !important;
+}
+
+.service-price-wrap input.service-price-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding-left: 38px !important;
+    padding-right: 12px !important;
+    text-align: left !important;
+}
+
+/* ==========================================
+   APPOINTMENTS VARIABLE CONTENT
+========================================== */
+
+#appointmentsContent {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+#appointmentsContent .variable-tabs {
+    margin-top: 0 !important;
+}
+
+#appointmentsContent .tab-content {
+    margin-top: 0 !important;
+    padding-top: 24px;
+}
+
+
+/* =====================================================
+   FIX: APPOINTMENTS / PET RECORDS DETAIL PANEL
+   Keep active custom variable content aligned to the top
+   like the existing Billing panel.
+===================================================== */
+
+.variable-details-card:has(.custom-variable-content[style*="display:block"]),
+.variable-details-card:has(.custom-variable-content[style*="display: block"]) {
+    display: block;
+    padding: 0;
+}
+
+/* ==========================================
+   PET RECORDS TABS
+========================================== */
+
+.custom-variable-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.custom-variable-tab {
+    position: relative;
+    border: none;
+    background: transparent;
+    padding: 15px 18px;
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.custom-variable-tab:hover {
+    color: #16a34a;
+    background: #f0fdf4;
+}
+
+.custom-variable-tab.active {
+    color: #16a34a;
+    background: #f0fdf4;
+}
+
+.custom-variable-tab.active::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: -1px;
+    height: 3px;
+    background: #16a34a;
+    border-radius: 3px 3px 0 0;
+}
+
+
+/* ==========================================
+   PET RECORDS TAB CONTENT
+========================================== */
+
+.custom-variable-tab-content {
+    display: none;
+}
+
+.custom-variable-tab-content.active {
+    display: block;
+}
+
+/* =====================================================
+   INVENTORY SYSTEM VARIABLES
+===================================================== */
+
+.detail-main-icon.inventory {
+    background: #f0e8ff;
+    color: #7c3aed;
+}
+
+.inventory-variable-content {
+    width: 100%;
+}
+
+.inventory-variable-note {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    background: #f8fbff;
+    color: #2563eb;
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.inventory-variable-note i {
+    margin-top: 2px;
+}
+
+.inventory-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.inventory-textarea {
+    min-height: 84px;
+    resize: vertical;
+}
+
+.inventory-message-text {
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.service-modal-title-icon.success {
+    background: #ecfdf5;
+    color: #16a34a;
+}
+
+.service-modal-title-icon.error {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.service-modal-title-icon.warning {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+@media (max-width: 700px) {
+    .inventory-form-grid {
+        grid-template-columns: 1fr;
+    }
+}

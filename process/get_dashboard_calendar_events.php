@@ -6,18 +6,45 @@ header("Content-Type: application/json");
 $events = [];
 
 /* =========================
-   APPOINTMENTS
+   CONFIRMED APPOINTMENTS
 ========================= */
-$apptQuery = mysqli_query($conn, "SELECT pet_name, service, appointment_date, appointment_time
-                                  FROM appointments");
+
+$apptQuery = mysqli_query($conn, "
+    SELECT
+        p.pet_name,
+        a.service,
+        a.appointment_date,
+        a.appointment_time
+
+    FROM appointments a
+
+    INNER JOIN pets p
+        ON p.pet_id = a.pet_id
+
+    WHERE a.status = 'Confirmed'
+      AND a.is_archived = 0
+
+    ORDER BY
+        a.appointment_date ASC,
+        a.appointment_time ASC
+");
 
 while ($row = mysqli_fetch_assoc($apptQuery)) {
-    $time = !empty($row['appointment_time']) ? date("H:i:s", strtotime($row['appointment_time'])) : "09:00:00";
+
+    $time = !empty($row['appointment_time'])
+        ? date("H:i:s", strtotime($row['appointment_time']))
+        : "09:00:00";
 
     $events[] = [
-        "title" => $row['pet_name'] . " - " . $row['service'],
-        "start" => $row['appointment_date'] . "T" . $time,
-        "color" => "#3b82f6",
+        "title" =>
+            $row['pet_name'] . " - " . $row['service'],
+
+        "start" =>
+            $row['appointment_date'] . "T" . $time,
+
+        "color" =>
+            "#3b82f6",
+
         "extendedProps" => [
             "event_type" => "Appointment"
         ]

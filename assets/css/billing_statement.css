@@ -1,0 +1,1071 @@
+/* =========================================================
+   BILLING STATEMENT PAGE
+========================================================= */
+
+.billing-statement-page {
+    padding: 105px 25px 40px;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+========================================================= */
+
+.back-to-billing {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-top: 8px;
+    margin-bottom: 14px;
+
+    padding: 4px 0;
+
+    color: #374151;
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    line-height: 1.5;
+
+    position: relative;
+    z-index: 2;
+}
+
+.back-to-billing:hover {
+    color: #18aef5;
+}
+
+
+/* =========================================================
+   MAIN STATEMENT CARD
+========================================================= */
+
+.statement-card {
+    width: 100%;
+    max-width: 1050px;
+
+    margin: 0 auto;
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    padding: 25px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(15, 23, 42, .07);
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.statement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    padding-bottom: 18px;
+
+    border-bottom:
+        1px solid #e5e7eb;
+}
+
+.statement-header h2 {
+    margin: 0 0 7px;
+
+    color: #111827;
+
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.statement-status {
+    display: inline-flex;
+
+    padding: 5px 11px;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.statement-status.pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.statement-status.paid,
+.statement-status.finished {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.statement-status.unpaid {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.receipt-number {
+    text-align: right;
+}
+
+.receipt-number span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #6b7280;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.receipt-number strong {
+    color: #111827;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   CLIENT INFORMATION
+========================================================= */
+
+.client-info-card {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 20px;
+
+    margin: 18px 0;
+
+    padding: 17px;
+
+    background: #f5faff;
+
+    border:
+        1px solid #e4f3fc;
+
+    border-radius: 13px;
+}
+
+.client-info-column {
+    display: flex;
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.info-icon {
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #dff3ff;
+
+    color: #18aef5;
+
+    border-radius: 9px;
+}
+
+.info-item span {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #6b7280;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    letter-spacing: .3px;
+}
+
+.info-item strong {
+    display: block;
+
+    color: #111827;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.info-item small {
+    color: #6b7280;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   BILLING GRID
+========================================================= */
+
+.billing-statement-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.65fr)
+        minmax(270px, .75fr);
+
+    gap: 20px;
+
+    align-items: start;
+}
+
+
+/* =========================================================
+   SECTION TITLE
+========================================================= */
+
+.section-title {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 10px;
+}
+
+.section-title > div {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    color: #111827;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.section-title i {
+    color: #18aef5;
+}
+
+
+/* =========================================================
+   ADD SERVICE BUTTON
+========================================================= */
+
+.add-service-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    border: none;
+
+    padding: 7px 11px;
+
+    border-radius: 8px;
+
+    background: #e0f4ff;
+
+    color: #0891d1;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.add-service-btn:hover {
+    background: #cceeff;
+}
+
+
+/* =========================================================
+   SERVICE TABLE
+========================================================= */
+
+.service-table-wrapper {
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 11px;
+
+    overflow: hidden;
+}
+
+.statement-table {
+    width: 100%;
+
+    border-collapse:
+        collapse;
+}
+
+.statement-table th {
+    padding: 10px 11px;
+
+    background: #f7f8fa;
+
+    color: #6b7280;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    text-align: left;
+}
+
+.statement-table th:not(:first-child),
+.statement-table td:not(:first-child) {
+    text-align: right;
+}
+
+.statement-table td {
+    padding: 11px;
+
+    border-top:
+        1px solid #eef2f7;
+
+    color: #111827;
+
+    font-size: 11px;
+}
+
+.item-type {
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: #18aef5;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+.no-items {
+    text-align: center !important;
+
+    padding: 25px !important;
+
+    color: #9ca3af !important;
+}
+
+
+/* =========================================================
+   NOTES
+========================================================= */
+
+.notes-box {
+    margin-top: 14px;
+
+    padding: 12px 14px;
+
+    background: #f8fafc;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 9px;
+}
+
+.notes-box strong {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #374151;
+
+    font-size: 10px;
+}
+
+.notes-box p {
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.summary-card,
+.payment-card {
+    padding: 16px;
+
+    background: #ffffff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 12px;
+}
+
+.summary-card h3,
+.payment-card h3 {
+    margin:
+        0 0 13px;
+
+    color: #111827;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.summary-row {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 6px 0;
+
+    color: #6b7280;
+
+    font-size: 10px;
+}
+
+.summary-row strong {
+    color: #374151;
+}
+
+.summary-divider {
+    height: 1px;
+
+    margin: 6px 0;
+
+    background: #e5e7eb;
+}
+
+.summary-row.subtotal {
+    color: #374151;
+
+    font-weight: 700;
+}
+
+.summary-row.total {
+    padding-top: 11px;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.summary-row.total strong {
+    color: #18aef5;
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   PAYMENT
+========================================================= */
+
+.payment-card {
+    margin-top: 14px;
+}
+
+.payment-input-group {
+    margin-bottom: 12px;
+}
+
+.payment-input-group label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #6b7280;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.amount-input-wrapper {
+    display: flex;
+
+    align-items: center;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+.amount-input-wrapper span {
+    padding-left: 10px;
+
+    color: #6b7280;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.amount-input-wrapper input {
+    width: 100%;
+
+    padding: 9px;
+
+    border: none;
+
+    outline: none;
+
+    color: #111827;
+
+    font-size: 12px;
+
+    background: transparent;
+}
+
+.payment-row {
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 7px 0;
+
+    border-top:
+        1px solid #f1f5f9;
+
+    color: #6b7280;
+
+    font-size: 10px;
+}
+
+.payment-row strong {
+    color: #111827;
+}
+
+#changeAmount {
+    color: #15803d;
+}
+
+.confirm-payment-btn {
+    width: 100%;
+
+    margin-top: 12px;
+
+    padding: 10px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #18aef5;
+
+    color: #ffffff;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.confirm-payment-btn:hover {
+    background: #0d9de2;
+}
+
+
+/* =========================================================
+   ADD SERVICE MODAL
+========================================================= */
+
+.service-modal-overlay {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+
+    padding: 20px;
+
+    background: rgba(15, 23, 42, .45);
+}
+
+.service-modal-overlay.show {
+    display: flex;
+}
+
+.service-modal {
+    width: 470px;
+    max-width: calc(100vw - 40px);
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 20px 50px
+        rgba(15, 23, 42, .2);
+
+    display: block;
+}
+
+.service-modal-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 18px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.service-modal-header h3 {
+    margin: 0 0 3px;
+
+    color: #111827;
+    font-size: 16px;
+}
+
+.service-modal-header p {
+    margin: 0;
+
+    color: #6b7280;
+    font-size: 10px;
+}
+
+.modal-close-btn {
+    width: 30px;
+    height: 30px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #f3f4f6;
+    color: #6b7280;
+
+    cursor: pointer;
+}
+
+.service-form {
+    padding: 18px;
+}
+
+.form-group {
+    margin-bottom: 13px;
+}
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #374151;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.form-group select,
+.form-group input {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 9px 10px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    outline: none;
+
+    background: #ffffff;
+    color: #111827;
+
+    font-size: 11px;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+    border-color: #18aef5;
+}
+
+.service-form-row {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+}
+
+/* BUTTONS */
+.service-modal-actions {
+    display: flex;
+
+    justify-content: flex-end;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 14px 18px;
+
+    border-top: 1px solid #e5e7eb;
+
+    background: #fafafa;
+
+    box-sizing: border-box;
+}
+
+.modal-cancel-btn,
+.modal-add-btn {
+    flex: none;
+
+    padding: 8px 13px;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.modal-cancel-btn {
+    border: 1px solid #d1d5db;
+
+    background: #ffffff;
+    color: #374151;
+}
+
+.modal-add-btn {
+    border: none;
+
+    background: #18aef5;
+    color: #ffffff;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .billing-statement-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .billing-statement-page {
+        padding:
+            105px
+            15px
+            25px;
+    }
+
+    .statement-card {
+        padding: 17px;
+    }
+
+    .statement-header {
+        flex-direction: column;
+
+        gap: 12px;
+    }
+
+    .receipt-number {
+        text-align: left;
+    }
+
+    .client-info-card {
+        grid-template-columns: 1fr;
+    }
+
+    .service-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .statement-table {
+        min-width: 550px;
+    }
+
+}
+/* =========================================================
+   BILLING MESSAGE MODAL
+========================================================= */
+
+.billing-message-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(15, 23, 42, .45);
+
+    z-index: 99999;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition:
+        opacity .2s ease,
+        visibility .2s ease;
+
+}
+
+
+.billing-message-overlay.show {
+
+    opacity: 1;
+
+    visibility: visible;
+
+}
+
+
+.billing-message-box {
+
+    width: 420px;
+
+    max-width: 100%;
+
+    padding: 28px;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 20px 50px
+        rgba(15, 23, 42, .20);
+
+    text-align: center;
+
+    transform:
+        translateY(10px)
+        scale(.98);
+
+    transition:
+        transform .2s ease;
+
+}
+
+
+.billing-message-overlay.show
+.billing-message-box {
+
+    transform:
+        translateY(0)
+        scale(1);
+
+}
+
+
+.billing-message-icon {
+
+    width: 52px;
+
+    height: 52px;
+
+    margin:
+        0 auto 15px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 22px;
+
+}
+
+
+.billing-message-icon.warning {
+
+    background: #fff4d6;
+
+    color: #d89b00;
+
+}
+
+
+.billing-message-icon.success {
+
+    background: #e8f7ee;
+
+    color: #198754;
+
+}
+
+
+.billing-message-icon.error {
+
+    background: #fdeaea;
+
+    color: #dc3545;
+
+}
+
+
+.billing-message-icon.info {
+
+    background: #eaf3ff;
+
+    color: #2563eb;
+
+}
+
+
+.billing-message-box h3 {
+
+    margin:
+        0 0 10px;
+
+    color: #111827;
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+}
+
+
+.billing-message-box p {
+
+    margin:
+        0 0 24px;
+
+    color: #6b7280;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+}
+
+
+.billing-message-actions {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+
+}
+
+
+.billing-message-btn {
+
+    min-width: 100px;
+
+    padding: 10px 18px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+}
+
+
+.billing-message-btn.cancel {
+
+    background: #f3f4f6;
+
+    color: #374151;
+
+}
+
+
+.billing-message-btn.cancel:hover {
+
+    background: #e5e7eb;
+
+}
+
+
+.billing-message-btn.confirm {
+
+    background: #18aef5;
+
+    color: #ffffff;
+
+}
+
+
+.billing-message-btn.confirm:hover {
+
+    background: #0d9de2;
+
+}
+
+
+@media (max-width: 480px) {
+
+    .billing-message-box {
+
+        width: 100%;
+
+        padding: 24px 20px;
+
+    }
+
+
+    .billing-message-actions {
+
+        flex-direction: column-reverse;
+
+    }
+
+
+    .billing-message-btn {
+
+        width: 100%;
+
+    }
+
+}

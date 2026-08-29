@@ -238,23 +238,55 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: "dayGridMonth",
-        headerToolbar: false,
-        height: "auto",
-        events: "../process/get_dashboard_calendar_events.php",
-        dayMaxEvents: 2,
-        displayEventTime: false,
+    initialView: "dayGridMonth",
+    headerToolbar: false,
+    height: "auto",
 
-        dateClick: function(info) {
-            openCalendarModal(info.dateStr);
-        },
+    events: "../process/get_dashboard_calendar_events.php",
 
-        moreLinkClick: function(info) {
-            const clickedDate = info.date.toISOString().split("T")[0];
-            openCalendarModal(clickedDate);
-            return "none";
+    dayMaxEvents: true,
+    displayEventTime: false,
+
+    eventDisplay: "block",
+
+    eventContent: function(arg) {
+
+        const eventType =
+            arg.event.extendedProps.event_type || "";
+
+        let markerClass = "appointment";
+
+        if (eventType === "Delivery Day") {
+            markerClass = "delivery";
+        } else if (eventType === "Order/Restock") {
+            markerClass = "restock";
+        } else if (eventType === "Other Event") {
+            markerClass = "other";
         }
-    });
+
+        return {
+            html: `
+                <span
+                    class="dashboard-calendar-marker ${markerClass}"
+                    title="${arg.event.title}"
+                ></span>
+            `
+        };
+    },
+
+    dateClick: function(info) {
+        openCalendarModal(info.dateStr);
+    },
+
+    moreLinkClick: function(info) {
+        const clickedDate =
+            info.date.toISOString().split("T")[0];
+
+        openCalendarModal(clickedDate);
+
+        return "none";
+    }
+});
 
     calendar.render();
 
@@ -370,5 +402,312 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+        /* =========================
+       DASHBOARD STATISTICS
+    ========================= */
+
+    fetch("../process/get_dashboard_stats.php")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to load dashboard statistics.");
+            }
+
+            return response.json();
+        })
+        .then(data => {
+
+            if (!data.success || !data.stats) {
+                throw new Error(
+                    data.message || "Invalid dashboard statistics response."
+                );
+            }
+
+            const stats = data.stats;
+
+
+            /* =========================
+               OUT OF STOCK
+            ========================= */
+
+            const outOfStockEl =
+                document.getElementById("dashboardOutOfStock");
+
+            if (outOfStockEl) {
+                outOfStockEl.textContent =
+                    Number(stats.out_of_stock || 0).toLocaleString();
+            }
+
+
+            /* =========================
+               EXPIRED ITEMS
+            ========================= */
+
+            const expiredItemsEl =
+                document.getElementById("dashboardExpiredItems");
+
+            if (expiredItemsEl) {
+                expiredItemsEl.textContent =
+                    Number(stats.expired_items || 0).toLocaleString();
+            }
+
+
+            /* =========================
+               REVENUE (MTD)
+            ========================= */
+
+            const revenueEl =
+                document.getElementById("dashboardRevenue");
+
+            if (revenueEl) {
+
+                const revenue =
+                    Number(stats.revenue_mtd || 0);
+
+                revenueEl.textContent =
+                    "₱" +
+                    revenue.toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+            }
+
+
+            /* =========================
+               TOTAL STOCK
+            ========================= */
+
+            const totalStockEl =
+                document.getElementById("dashboardTotalStock");
+
+            if (totalStockEl) {
+                totalStockEl.textContent =
+                    Number(stats.total_stock || 0).toLocaleString();
+            }
+
+
+            /* =========================
+               REGISTERED CLIENTS
+            ========================= */
+
+            const registeredClientsEl =
+                document.getElementById(
+                    "dashboardRegisteredClients"
+                );
+
+            if (registeredClientsEl) {
+                registeredClientsEl.textContent =
+                    Number(
+                        stats.registered_clients || 0
+                    ).toLocaleString();
+            }
+
+
+            /* =========================
+               TOTAL PATIENTS
+            ========================= */
+
+            const totalPatientsEl =
+                document.getElementById(
+                    "dashboardTotalPatients"
+                );
+
+            if (totalPatientsEl) {
+                totalPatientsEl.textContent =
+                    Number(
+                        stats.total_patients || 0
+                    ).toLocaleString();
+            }
+
+
+            /* =========================
+               NEW BOOKINGS
+            ========================= */
+
+            const newBookingsEl =
+                document.getElementById(
+                    "dashboardNewBookings"
+                );
+
+            if (newBookingsEl) {
+                newBookingsEl.textContent =
+                    Number(
+                        stats.new_bookings || 0
+                    ).toLocaleString();
+            }
+
+        })
+        .catch(error => {
+            console.error(
+                "Error loading dashboard statistics:",
+                error
+            );
+        });
+
+        /* =========================
+       UPCOMING EVENTS
+    ========================= */
+
+    const upcomingEventsList =
+        document.getElementById("upcomingEventsList");
+
+    if (upcomingEventsList) {
+
+        fetch("../process/get_dashboard_calendar_events.php")
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Failed to load upcoming events."
+                    );
+                }
+
+                return response.json();
+            })
+
+            .then(events => {
+
+                if (!Array.isArray(events)) {
+                    throw new Error(
+                        "Invalid upcoming events response."
+                    );
+                }
+
+                const today = new Date();
+
+                today.setHours(0, 0, 0, 0);
+
+
+                /* =========================
+                   FILTER FUTURE EVENTS
+                ========================= */
+
+                const upcomingEvents = events
+                    .filter(event => {
+
+                        if (!event.start) {
+                            return false;
+                        }
+
+                        const datePart =
+                            event.start.substring(0, 10);
+
+                        const eventDate =
+                            new Date(
+                                datePart + "T00:00:00"
+                            );
+
+                        return eventDate >= today;
+                    })
+
+
+                    /* =========================
+                       SORT NEAREST FIRST
+                    ========================= */
+
+                    .sort((a, b) => {
+
+                        return new Date(a.start) -
+                               new Date(b.start);
+
+                    })
+
+
+                    /* =========================
+                       SHOW ONLY NEXT 3
+                    ========================= */
+
+                    .slice(0, 3);
+
+
+                /* =========================
+                   NO UPCOMING EVENTS
+                ========================= */
+
+                if (upcomingEvents.length === 0) {
+
+                    upcomingEventsList.innerHTML = `
+                        <div class="upcoming-item">
+                            <div class="event-date">
+                                No upcoming events
+                            </div>
+
+                            <div class="event-title">
+                                There are no upcoming confirmed
+                                appointments or events.
+                            </div>
+                        </div>
+                    `;
+
+                    return;
+                }
+
+
+                /* =========================
+                   RENDER UPCOMING EVENTS
+                ========================= */
+
+                upcomingEventsList.innerHTML =
+                    upcomingEvents.map(event => {
+
+                        const datePart =
+                            event.start.substring(0, 10);
+
+                        const dateObj =
+                            new Date(
+                                datePart + "T00:00:00"
+                            );
+
+                        const formattedDate =
+                            dateObj.toLocaleDateString(
+                                "en-US",
+                                {
+                                    month: "short",
+                                    day: "2-digit",
+                                    year: "numeric",
+                                    weekday: "short"
+                                }
+                            );
+
+                        return `
+                            <div class="upcoming-item">
+
+                                <div class="event-date">
+                                    ${formattedDate}
+                                </div>
+
+                                <div class="event-title">
+                                    ${event.title}
+                                </div>
+
+                            </div>
+                        `;
+
+                    }).join("");
+
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "Error loading upcoming events:",
+                    error
+                );
+
+                upcomingEventsList.innerHTML = `
+                    <div class="upcoming-item">
+
+                        <div class="event-date">
+                            Unable to load events
+                        </div>
+
+                        <div class="event-title">
+                            Please refresh the Dashboard.
+                        </div>
+
+                    </div>
+                `;
+            });
+    }    
 
 });

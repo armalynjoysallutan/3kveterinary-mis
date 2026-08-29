@@ -7,6 +7,8 @@ $endOfWeek   = date("Y-m-d", strtotime("sunday this week"));
 $sql = "SELECT DAYOFWEEK(appointment_date) AS day_num, COUNT(*) AS total
         FROM appointments
         WHERE appointment_date BETWEEN '$startOfWeek' AND '$endOfWeek'
+          AND status = 'Confirmed'
+          AND is_archived = 0
         GROUP BY DAYOFWEEK(appointment_date)";
 
 $result = mysqli_query($conn, $sql);

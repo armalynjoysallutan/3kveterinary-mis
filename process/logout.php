@@ -1,17 +1,63 @@
 <?php
+
 session_start();
 
-// Remove all session variables
+require_once "../config/database.php";
+require_once "../config/audit_log.php";
+
+
+// ========================================
+// AUDIT LOG — LOGOUT
+// ========================================
+
+if (isset($_SESSION["admin_id"])) {
+
+    logAudit(
+        $conn,
+        "Authentication",
+        "Logout",
+        "User logged out of the system.",
+        null
+    );
+
+}
+
+
+// ========================================
+// REMOVE ALL SESSION VARIABLES
+// ========================================
+
 $_SESSION = [];
 
-// Destroy the session
+
+// ========================================
+// DESTROY SESSION
+// ========================================
+
 session_destroy();
 
-// Prevent browser cache
-header("Cache-Control: no-store, no-cache, must-revalidate");
-header("Pragma: no-cache");
 
-// Redirect to login page
-header("Location: ../auth/login.php");
+// ========================================
+// PREVENT BROWSER CACHE
+// ========================================
+
+header(
+    "Cache-Control: no-store, no-cache, must-revalidate"
+);
+
+header(
+    "Pragma: no-cache"
+);
+
+
+// ========================================
+// REDIRECT TO LOGIN
+// ========================================
+
+header(
+    "Location: ../auth/login.php"
+);
+
 exit();
+
 ?>

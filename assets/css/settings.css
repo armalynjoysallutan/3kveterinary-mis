@@ -1,0 +1,394 @@
+/* =========================================
+   SETTINGS PAGE
+========================================= */
+
+.settings-content {
+
+    padding: 145px 30px 30px;
+
+}
+
+
+/* =========================================
+   SETTINGS HEADER CARD
+========================================= */
+
+.settings-header-card {
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    padding: 24px 28px;
+
+    margin-bottom: 24px;
+
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.06);
+
+    border: 1px solid #eef2f7;
+
+}
+
+
+.settings-header-card h2 {
+
+    margin: 0 0 6px;
+
+    font-size: 30px;
+
+    font-weight: 700;
+
+    color: #111827;
+
+}
+
+
+.settings-header-card p {
+
+    margin: 0;
+
+    font-size: 14px;
+
+    color: #6b7280;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================
+   SETTINGS GRID
+========================================= */
+
+.settings-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 22px;
+
+}
+
+
+/* =========================================
+   SETTINGS CARD
+========================================= */
+
+.settings-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 20px;
+
+    padding: 26px;
+
+    min-height: 245px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.06);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+
+}
+
+
+.settings-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 30px rgba(15, 23, 42, 0.09);
+
+}
+
+
+/* =========================================
+   CARD ICON
+========================================= */
+
+.settings-card-icon {
+
+    width: 52px;
+
+    height: 52px;
+
+    border-radius: 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-bottom: 18px;
+
+}
+
+
+.settings-card-icon i {
+
+    font-size: 22px;
+
+}
+
+
+/* BLUE */
+
+.settings-card-icon.blue {
+
+    background: #e5f3ff;
+
+    color: #2563eb;
+
+}
+
+
+/* GREEN */
+
+.settings-card-icon.green {
+
+    background: #e5f8eb;
+
+    color: #16a34a;
+
+}
+
+
+/* PURPLE */
+
+.settings-card-icon.purple {
+
+    background: #f0e7ff;
+
+    color: #7c3aed;
+
+}
+
+
+/* ORANGE */
+
+.settings-card-icon.orange {
+
+    background: #fff0e5;
+
+    color: #f97316;
+
+}
+
+
+/* =========================================
+   CARD CONTENT
+========================================= */
+
+.settings-card-content {
+
+    flex: 1;
+
+}
+
+
+.settings-card-content h3 {
+
+    margin: 0 0 8px;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    color: #111827;
+
+}
+
+
+.settings-card-content p {
+
+    margin: 0;
+
+    max-width: 420px;
+
+    font-size: 14px;
+
+    line-height: 1.55;
+
+    color: #4b5563;
+
+}
+
+
+/* =========================================
+   CARD FOOTER
+========================================= */
+
+.settings-card-footer {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-top: 22px;
+
+}
+
+
+/* =========================================
+   OPEN BUTTON
+========================================= */
+
+.settings-open-btn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 76px;
+
+    padding: 10px 18px;
+
+    border-radius: 9px;
+
+    text-decoration: none;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: .2s ease;
+
+}
+
+
+/* BLUE */
+
+.blue-btn {
+
+    background: #2563eb;
+
+}
+
+
+.blue-btn:hover {
+
+    background: #1d4ed8;
+
+}
+
+
+/* GREEN */
+
+.green-btn {
+
+    background: #16a34a;
+
+}
+
+
+.green-btn:hover {
+
+    background: #15803d;
+
+}
+
+
+/* PURPLE */
+
+.purple-btn {
+
+    background: #7c3aed;
+
+}
+
+
+.purple-btn:hover {
+
+    background: #6d28d9;
+
+}
+
+
+/* ORANGE */
+
+.orange-btn {
+
+    background: #f97316;
+
+}
+
+
+.orange-btn:hover {
+
+    background: #ea580c;
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .settings-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+@media (max-width: 768px) {
+
+    .settings-content {
+
+        padding: 130px 18px 25px;
+
+    }
+
+
+    .settings-intro h2 {
+
+        font-size: 24px;
+
+    }
+
+
+    .settings-card {
+
+        min-height: auto;
+
+        padding: 22px;
+
+        border-radius: 16px;
+
+    }
+
+
+    .settings-card-footer {
+
+        justify-content: stretch;
+
+    }
+
+
+    .settings-open-btn {
+
+        width: 100%;
+
+    }
+
+}

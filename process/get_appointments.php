@@ -6,6 +6,7 @@ header("Content-Type: application/json");
 
 $sql = "SELECT
             a.appointment_id,
+            a.pet_id,
             a.appointment_date,
             a.appointment_time,
             a.appointment_type,

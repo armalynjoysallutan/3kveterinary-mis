@@ -73,7 +73,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
                         <h3>📅 Event Calendar</h3>
 
                         <p class="calendar-subtitle">
-                            View delivery days and important events.
+                            View confirmed appointments and important events.
                         </p>
 
                         <h4 id="currentMonth"></h4>
@@ -118,22 +118,15 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
                     <h4>Upcoming Events</h4>
 
-                    <div class="upcoming-events-list">
+                    <div 
+                       class="upcoming-events-list"
+                       id="upcomingEventsList"
 
-                        <div class="upcoming-item">
-                            <div class="event-date">Jul 03, 2026 (Fri)</div>
-                            <div class="event-title">Bantay - Vaccination</div>
-                        </div>
-
-                        <div class="upcoming-item">
-                            <div class="event-date">Jul 04, 2026 (Sat)</div>
-                            <div class="event-title">Snow - Consultation</div>
-                        </div>
-
-                        <div class="upcoming-item">
-                            <div class="event-date">Jul 05, 2026 (Sun)</div>
-                            <div class="event-title">Tiger - Checkup</div>
-                        </div>
+                    >
+                       <div class="upcoming-item">
+                           <div class="event-date">Loading...</div>
+                           <div class="event-title">Loading upcoming events...</div>
+                       </div>
 
                     </div>
 
@@ -163,10 +156,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
                         <h4>Out of Stock</h4>
 
-                        <h2>20</h2>
+                        <h2 id="dashboardOutOfStock">0</h2>
 
                         <small class="green-text">
-                            +10 new this week
+                            Expired batches with stock
                         </small>
 
                     </div>
@@ -187,11 +180,11 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
                         <h4>Expired Items</h4>
 
-                        <h2>5</h2>
+                        <h2 id="dashboardExpiredItems">0</h2>
 
                         <small class="red-text">
 
-                            +3 new this week
+                            Items currently unavailable
                         </small>
 
                     </div>
@@ -212,10 +205,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
                         <h4>Revenue (MTD)</h4>
 
-                        <h2>₱7,200</h2>
+                        <h2 id="dashboardRevenue">₱0.00</h2>
 
                         <small class="green-text">
-                            +18% from last month
+                            Paid billing this month
                         </small>
                     </div>
                     
@@ -235,10 +228,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
                         <h4>Total Stock</h4>
 
-                        <h2>620</h2>
+                        <h2 id="dashboardTotalStock">0</h2>
 
                         <small class="green-text">
-                            +50 new this week
+                            Current stock quantity
                         </small>
                     </div>
 
@@ -259,10 +252,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
                             <h4>Registered Clients</h4>
 
-                            <h2>198</h2>
+                            <h2 id="dashboardRegisteredClients">0</h2>
 
                             <small class="green-text">
-                                +5 new this month
+                                Active registered clients
                             </small>
 
                         </div>
@@ -283,10 +276,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
                             <h4>Total Patients</h4>
 
-                            <h2>342</h2>
+                            <h2 id="dashboardTotalPatients">0</h2>
 
                             <small class="green-text">
-                                +8 new this week
+                                Pets of active clients
                             </small>
 
                         </div>
@@ -309,11 +302,11 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
                         <h4>New Bookings</h4>
 
-                        <h2>5</h2>
+                        <h2 id="dashboardNewBookings">0</h2>
 
                     </div>
 
-                    <a href="#" class="view-link">View</a>
+                    <a href="appointments.php" class="view-link">View</a>
 
                 </div>
             </div>
@@ -330,96 +323,41 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
 <!-- CALENDAR DAY MODAL -->
 <div class="calendar-modal" id="calendarModal">
+
     <div class="calendar-modal-content">
 
         <div class="calendar-modal-header">
+
             <div>
-                <h3 id="calendarModalDate">July 2, 2026</h3>
-                <p id="modalDateSubtitle">All reminders and events for this day</p>
+                <h3 id="calendarModalDate"></h3>
+
+                <p id="modalDateSubtitle">
+                    All reminders and events for this day
+                </p>
             </div>
 
-            <button class="calendar-modal-close" id="closeCalendarModal">
+            <button
+                class="calendar-modal-close"
+                id="closeCalendarModal"
+            >
                 <i class="fa-solid fa-xmark"></i>
             </button>
+
         </div>
 
-        <div class="calendar-modal-body" id="calendarModalBody">
+        <div
+            class="calendar-modal-body"
+            id="calendarModalBody"
+        >
 
-            <!-- APPOINTMENTS -->
-            <div class="modal-section">
-                <div class="modal-section-title">
-                    <span class="modal-dot appointments"></span>
-                    <span>Appointments</span>
-                </div>
-
-                <div class="modal-event-list">
-                    <div class="modal-event-card">
-                        <div class="modal-event-time">9:00 AM</div>
-                        <div class="modal-event-details">
-                            <strong>Max - Vaccination</strong>
-                            <small>Owner: Juan Dela Cruz</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DELIVERY DAY -->
-            <div class="modal-section">
-                <div class="modal-section-title">
-                    <span class="modal-dot delivery"></span>
-                    <span>Delivery Day</span>
-                </div>
-
-                <div class="modal-event-list">
-                    <div class="modal-event-card">
-                        <div class="modal-event-time">10:00 AM</div>
-                        <div class="modal-event-details">
-                            <strong>Pet Essentials Delivery</strong>
-                            <small>Supplier delivery scheduled</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ORDER / RESTOCK -->
-            <div class="modal-section">
-                <div class="modal-section-title">
-                    <span class="modal-dot restock"></span>
-                    <span>Order / Restock</span>
-                </div>
-
-                <div class="modal-event-list">
-                    <div class="modal-event-card">
-                        <div class="modal-event-time">2:00 PM</div>
-                        <div class="modal-event-details">
-                            <strong>Restock Deworming Tablets</strong>
-                            <small>Prepare supplier order</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- OTHER EVENT -->
-            <div class="modal-section">
-                <div class="modal-section-title">
-                    <span class="modal-dot other"></span>
-                    <span>Other Event</span>
-                </div>
-
-                <div class="modal-event-list">
-                    <div class="modal-event-card">
-                        <div class="modal-event-time">4:00 PM</div>
-                        <div class="modal-event-details">
-                            <strong>Clinic Staff Meeting</strong>
-                            <small>Monthly operations check-in</small>
-                        </div>
-                    </div>
-                </div>
+            <div class="modal-loading">
+                Loading events...
             </div>
 
         </div>
 
     </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>

@@ -17,13 +17,56 @@ if (empty($date)) {
 
 /* =========================
    APPOINTMENTS
+   CONFIRMED ONLY
 ========================= */
-$stmt = mysqli_prepare($conn, "SELECT owner_name, pet_name, service, appointment_time, status
-                               FROM appointments
-                               WHERE appointment_date = ?
-                               ORDER BY appointment_time ASC");
+
+$stmt = mysqli_prepare($conn, "
+    SELECT
+        c.owner_name,
+        p.pet_name,
+        a.service,
+        a.appointment_time,
+        a.status
+
+    FROM appointments a
+
+    INNER JOIN customers c
+        ON c.customer_id = a.customer_id
+
+    INNER JOIN pets p
+        ON p.pet_id = a.pet_id
+
+    WHERE a.appointment_date = ?
+      AND a.status = 'Confirmed'
+      AND a.is_archived = 0
+
+    ORDER BY a.appointment_time ASC
+");
+
+if (!$stmt) {
+    echo json_encode([
+        "appointments" => [],
+        "delivery_events" => [],
+        "restock_events" => [],
+        "other_events" => [],
+        "error" => "Appointment query preparation failed: " . mysqli_error($conn)
+    ]);
+    exit();
+}
+
 mysqli_stmt_bind_param($stmt, "s", $date);
-mysqli_stmt_execute($stmt);
+
+if (!mysqli_stmt_execute($stmt)) {
+    echo json_encode([
+        "appointments" => [],
+        "delivery_events" => [],
+        "restock_events" => [],
+        "other_events" => [],
+        "error" => "Appointment query execution failed: " . mysqli_stmt_error($stmt)
+    ]);
+    exit();
+}
+
 $result = mysqli_stmt_get_result($stmt);
 
 $appointments = [];

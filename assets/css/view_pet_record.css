@@ -1,0 +1,1640 @@
+/* =========================================================
+   VIEW PET RECORD
+   ========================================================= */
+
+.view-record-page {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.view-record-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
+.back-record-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    height: 32px;
+    padding: 0 13px;
+
+    border: 1px solid #dfe5ec;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #475569;
+
+    text-decoration: none;
+    font-size: 9px;
+    font-weight: 700;
+
+    transition: 0.2s ease;
+}
+
+.back-record-btn:hover {
+    border-color: #18aef5;
+    color: #18aef5;
+    background: #f7fcff;
+}
+
+
+/* =========================================================
+   OWNER + PET INFORMATION
+   ========================================================= */
+
+.record-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+
+    margin-bottom: 14px;
+}
+
+.record-info-card {
+    overflow: hidden;
+
+    border: 1px solid #dfe5ec;
+    border-radius: 10px;
+
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.record-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 34px;
+    padding: 0 13px;
+
+    border-bottom: 1px solid #d9dfed;
+
+    background: #eef1fb;
+
+    color: #1f2937;
+
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.record-section-title i {
+    color: #475569;
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   OWNER INFORMATION
+   ========================================================= */
+
+.record-info-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 11px 20px;
+
+    padding: 14px;
+}
+
+.record-field {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.record-field.full-field {
+    grid-column: 1 / -1;
+}
+
+.record-field span {
+    color: #64748b;
+    font-size: 8px;
+}
+
+.record-field strong {
+    color: #374151;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   PET INFORMATION
+   ========================================================= */
+
+.record-pet-body {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+
+    gap: 14px;
+
+    padding: 14px;
+
+    align-items: center;
+}
+
+.record-pet-avatar {
+    width: 68px;
+    height: 68px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #eef8ff;
+    color: #18aef5;
+
+    font-size: 25px;
+}
+
+.record-pet-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px 18px;
+}
+
+
+/* =========================================================
+   MEDICAL RECORD HISTORY
+   ========================================================= */
+
+.medical-history-card {
+    overflow: hidden;
+
+    border: 1px solid #dfe5ec;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.medical-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 12px 14px;
+
+    border-bottom: 1px solid #e3e8ef;
+}
+
+.medical-history-title h2 {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    margin: 0;
+
+    color: #1f2937;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+.medical-history-title h2 i {
+    color: #475569;
+}
+
+.medical-history-title p {
+    margin: 4px 0 0;
+
+    color: #94a3b8;
+
+    font-size: 8px;
+}
+
+
+/* =========================================================
+   ADD NEW RECORD BUTTON
+   ========================================================= */
+
+.add-medical-record-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    height: 31px;
+
+    padding: 0 12px;
+
+    border: 1px solid #18aef5;
+    border-radius: 7px;
+
+    background: #18aef5;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 8px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.add-medical-record-btn:hover {
+    background: #0798df;
+    border-color: #0798df;
+}
+
+
+/* =========================================================
+   MEDICAL HISTORY TABLE
+   ========================================================= */
+
+.medical-history-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.medical-history-table {
+    width: 100%;
+    min-width: 920px;
+
+    border-collapse: collapse;
+}
+
+.medical-history-table th {
+    height: 36px;
+
+    padding: 0 8px;
+
+    border-bottom: 1px solid #dfe5ec;
+
+    background: #eef1fb;
+
+    color: #475569;
+
+    font-size: 7px;
+    font-weight: 800;
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+.medical-history-table td {
+    padding: 9px 8px;
+
+    border-bottom: 1px solid #edf0f4;
+
+    color: #374151;
+
+    font-size: 8px;
+
+    vertical-align: middle;
+}
+
+.medical-history-table tbody tr:hover {
+    background: #fafcff;
+}
+
+
+/* =========================================================
+   EMPTY MEDICAL RECORD
+   ========================================================= */
+
+.medical-empty {
+    height: 145px;
+
+    text-align: center !important;
+}
+
+.medical-empty i {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #cbd5e1;
+
+    font-size: 24px;
+}
+
+.medical-empty strong {
+    display: block;
+
+    color: #475569;
+
+    font-size: 10px;
+}
+
+.medical-empty span {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #94a3b8;
+
+    font-size: 8px;
+}
+
+
+/* =========================================================
+   ACTION BUTTON
+   ========================================================= */
+
+.record-action-btn {
+    width: 27px;
+    height: 27px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #dfe5ec;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #475569;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.record-action-btn:hover {
+    border-color: #18aef5;
+    background: #f7fcff;
+    color: #18aef5;
+}
+
+
+/* =========================================================
+   MEDICAL RECORD MODAL
+   ========================================================= */
+
+.medical-record-modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+}
+
+.medical-record-modal.open {
+    display: flex;
+}
+
+.medical-record-modal-backdrop {
+    position: absolute;
+
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.medical-record-modal-dialog {
+    position: relative;
+
+    z-index: 1;
+
+    width: min(680px, 100%);
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    border: 1px solid #dfe5ec;
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.20);
+}
+
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.medical-record-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 16px 18px;
+
+    border-bottom: 1px solid #e8edf3;
+}
+
+.medical-record-modal-header h2 {
+    margin: 0;
+
+    color: #1f2937;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.medical-record-modal-header p {
+    margin: 4px 0 0;
+
+    color: #94a3b8;
+
+    font-size: 8px;
+}
+
+.medical-modal-close {
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #e3e7ec;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #64748b;
+
+    cursor: pointer;
+}
+
+.medical-modal-close:hover {
+    background: #f8fafc;
+    color: #1f2937;
+}
+
+
+/* =========================================================
+   MODAL FORM
+   ========================================================= */
+
+#medicalRecordForm {
+    padding: 17px 18px 18px;
+}
+
+.medical-form-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 13px;
+}
+
+.medical-form-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.medical-form-group.full {
+    grid-column: 1 / -1;
+}
+
+.medical-form-group label {
+    color: #475569;
+
+    font-size: 8px;
+    font-weight: 800;
+}
+
+.medical-form-group label span {
+    color: #ef4444;
+}
+
+.medical-form-group input,
+.medical-form-group textarea {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border: 1px solid #dfe5ec;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #1f2937;
+
+    font-family: inherit;
+    font-size: 9px;
+
+    outline: none;
+}
+
+.medical-form-group input {
+    height: 34px;
+
+    padding: 0 9px;
+}
+
+.medical-form-group textarea {
+    min-height: 70px;
+
+    padding: 9px;
+
+    resize: vertical;
+}
+
+.medical-form-group input:focus,
+.medical-form-group textarea:focus {
+    border-color: #18aef5;
+
+    box-shadow:
+        0 0 0 3px rgba(24, 174, 245, 0.10);
+}
+
+.medical-form-group small {
+    color: #94a3b8;
+
+    font-size: 7px;
+}
+
+
+/* =========================================================
+   MODAL BUTTONS
+   ========================================================= */
+
+.medical-record-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    margin-top: 16px;
+    padding-top: 13px;
+
+    border-top: 1px solid #edf0f4;
+}
+
+.medical-cancel-btn,
+.medical-save-btn {
+    height: 32px;
+
+    padding: 0 13px;
+
+    border-radius: 7px;
+
+    font-family: inherit;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.medical-cancel-btn {
+    border: 1px solid #dfe5ec;
+
+    background: #ffffff;
+    color: #475569;
+}
+
+.medical-cancel-btn:hover {
+    background: #f8fafc;
+}
+
+.medical-save-btn {
+    border: 1px solid #18aef5;
+
+    background: #18aef5;
+    color: #ffffff;
+}
+
+.medical-save-btn:hover {
+    background: #0798df;
+    border-color: #0798df;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+    .record-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .record-info-body,
+    .record-pet-details,
+    .medical-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .record-field.full-field,
+    .medical-form-group.full {
+        grid-column: 1;
+    }
+
+    .medical-history-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .add-medical-record-btn {
+        width: 100%;
+    }
+
+}
+/* =========================================================
+   FIX: SPACE BELOW TOPBAR
+   ========================================================= */
+
+.view-record-page {
+    padding-top: 130px;
+    box-sizing: border-box;
+}
+
+/* Keep the first information cards fully visible */
+.record-info-grid {
+    margin-top: 0;
+}
+/* =========================================
+   ADD SERVICE MODAL
+========================================= */
+
+.service-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    z-index: 9999;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.service-modal-overlay.active {
+    display: flex;
+}
+
+.service-modal {
+    width: 100%;
+    max-width: 620px;
+    max-height: 90vh;
+
+    background: #ffffff;
+    border-radius: 18px;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.20);
+
+    overflow: hidden;
+
+    animation: serviceModalFadeIn 0.2s ease;
+}
+
+@keyframes serviceModalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* =========================================
+   MODAL HEADER
+========================================= */
+
+.service-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    padding: 22px 24px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.service-modal-header h2 {
+    margin: 0;
+
+    font-size: 21px;
+    font-weight: 700;
+
+    color: #172033;
+}
+
+.service-modal-header p {
+    margin: 5px 0 0;
+
+    font-size: 13px;
+    color: #8a97aa;
+}
+
+.service-modal-close {
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #f4f6fa;
+
+    color: #607086;
+
+    font-size: 25px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.service-modal-close:hover {
+    background: #e9edf4;
+    color: #172033;
+}
+
+
+/* =========================================
+   MODAL BODY
+========================================= */
+
+.service-modal-body {
+    padding: 24px;
+
+    max-height: calc(90vh - 145px);
+    overflow-y: auto;
+}
+
+.service-form-group {
+    margin-bottom: 18px;
+}
+
+.service-form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #334155;
+}
+
+.service-form-group label span {
+    color: #ef4444;
+}
+
+.service-form-group input,
+.service-form-group select {
+    width: 100%;
+    height: 48px;
+
+    padding: 0 14px;
+
+    border: 1px solid #d9e0ea;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #253247;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    outline: none;
+
+    transition: 0.2s ease;
+
+    box-sizing: border-box;
+}
+
+.service-form-group input:focus,
+.service-form-group select:focus {
+    border-color: #1da9e9;
+
+    box-shadow: 0 0 0 3px rgba(29, 169, 233, 0.10);
+}
+
+.service-form-group select:disabled {
+    background: #f5f7fa;
+    color: #9aa6b5;
+    cursor: not-allowed;
+}
+
+.service-form-group input::placeholder {
+    color: #9aa6b5;
+}
+
+
+/* =========================================
+   TWO COLUMN ROW
+========================================= */
+
+.service-form-row {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 16px;
+}
+
+
+/* =========================================
+   WEIGHT + KG
+========================================= */
+
+.input-with-unit {
+    position: relative;
+}
+
+.input-with-unit input {
+    padding-right: 45px;
+}
+
+.input-with-unit span {
+    position: absolute;
+
+    right: 14px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #64748b;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    pointer-events: none;
+}
+
+
+/* =========================================
+   READONLY PRICE
+========================================= */
+
+#serviceUnitPrice {
+    background: #f8fafc;
+    color: #334155;
+
+    cursor: default;
+}
+
+
+/* =========================================
+   MODAL FOOTER
+========================================= */
+
+.service-modal-footer {
+    display: flex;
+
+    justify-content: flex-end;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 18px 24px;
+
+    border-top: 1px solid #e5e7eb;
+
+    background: #ffffff;
+}
+
+.service-btn {
+    height: 44px;
+
+    padding: 0 20px;
+
+    border-radius: 9px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.service-btn-cancel {
+    border: 1px solid #d9e0ea;
+
+    background: #ffffff;
+
+    color: #475569;
+}
+
+.service-btn-cancel:hover {
+    background: #f5f7fa;
+}
+
+.service-btn-primary {
+    border: 1px solid #1da9e9;
+
+    background: #1da9e9;
+
+    color: #ffffff;
+}
+
+.service-btn-primary:hover {
+    background: #1297d2;
+    border-color: #1297d2;
+}
+
+.service-btn-primary i {
+    margin-right: 6px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 600px) {
+
+    .service-modal-overlay {
+        padding: 12px;
+    }
+
+    .service-modal {
+        max-height: 94vh;
+        border-radius: 14px;
+    }
+
+    .service-form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .service-modal-header {
+        padding: 18px;
+    }
+
+    .service-modal-body {
+        padding: 18px;
+    }
+
+    .service-modal-footer {
+        padding: 15px 18px;
+    }
+
+    .service-btn {
+        flex: 1;
+    }
+}
+/* =========================================
+   SERVICES PERFORMED
+========================================= */
+
+.selected-services {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: 5px;
+}
+
+.no-services {
+    padding: 12px 14px;
+
+    border: 1px dashed #d9e0ea;
+    border-radius: 9px;
+
+    background: #f8fafc;
+
+    color: #94a3b8;
+
+    font-size: 9px;
+    text-align: center;
+}
+
+
+/* Individual selected service */
+
+.selected-service-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 48px;
+    padding: 9px 12px;
+    border: 1px solid #e5eaf0;
+    border-radius: 7px;
+    background: #fafcff;
+}
+.selected-service-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.selected-service-name {
+    color: #334155;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.selected-service-price {
+    color: #94a3b8;
+
+    font-size: 8px;
+}
+
+.remove-service-btn {
+    width: 28px;
+    height: 28px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #f1d4d4;
+    border-radius: 6px;
+
+    background: #fff7f7;
+    color: #ef4444;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.remove-service-btn:hover {
+    background: #fee2e2;
+    border-color: #ef4444;
+}
+
+
+/* Add Service button inside the form */
+
+.add-service-inside-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    height: 32px;
+
+    padding: 0 12px;
+
+    border: 1px solid #18aef5;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #18aef5;
+
+    font-family: inherit;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.add-service-inside-btn:hover {
+    background: #18aef5;
+    color: #ffffff;
+}
+/* FIX: Add Service button must remain clickable */
+.add-service-inside-btn {
+    position: relative;
+    z-index: 10001 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+/* =========================================
+   COMPACT ADD SERVICE MODAL
+========================================= */
+
+.service-modal {
+    max-width: 560px;
+    max-height: 75vh;
+    border-radius: 14px;
+}
+
+/* Header */
+.service-modal-header {
+    padding: 16px 20px;
+}
+
+.service-modal-header h2 {
+    font-size: 18px;
+}
+
+.service-modal-header p {
+    margin-top: 3px;
+    font-size: 11px;
+}
+
+.service-modal-close {
+    width: 34px;
+    height: 34px;
+    font-size: 20px;
+    border-radius: 8px;
+}
+
+/* Body */
+.service-modal-body {
+    padding: 18px 20px;
+    max-height: calc(75vh - 120px);
+}
+
+.service-form-group {
+    margin-bottom: 13px;
+}
+
+.service-form-group label {
+    margin-bottom: 5px;
+    font-size: 11px;
+}
+
+.service-form-group input,
+.service-form-group select {
+    height: 40px;
+    padding: 0 11px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.service-form-row {
+    gap: 12px;
+}
+
+/* Weight unit */
+.input-with-unit input {
+    padding-right: 40px;
+}
+
+.input-with-unit span {
+    right: 12px;
+    font-size: 12px;
+}
+
+/* Footer */
+.service-modal-footer {
+    padding: 13px 20px;
+    gap: 8px;
+}
+
+.service-btn {
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+/* Smaller Add Service Modal Buttons */
+.service-btn {
+    height: 34px;
+    padding: 0 13px;
+    border-radius: 7px;
+    font-size: 10px;
+}
+
+.service-btn-primary i {
+    margin-right: 4px;
+}
+
+.selected-service-info strong {
+    color: #1f2937;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.selected-service-info small {
+    color: #94a3b8;
+    font-size: 8px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.service-source-badge {
+    padding: 4px 8px;
+    border-radius: 5px;
+    background: #eaf7ff;
+    color: #159bd8;
+    font-size: 8px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* =========================================================
+   SERVICES PERFORMED - ADDITIONAL SERVICE
+   ========================================================= */
+
+.selected-service-item.additional-service-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+
+    padding: 9px 12px;
+
+    border: 1px solid #e5eaf0;
+    border-radius: 7px;
+
+    background: #fafcff;
+}
+
+
+/* SERVICE INFORMATION */
+
+.additional-service-item .selected-service-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    min-width: 0;
+}
+
+.additional-service-item .selected-service-info strong {
+    display: block;
+
+    margin: 0;
+
+    color: #1f2937;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.additional-service-item .selected-service-info span {
+    display: block;
+    margin: 0;
+    color: #94a3b8;
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-transform: capitalize;
+}
+
+/* RIGHT SIDE */
+
+.additional-service-item .service-item-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    flex-shrink: 0;
+}
+
+
+/* ADDITIONAL BADGE */
+
+.additional-service-item .service-source-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 8px;
+
+    border-radius: 5px;
+
+    background: #eaf7ff;
+    color: #159bd8;
+
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+
+/* PRICE */
+
+.additional-service-item .service-price {
+    color: #64748b;
+    font-size: 9px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+
+/* REMOVE BUTTON */
+
+.additional-service-item .remove-service-btn {
+    width: 22px;
+    height: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid #d7dee6;
+    border-radius: 5px;
+
+    background: #ffffff;
+    color: #64748b;
+
+    font-size: 10px;
+
+    cursor: pointer;
+}
+
+.additional-service-item .remove-service-btn:hover {
+    background: #f8fafc;
+    color: #dc2626;
+    border-color: #f1b5b5;
+}
+
+/* =========================================================
+   SYSTEM MESSAGE MODAL
+========================================================= */
+
+.system-message-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20000;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.system-message-modal.open {
+    display: flex;
+}
+
+.system-message-backdrop {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.55);
+}
+
+.system-message-dialog {
+    position: relative;
+    z-index: 1;
+
+    width: min(420px, 100%);
+
+    background: #ffffff;
+    border: 1px solid #dfe5ec;
+    border-radius: 12px;
+
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+
+    overflow: hidden;
+
+    animation: systemMessageFadeIn 0.18s ease;
+}
+
+@keyframes systemMessageFadeIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+.system-message-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 15px 17px;
+
+    border-bottom: 1px solid #edf0f4;
+}
+
+.system-message-icon {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: #fff7e6;
+    color: #f59e0b;
+
+    flex-shrink: 0;
+}
+
+.system-message-icon i {
+    font-size: 15px;
+}
+
+.system-message-header h3 {
+    margin: 0;
+
+    color: #1f2937;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.system-message-body {
+    padding: 18px 17px 8px;
+}
+
+.system-message-body p {
+    margin: 0;
+
+    color: #475569;
+
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.system-message-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    padding: 12px 17px 15px;
+}
+
+.system-message-ok-btn {
+    height: 32px;
+
+    min-width: 70px;
+    padding: 0 14px;
+
+    border: 1px solid #18aef5;
+    border-radius: 7px;
+
+    background: #18aef5;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.system-message-ok-btn:hover {
+    background: #0798df;
+    border-color: #0798df;
+}
+
+/* =========================================================
+   SYSTEM CONFIRMATION MODAL
+========================================================= */
+
+.system-confirm-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20001;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.system-confirm-modal.open {
+    display: flex;
+}
+
+.system-confirm-backdrop {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.55);
+}
+
+.system-confirm-dialog {
+    position: relative;
+    z-index: 1;
+
+    width: min(420px, 100%);
+    padding: 24px;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe5ec;
+    border-radius: 12px;
+
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+
+    text-align: center;
+}
+
+.system-confirm-icon {
+    width: 48px;
+    height: 48px;
+
+    margin: 0 auto 13px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #fff7e6;
+    color: #f59e0b;
+
+    font-size: 21px;
+}
+
+.system-confirm-dialog h3 {
+    margin: 0 0 7px;
+
+    color: #1f2937;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.system-confirm-dialog p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.system-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    margin-top: 20px;
+}
+
+.system-confirm-cancel,
+.system-confirm-ok {
+    height: 32px;
+
+    padding: 0 14px;
+
+    border-radius: 7px;
+
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.system-confirm-cancel {
+    border: 1px solid #dfe5ec;
+
+    background: #ffffff;
+    color: #475569;
+}
+
+.system-confirm-cancel:hover {
+    background: #f8fafc;
+}
+
+.system-confirm-ok {
+    border: 1px solid #18aef5;
+
+    background: #18aef5;
+    color: #ffffff;
+}
+
+.system-confirm-ok:hover {
+    background: #0798df;
+}

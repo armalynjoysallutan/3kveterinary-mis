@@ -352,9 +352,10 @@ function loadAppointmentList(){
 
                         actionsHTML = `
                             <button
-                                class="link-btn bill-btn"
-                                data-id="${appointment.appointment_id}">
-                                Bill
+                              class="link-btn medical-record-btn"
+                              data-appointment-id="${appointment.appointment_id}"
+                              data-pet-id="${appointment.pet_id}">
+                              Medical Record
                             </button>
                         `;
 
@@ -947,71 +948,188 @@ if(cancelAppointmentModal){
 }
 
 // ===========================
-// DYNAMIC SERVICES
+// DATABASE-DRIVEN SERVICES
 // ===========================
+//
+// Service Categories and Services are no longer hardcoded here.
+// The PHP page loads Active records from System Variables and
+// exposes them as window.appointmentServiceCatalog.
 
-const services = {
+const appointmentServiceCatalog =
+    Array.isArray(window.appointmentServiceCatalog)
+        ? window.appointmentServiceCatalog
+        : [];
 
-    particulars: [
-        "Consultation",
-        "Medication / Treatment",
-        "Confinement / Boarding"
-    ],
+const category =
+    document.getElementById("serviceCategory");
 
-    deworming: [
-        "Tablet",
-        "Paste"
-    ],
+const service =
+    document.getElementById("service");
 
-    vaccination: [
-        "9 in 1",
-        "Anti Rabies",
-        "Kennel Cough",
-        "QuadCat"
-    ],
 
-    laboratory: [
-        "Blood Chemistry",
-        "Smear Test",
-        "Ultrasound",
-        "Test Kit"
-    ],
+function populateServiceCategories(){
 
-    specialties: [
-        "Surgical Procedures",
-        "Dental Hygiene",
-        "Skin Disease Treatment"
-    ]
+    if(!category){
+        return;
+    }
 
-};
+    category.innerHTML =
+        '<option value="">Select Category</option>';
 
-const category = document.getElementById("serviceCategory");
-const service = document.getElementById("service");
+    if(appointmentServiceCatalog.length === 0){
 
-category.addEventListener("change", function () {
+        const option =
+            document.createElement("option");
+
+        option.value = "";
+        option.textContent =
+            "No active service categories available";
+        option.disabled = true;
+
+        category.appendChild(option);
+
+        if(service){
+            service.innerHTML =
+                '<option value="">Select Category First</option>';
+            service.disabled = true;
+        }
+
+        return;
+    }
+
+    appointmentServiceCatalog.forEach(
+        function(categoryData){
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                String(categoryData.category_id);
+
+            option.textContent =
+                categoryData.category_name;
+
+            option.dataset.categoryName =
+                categoryData.category_name;
+
+            category.appendChild(option);
+        }
+    );
+}
+
+
+function getSelectedCategoryData(){
+
+    if(!category || !category.value){
+        return null;
+    }
+
+    return appointmentServiceCatalog.find(
+        function(item){
+            return String(item.category_id) ===
+                   String(category.value);
+        }
+    ) || null;
+}
+
+
+function getSelectedCategoryName(){
+
+    const selectedOption =
+        category &&
+        category.options[category.selectedIndex];
+
+    return selectedOption
+        ? (selectedOption.dataset.categoryName ||
+           selectedOption.textContent || "")
+        : "";
+}
+
+
+function populateServicesForCategory(){
+
+    if(!service){
+        return;
+    }
 
     service.innerHTML =
         '<option value="">Select Service</option>';
 
-    const selected = this.value;
+    service.disabled = true;
 
-    if (services[selected]) {
+    const categoryData =
+        getSelectedCategoryData();
 
-        services[selected].forEach(function(item){
-
-            const option = document.createElement("option");
-
-            option.value = item;
-
-            option.textContent = item;
-
-            service.appendChild(option);
-
-        });
-
+    if(!categoryData){
+        service.innerHTML =
+            '<option value="">Select Category First</option>';
+        return;
     }
 
-});
+    const activeServices =
+        Array.isArray(categoryData.services)
+            ? categoryData.services
+            : [];
+
+    if(activeServices.length === 0){
+
+        service.innerHTML =
+            '<option value="">No active services available</option>';
+        return;
+    }
+
+    activeServices.forEach(
+        function(serviceData){
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                String(serviceData.service_id);
+
+            option.textContent =
+                serviceData.service_name;
+
+            option.dataset.serviceName =
+                serviceData.service_name;
+
+            option.dataset.pricingType =
+                serviceData.pricing_type || "";
+
+            if(serviceData.fixed_price !== null &&
+               serviceData.fixed_price !== undefined){
+
+                option.dataset.fixedPrice =
+                    serviceData.fixed_price;
+            }
+
+            service.appendChild(option);
+        }
+    );
+
+    service.disabled = false;
+}
+
+
+populateServiceCategories();
+
+
+if(category){
+
+    category.addEventListener(
+        "change",
+        function(){
+
+            populateServicesForCategory();
+
+            // Recalculate the available appointment times using
+            // the selected category name instead of an old hardcoded key.
+            if(typeof generateAvailableTimeSlots === "function"){
+                generateAvailableTimeSlots();
+            }
+        }
+    );
+}
 
 // ===========================
 // SERVICE AVAILABILITY
@@ -1022,7 +1140,13 @@ document.getElementById("availabilityCard");
 
 service.addEventListener("change", function(){
 
-    const selected = this.value;
+    const selectedOption =
+        this.options[this.selectedIndex];
+
+    const selected =
+        selectedOption
+            ? (selectedOption.dataset.serviceName || "")
+            : "";
 
     const vetRequired = [
 
@@ -1124,20 +1248,27 @@ const vetServices = [
 
 const veterinarian = document.getElementById("veterinarian");
 
-service.addEventListener("change", function(){
+// The current appointment form does not render an assigned-veterinarian
+// field, so do not try to access it when it is absent. This keeps the
+// service selection and availability logic working normally.
+if(veterinarian){
 
-    if(vetServices.includes(this.value)){
+    service.addEventListener("change", function(){
 
-        veterinarian.disabled = false;
+        if(vetServices.includes(this.value)){
 
-    }else{
+            veterinarian.disabled = false;
 
-        veterinarian.disabled = true;
-        veterinarian.value = "";
+        }else{
 
-    }
+            veterinarian.disabled = true;
+            veterinarian.value = "";
 
-});
+        }
+
+    });
+
+}
 
 // ===========================
 // SMART TIME SLOTS
@@ -1234,9 +1365,12 @@ async function generateAvailableTimeSlots(){
 
     if(day === 6){
 
+        const selectedCategoryName =
+            getSelectedCategoryName().trim().toLowerCase();
+
         if(
-            serviceCategory.value === "vaccination" ||
-            serviceCategory.value === "deworming"
+            selectedCategoryName === "vaccination" ||
+            selectedCategoryName === "deworming"
         ){
 
             startHour = 8;
@@ -1258,9 +1392,12 @@ async function generateAvailableTimeSlots(){
 
     else{
 
+        const selectedCategoryName =
+            getSelectedCategoryName().trim().toLowerCase();
+
         if(
-            serviceCategory.value === "vaccination" ||
-            serviceCategory.value === "deworming"
+            selectedCategoryName === "vaccination" ||
+            selectedCategoryName === "deworming"
         ){
 
             startHour = 8;
@@ -1572,14 +1709,53 @@ if(saveAppointment){
         const formData = new FormData();
 
         // Appointment Information
+        const selectedCategoryOption =
+            document.getElementById("serviceCategory").options[
+                document.getElementById("serviceCategory").selectedIndex
+            ];
+
+        const selectedServiceOption =
+            document.getElementById("service").options[
+                document.getElementById("service").selectedIndex
+            ];
+
+        const selectedCategoryId =
+            document.getElementById("serviceCategory").value;
+
+        const selectedServiceId =
+            document.getElementById("service").value;
+
+        const selectedCategoryName =
+            selectedCategoryOption
+                ? (selectedCategoryOption.dataset.categoryName ||
+                   selectedCategoryOption.textContent || "")
+                : "";
+
+        const selectedServiceName =
+            selectedServiceOption
+                ? (selectedServiceOption.dataset.serviceName ||
+                   selectedServiceOption.textContent || "")
+                : "";
+
+        formData.append(
+            "serviceCategoryId",
+            selectedCategoryId
+        );
+
+        formData.append(
+            "serviceId",
+            selectedServiceId
+        );
+
+        // Keep the names too for compatibility with existing appointment data.
         formData.append(
             "serviceCategory",
-            document.getElementById("serviceCategory").value
+            selectedCategoryName
         );
 
         formData.append(
             "service",
-            document.getElementById("service").value
+            selectedServiceName
         );
 
         formData.append(
@@ -1908,37 +2084,12 @@ function toggleClientType(){
         );
 
 
-        // ===========================
-        // MAKE PET FIELDS EDITABLE
-        // ===========================
+       // ===========================
+      // LOCK PET FIELDS UNTIL
+     // OWNER DETAILS ARE COMPLETE
+     // ===========================
 
-        document.getElementById(
-            "petName"
-        ).readOnly = false;
-
-        document.getElementById(
-            "species"
-        ).disabled = false;
-
-        document.getElementById(
-            "breed"
-        ).disabled = false;
-
-        document.getElementById(
-            "color"
-        ).readOnly = false;
-
-        document.getElementById(
-            "gender"
-        ).disabled = false;
-
-        document.getElementById(
-            "weight"
-        ).readOnly = false;
-
-        document.getElementById(
-            "estimatedAge"
-        ).readOnly = false;
+        setPetFieldsEditable(false);
 
 
         // ===========================
@@ -2094,6 +2245,74 @@ function setPetFieldsEditable(editable){
         !editable;
 
 }
+
+// ===========================
+// NEW CLIENT OWNER COMPLETION
+// ===========================
+
+const newClientOwnerFields = [
+    document.getElementById("ownerName"),
+    document.getElementById("contactNumber"),
+    document.getElementById("address")
+];
+
+function isNewClientOwnerComplete(){
+
+    return newClientOwnerFields.every(function(field){
+
+        return field &&
+               field.value.trim() !== "";
+
+    });
+
+}
+
+
+function updateNewClientPetAccess(){
+
+    if(!newRadio.checked){
+        return;
+    }
+
+    const ownerComplete =
+        isNewClientOwnerComplete();
+
+    setPetFieldsEditable(
+        ownerComplete
+    );
+
+    const petSectionNotice =
+        document.getElementById(
+            "petSectionNotice"
+        );
+
+    if(petSectionNotice){
+
+        petSectionNotice.classList.toggle(
+            "show",
+            !ownerComplete
+        );
+
+    }
+
+}
+newClientOwnerFields.forEach(function(field){
+
+    if(!field){
+        return;
+    }
+
+    field.addEventListener(
+        "input",
+        updateNewClientPetAccess
+    );
+
+    field.addEventListener(
+        "change",
+        updateNewClientPetAccess
+    );
+
+});
 
 
 function clearPetFields(){
@@ -2406,10 +2625,6 @@ if(isExistingClient){
             ),
 
             document.getElementById(
-                "weight"
-            ),
-
-            document.getElementById(
                 "estimatedAge"
             )
 
@@ -2502,10 +2717,6 @@ if(isExistingClient){
             ),
 
             document.getElementById(
-                "weight"
-            ),
-
-            document.getElementById(
                 "estimatedAge"
             )
 
@@ -2584,7 +2795,7 @@ if(isExistingClient){
 // ===========================
 
 const requiredFields = document.querySelectorAll(
-    "#serviceCategory, #service, #appointmentDate, #appointmentTime, #appointmentType, #reason, #ownerName, #contactNumber, #address, #petName, #species, #breed, #color, #gender, #weight, #estimatedAge, #otherBreed"
+    "#serviceCategory, #service, #appointmentDate, #appointmentTime, #appointmentType, #reason, #ownerName, #contactNumber, #address, #petName, #species, #breed, #color, #gender, #estimatedAge, #otherBreed"
 );
 
 requiredFields.forEach(function(field){
@@ -2653,43 +2864,73 @@ const otherBreedContainer =
 const otherBreed =
     document.getElementById("otherBreed");
 
-const dogBreeds = [
-    "Labrador Retriever",
-    "Golden Retriever",
-    "German Shepherd",
-    "Shih Tzu",
-    "Pomeranian",
-    "Poodle",
-    "Beagle",
-    "Bulldog",
-    "Chihuahua",
-    "Siberian Husky",
-    "Mixed Breed",
-    "Others"
-];
+/*
+ * Species and breeds now come from System Variables.
+ * The PHP page exposes only Active records through:
+ *   window.appointmentSpeciesList
+ *   window.appointmentBreedCatalog
+ *
+ * "Others" remains a manual fallback and is intentionally
+ * not part of the database reference list.
+ */
+const appointmentSpeciesList =
+    Array.isArray(window.appointmentSpeciesList)
+        ? window.appointmentSpeciesList
+        : [];
 
-const catBreeds = [
-    "Persian",
-    "Siamese",
-    "Maine Coon",
-    "Ragdoll",
-    "British Shorthair",
-    "Bengal",
-    "Scottish Fold",
-    "American Shorthair",
-    "Sphynx",
-    "Mixed Breed",
-    "Others"
-];
+const appointmentBreedCatalog =
+    Array.isArray(window.appointmentBreedCatalog)
+        ? window.appointmentBreedCatalog
+        : [];
 
-species.addEventListener("change", function(){
+function normalizeSpecies(value){
+
+    return String(value || "")
+        .trim()
+        .toLowerCase();
+
+}
+
+function getBreedsForSpecies(speciesValue){
+
+    const normalizedSpecies =
+        normalizeSpecies(speciesValue);
+
+    const catalogGroup =
+        appointmentBreedCatalog.find(function(group){
+
+            return normalizeSpecies(group.species) ===
+                   normalizedSpecies;
+
+        });
+
+    if(!catalogGroup){
+        return [];
+    }
+
+    return Array.isArray(catalogGroup.breeds)
+        ? catalogGroup.breeds
+        : [];
+
+}
+
+function populateBreedsForSpecies(speciesValue){
+
+    if(!breed){
+        return;
+    }
 
     breed.innerHTML = "";
 
-    otherBreedContainer.style.display = "none";
-    otherBreed.value = "";
+    if(otherBreedContainer){
+        otherBreedContainer.style.display = "none";
+    }
 
-    if(this.value === ""){
+    if(otherBreed){
+        otherBreed.value = "";
+    }
+
+    if(!speciesValue){
 
         breed.disabled = true;
 
@@ -2704,49 +2945,76 @@ species.addEventListener("change", function(){
     breed.innerHTML =
         '<option value="">Select Breed</option>';
 
-    let breeds = [];
-
-    if(this.value === "dog"){
-        breeds = dogBreeds;
-    }
-
-    if(this.value === "cat"){
-        breeds = catBreeds;
-    }
+    const breeds =
+        getBreedsForSpecies(speciesValue);
 
     breeds.forEach(function(item){
 
         const option =
             document.createElement("option");
 
-        option.value = item;
-        option.textContent = item;
+        option.value = item.breed;
+        option.textContent = item.breed;
 
         breed.appendChild(option);
 
     });
 
-});
+    // "Others" is intentionally kept as a manual fallback.
+    const othersOption =
+        document.createElement("option");
+
+    othersOption.value = "Others";
+    othersOption.textContent = "Others";
+
+    breed.appendChild(othersOption);
+
+}
+
+if(species){
+
+    species.addEventListener("change", function(){
+
+        populateBreedsForSpecies(this.value);
+
+    });
+
+}
+
 // ===========================
 // OTHER BREED
 // ===========================
 
-breed.addEventListener("change", function(){
+if(breed){
 
-    if(this.value === "Others"){
+    breed.addEventListener("change", function(){
 
-        otherBreedContainer.style.display = "block";
+        if(this.value === "Others"){
 
-        otherBreed.focus();
+            if(otherBreedContainer){
+                otherBreedContainer.style.display = "block";
+            }
 
-    }else{
+            if(otherBreed){
+                otherBreed.focus();
+            }
 
-        otherBreedContainer.style.display = "none";
+        }else{
 
-        otherBreed.value = "";
+            if(otherBreedContainer){
+                otherBreedContainer.style.display = "none";
+            }
 
-    }
-}); 
+            if(otherBreed){
+                otherBreed.value = "";
+            }
+
+        }
+
+    });
+
+}
+
 // ===========================
 // CONFIRM APPOINTMENT
 // ===========================
@@ -3547,6 +3815,11 @@ existingPet.addEventListener(
     document.getElementById("species").value =
         selectedPet.species || "";
 
+    // Load the active database breeds for the saved species.
+    populateBreedsForSpecies(
+        selectedPet.species || ""
+    );
+
     document.getElementById("color").value =
         selectedPet.color || "";
 
@@ -3601,6 +3874,14 @@ if(savedBreed){
 
 
     breed.value = savedBreed;
+
+    if(savedBreed === "Others") {
+
+        if(otherBreedContainer){
+            otherBreedContainer.style.display = "block";
+        }
+
+    }
 
 }
 
@@ -3770,6 +4051,157 @@ function resetAppointmentForm(){
     toggleClientType();
 
 }
+
+// ========================================
+// BILL COMPLETED APPOINTMENT
+// ========================================
+
+document.addEventListener("click", async function(e) {
+
+    const billButton = e.target.closest(".bill-btn");
+
+    if (!billButton) {
+        return;
+    }
+
+    const appointmentId = billButton.dataset.id;
+
+    if (!appointmentId) {
+        return;
+    }
+
+    console.log(
+        "Bill clicked for appointment:",
+        appointmentId
+    );
+
+    billButton.disabled = true;
+    billButton.textContent = "Loading...";
+
+    try {
+
+        const response = await fetch(
+            "../process/create_billing.php",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded"
+                },
+
+                body: new URLSearchParams({
+                    appointment_id: appointmentId
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        console.log(
+            "Billing Result:",
+            result
+        );
+
+        if (!result.success) {
+
+    alert(
+        result.message +
+        (result.error
+            ? "\n\nDatabase Error:\n" + result.error
+            : "")
+    );
+
+    console.error(
+        "Billing creation failed:",
+        result
+    );
+
+    billButton.disabled = false;
+    billButton.textContent = "Bill";
+
+    return;
+}
+        window.location.href =
+            "billing_statement.php?billing_id=" +
+            encodeURIComponent(
+                result.billing_id
+            );
+
+    } catch (error) {
+
+        console.error(
+            "Billing error:",
+            error
+        );
+
+        alert(
+            "Something went wrong while creating billing."
+        );
+
+        billButton.disabled = false;
+        billButton.textContent = "Bill";
+    }
+
+});
+
+// ========================================
+// OPEN MEDICAL RECORD FOR COMPLETED APPOINTMENT
+// ========================================
+document.addEventListener("click", function(e){
+
+    const medicalRecordButton =
+        e.target.closest(".medical-record-btn");
+
+    if(!medicalRecordButton){
+        return;
+    }
+
+    const appointmentId =
+        medicalRecordButton.dataset.appointmentId;
+
+    const petId =
+        medicalRecordButton.dataset.petId;
+
+    if(!appointmentId || !petId){
+        console.error("Missing appointment ID or pet ID.");
+        return;
+    }
+
+    window.location.href =
+        "view_pet_record.php?pet_id=" +
+        encodeURIComponent(petId) +
+        "&appointment_id=" +
+        encodeURIComponent(appointmentId);
+
+});
+
+
+// ========================================
+// VIEW EXISTING BILL
+// ========================================
+
+document.addEventListener("click", function(e){
+
+    const viewBillButton =
+        e.target.closest(".view-bill-btn");
+
+    if(!viewBillButton){
+        return;
+    }
+
+    const billingId =
+        viewBillButton.dataset.billingId;
+
+    if(!billingId){
+        return;
+    }
+
+    window.location.href =
+        "billing_statement.php?billing_id=" +
+        encodeURIComponent(billingId);
+
+});
 
 
 });

@@ -7,6 +7,159 @@ if (!isset($_SESSION["admin_username"])) {
 }
 
 require_once __DIR__ . '/../config/database.php';
+
+/* =====================================================
+   ACTIVE SERVICE CATALOG FOR APPOINTMENT FORM
+   -----------------------------------------------------
+   Service Categories and Services are managed from
+   System Variables. The appointment form reads only
+   Active records from the database.
+   ===================================================== */
+$appointmentServiceCatalog = [];
+
+$serviceCatalogSql = "
+    SELECT
+        sc.category_id,
+        sc.category_name,
+        s.service_id,
+        s.service_name,
+        s.pricing_type,
+        s.fixed_price
+    FROM service_categories sc
+    LEFT JOIN services s
+        ON s.category_id = sc.category_id
+        AND s.status = 'Active'
+    WHERE sc.status = 'Active'
+    ORDER BY
+        sc.category_name ASC,
+        s.service_name ASC
+";
+
+$serviceCatalogResult = mysqli_query($conn, $serviceCatalogSql);
+
+if ($serviceCatalogResult) {
+
+    while ($row = mysqli_fetch_assoc($serviceCatalogResult)) {
+
+        $categoryId = (int)$row['category_id'];
+
+        if (!isset($appointmentServiceCatalog[$categoryId])) {
+            $appointmentServiceCatalog[$categoryId] = [
+                'category_id' => $categoryId,
+                'category_name' => $row['category_name'],
+                'services' => []
+            ];
+        }
+
+        if ($row['service_id'] !== null) {
+            $appointmentServiceCatalog[$categoryId]['services'][] = [
+                'service_id' => (int)$row['service_id'],
+                'service_name' => $row['service_name'],
+                'pricing_type' => $row['pricing_type'],
+                'fixed_price' => $row['fixed_price'] !== null
+                    ? (float)$row['fixed_price']
+                    : null
+            ];
+        }
+    }
+}
+
+$appointmentServiceCatalog = array_values($appointmentServiceCatalog);
+
+$appointmentServiceCatalogJson = json_encode(
+    $appointmentServiceCatalog,
+    JSON_HEX_TAG |
+    JSON_HEX_AMP |
+    JSON_HEX_APOS |
+    JSON_HEX_QUOT
+);
+
+if ($appointmentServiceCatalogJson === false) {
+    $appointmentServiceCatalogJson = '[]';
+}
+
+/* =====================================================
+   ACTIVE PET SPECIES + BREEDS FOR APPOINTMENT FORM
+   -----------------------------------------------------
+   Species and breeds are managed from System Variables.
+   Only Active records are shown in the appointment form.
+   'Others' remains a manual fallback and is NOT stored
+   as a reference breed in the database.
+   ===================================================== */
+$appointmentSpeciesList = [];
+$appointmentBreedCatalog = [];
+
+$petReferenceSql = "
+    SELECT
+        ps.species_id,
+        ps.species,
+        pb.breed_id,
+        pb.breed
+    FROM pet_species ps
+    LEFT JOIN pet_breeds pb
+        ON pb.species_id = ps.species_id
+        AND pb.status = 'Active'
+    WHERE ps.status = 'Active'
+    ORDER BY
+        ps.species ASC,
+        pb.breed ASC
+";
+
+$petReferenceResult = mysqli_query($conn, $petReferenceSql);
+
+if ($petReferenceResult) {
+    while ($row = mysqli_fetch_assoc($petReferenceResult)) {
+
+        $speciesId = (int)$row['species_id'];
+        $speciesName = $row['species'];
+
+        if (!isset($appointmentBreedCatalog[$speciesId])) {
+            $appointmentSpeciesList[] = [
+                'species_id' => $speciesId,
+                'species' => $speciesName
+            ];
+
+            $appointmentBreedCatalog[$speciesId] = [
+                'species_id' => $speciesId,
+                'species' => $speciesName,
+                'breeds' => []
+            ];
+        }
+
+        if ($row['breed_id'] !== null) {
+            $appointmentBreedCatalog[$speciesId]['breeds'][] = [
+                'breed_id' => (int)$row['breed_id'],
+                'breed' => $row['breed']
+            ];
+        }
+    }
+}
+
+$appointmentBreedCatalog = array_values($appointmentBreedCatalog);
+
+$appointmentSpeciesJson = json_encode(
+    $appointmentSpeciesList,
+    JSON_HEX_TAG |
+    JSON_HEX_AMP |
+    JSON_HEX_APOS |
+    JSON_HEX_QUOT
+);
+
+if ($appointmentSpeciesJson === false) {
+    $appointmentSpeciesJson = '[]';
+}
+
+$appointmentBreedCatalogJson = json_encode(
+    $appointmentBreedCatalog,
+    JSON_HEX_TAG |
+    JSON_HEX_AMP |
+    JSON_HEX_APOS |
+    JSON_HEX_QUOT
+);
+
+if ($appointmentBreedCatalogJson === false) {
+    $appointmentBreedCatalogJson = '[]';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -404,26 +557,6 @@ require_once __DIR__ . '/../config/database.php';
                                 Select Category
                             </option>
 
-                            <option value="particulars">
-                                Particulars
-                            </option>
-
-                            <option value="deworming">
-                                Deworming
-                            </option>
-
-                            <option value="vaccination">
-                                Vaccination
-                            </option>
-
-                            <option value="laboratory">
-                                Laboratory Exam
-                            </option>
-
-                            <option value="specialties">
-                                Specialties
-                            </option>
-
                         </select>
 
                         <small
@@ -670,6 +803,13 @@ require_once __DIR__ . '/../config/database.php';
 
                 <h4>Pet Information</h4>
 
+                <p
+                 id="petSectionNotice"
+                 class="pet-section-notice">
+                 <i class="fa-solid fa-lock"></i>
+                 Complete Owner Information first
+               </p>
+
                 <div class="form-grid">
 
 
@@ -704,13 +844,15 @@ require_once __DIR__ . '/../config/database.php';
                                 Select Species
                             </option>
 
-                            <option value="dog">
-                                Dog
-                            </option>
+                            <?php foreach ($appointmentSpeciesList as $appointmentSpecies): ?>
 
-                            <option value="cat">
-                                Cat
-                            </option>
+                                <option
+                                    value="<?= htmlspecialchars(strtolower($appointmentSpecies['species']), ENT_QUOTES, 'UTF-8') ?>"
+                                >
+                                    <?= htmlspecialchars($appointmentSpecies['species'], ENT_QUOTES, 'UTF-8') ?>
+                                </option>
+
+                            <?php endforeach; ?>
 
                         </select>
 
@@ -1214,6 +1356,12 @@ require_once __DIR__ . '/../config/database.php';
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
 <script src="../assets/js/layout.js"></script>
+<script>
+    window.appointmentServiceCatalog = <?= $appointmentServiceCatalogJson ?>;
+    window.appointmentSpeciesList = <?= $appointmentSpeciesJson ?>;
+    window.appointmentBreedCatalog = <?= $appointmentBreedCatalogJson ?>;
+</script>
+
 <script src="../assets/js/appointments.js"></script>
 
 </body>

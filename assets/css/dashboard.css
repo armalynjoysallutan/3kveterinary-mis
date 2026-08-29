@@ -955,3 +955,44 @@ body{
     border-radius:12px;
     font-size:15px;
 }
+
+/* =========================
+   DASHBOARD CALENDAR MARKERS
+========================= */
+
+.dashboard-calendar-marker {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 2px;
+}
+
+/* Confirmed Appointment */
+.dashboard-calendar-marker.appointment {
+    background: #3b82f6;
+}
+
+/* Delivery Day */
+.dashboard-calendar-marker.delivery {
+    background: #22c55e;
+}
+
+/* Order / Restock */
+.dashboard-calendar-marker.restock {
+    background: #f59e0b;
+}
+
+/* Other Event */
+.dashboard-calendar-marker.other {
+    background: #a855f7;
+}
+
+/* Keep event container compact */
+.fc-daygrid-event {
+    background: transparent !important;
+    border: none !important;
+    padding: 2px !important;
+    margin: 0 !important;
+    text-align: center;
+}

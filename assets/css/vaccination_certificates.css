@@ -1,0 +1,676 @@
+/* =========================================================
+   VACCINATION CERTIFICATE
+   ========================================================= */
+
+.vaccination-certificate-content {
+    width: 100%;
+}
+
+
+/* =========================================================
+   INFO CARD
+   ========================================================= */
+
+.vaccination-info-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 18px 22px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    margin-top: 22px;
+
+    border: 1px solid #e5eaf0;
+
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+
+.vaccination-info-icon {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 12px;
+
+    background: #eef5ff;
+
+    color: #2563eb;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+
+    flex-shrink: 0;
+}
+
+
+.vaccination-info-card h3 {
+    margin: 0;
+
+    font-size: 18px;
+
+    color: #1e293b;
+}
+
+
+.vaccination-info-card p {
+    margin: 4px 0 0;
+
+    font-size: 13px;
+
+    color: #7b8aa0;
+}
+
+
+/* =========================================================
+   LIST CARD
+   ========================================================= */
+
+.vaccination-list-card {
+    margin-top: 22px;
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    border: 1px solid #e5eaf0;
+
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+
+.vaccination-list-card .section-header {
+    padding: 20px 24px;
+
+    border-bottom: 1px solid #edf1f5;
+}
+
+
+.vaccination-list-card .section-header h3 {
+    margin: 0;
+
+    font-size: 19px;
+
+    color: #1e293b;
+}
+
+
+.vaccination-list-card .section-header p {
+    margin: 4px 0 0;
+
+    font-size: 13px;
+
+    color: #8190a5;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.vaccination-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 13px;
+}
+
+
+.vaccination-table thead {
+    background: #f7f9fc;
+}
+
+
+.vaccination-table th {
+    padding: 14px 16px;
+
+    text-align: left;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    color: #64748b;
+
+    letter-spacing: .3px;
+
+    white-space: nowrap;
+
+    border-bottom: 1px solid #e8edf3;
+}
+
+
+.vaccination-table td {
+    padding: 16px;
+
+    color: #334155;
+
+    border-bottom: 1px solid #edf1f5;
+
+    vertical-align: middle;
+}
+
+
+.vaccination-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+.vaccination-table tbody tr:hover {
+    background: #fafcff;
+}
+
+
+.vaccination-table td strong {
+    color: #243b5a;
+
+    font-weight: 700;
+}
+
+
+.vaccination-table td small {
+    color: #8a98aa;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   PET ID
+   ========================================================= */
+
+.pet-id {
+    color: #2563eb;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   QR STATUS
+   ========================================================= */
+
+.qr-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+.qr-status.generated {
+    background: #e7f8ee;
+
+    color: #168447;
+}
+
+
+.qr-status.not-generated {
+    background: #f1f3f5;
+
+    color: #7b8794;
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.certificate-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+
+.action-btn {
+    width: 34px;
+    height: 34px;
+
+    border-radius: 9px;
+
+    border: 1px solid #dce3eb;
+
+    background: #ffffff;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    transition: .2s ease;
+}
+
+
+.action-btn:hover {
+    transform: translateY(-1px);
+}
+
+
+.action-btn.view {
+    color: #2563eb;
+}
+
+
+.action-btn.print {
+    color: #475569;
+}
+
+
+.action-btn.generate {
+    color: #2563eb;
+
+    border-color: #cdddfb;
+
+    background: #f5f8ff;
+}
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.vaccination-empty {
+    text-align: center;
+
+    padding: 55px 20px;
+
+    color: #94a3b8;
+}
+
+
+.vaccination-empty i {
+    font-size: 35px;
+
+    margin-bottom: 12px;
+}
+
+
+.vaccination-empty h4 {
+    margin: 0 0 5px;
+
+    color: #475569;
+
+    font-size: 16px;
+}
+
+
+.vaccination-empty p {
+    margin: 0;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
+   ========================================================= */
+
+.vaccination-modal-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.55);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 9999;
+}
+
+
+.vaccination-modal-overlay.show {
+    display: flex;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.vaccination-modal {
+    width: min(480px, calc(100vw - 40px));
+
+    background: #ffffff;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 25px 60px rgba(15, 23, 42, .20);
+
+    animation: vaccinationModalIn .18s ease;
+}
+
+
+@keyframes vaccinationModalIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.vaccination-modal-header {
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid #edf1f5;
+}
+
+
+.vaccination-modal-header h2 {
+    margin: 0;
+
+    font-size: 19px;
+
+    color: #26384f;
+}
+
+
+.vaccination-modal-header p {
+    margin: 4px 0 0;
+
+    font-size: 12px;
+
+    color: #8795a8;
+}
+
+
+.modal-close-btn {
+    width: 34px;
+    height: 34px;
+
+    border-radius: 9px;
+
+    border: 1px solid #dfe5ec;
+
+    background: #ffffff;
+
+    color: #64748b;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+/* =========================================================
+   MODAL BODY
+   ========================================================= */
+
+.vaccination-modal-body {
+    padding: 20px;
+}
+
+
+.certificate-preview {
+    border: 1px solid #dfe5ec;
+
+    border-radius: 12px;
+
+    padding: 22px;
+
+    text-align: center;
+
+    background: #ffffff;
+}
+
+
+.clinic-name {
+    font-size: 17px;
+
+    font-weight: 800;
+
+    color: #26384f;
+}
+
+
+.clinic-subtitle {
+    margin-top: 1px;
+
+    font-size: 10px;
+
+    color: #718096;
+
+    letter-spacing: .7px;
+}
+
+
+.certificate-preview h3 {
+    margin: 18px 0 12px;
+
+    font-size: 16px;
+
+    color: #334155;
+}
+
+
+/* =========================================================
+   QR PLACEHOLDER
+   ========================================================= */
+
+.qr-placeholder {
+    width: 150px;
+    height: 150px;
+
+    margin: 0 auto 18px;
+
+    border: 2px dashed #cbd5e1;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #2563eb;
+
+    background: #f8fafc;
+
+    font-size: 65px;
+}
+
+
+.certificate-pet-info {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 8px;
+
+    text-align: left;
+}
+
+
+.certificate-pet-info > div {
+    padding: 9px 10px;
+
+    border-radius: 8px;
+
+    background: #f8fafc;
+
+    border: 1px solid #edf1f5;
+}
+
+
+.certificate-pet-info span {
+    display: block;
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    color: #8795a8;
+
+    letter-spacing: .3px;
+
+    margin-bottom: 3px;
+}
+
+
+.certificate-pet-info strong {
+    display: block;
+
+    font-size: 11px;
+
+    color: #334155;
+
+    word-break: break-word;
+}
+
+
+.qr-instruction {
+    margin: 15px 0 0;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+    color: #7b8797;
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+   ========================================================= */
+
+.vaccination-modal-footer {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding: 14px 20px;
+
+    border-top: 1px solid #edf1f5;
+
+    background: #fafbfc;
+}
+
+
+.modal-cancel-btn,
+.modal-save-btn {
+    height: 36px;
+
+    padding: 0 14px;
+
+    border-radius: 9px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.modal-cancel-btn {
+    background: #ffffff;
+
+    color: #475569;
+
+    border: 1px solid #dce3eb;
+}
+
+
+.modal-save-btn {
+    background: #2563eb;
+
+    color: #ffffff;
+
+    border: none;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .vaccination-table {
+        min-width: 900px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .vaccination-info-card {
+        align-items: flex-start;
+    }
+
+    .certificate-pet-info {
+        grid-template-columns: 1fr;
+    }
+
+    .vaccination-modal {
+        width: calc(100vw - 24px);
+    }
+
+}
