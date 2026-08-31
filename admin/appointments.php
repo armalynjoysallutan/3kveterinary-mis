@@ -234,7 +234,7 @@ if ($appointmentBreedCatalogJson === false) {
                 <div class="calendar-header">
 
                     <div class="calendar-title">
-                        <h3>📅 Weekly Calendar</h3>
+                        <h3>📅 Weekly Calendarsss</h3>
                     </div>
 
                     <div class="calendar-controls">
