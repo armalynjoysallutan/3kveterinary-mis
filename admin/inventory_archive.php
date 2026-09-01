@@ -475,7 +475,7 @@ function archivedInventoryStockStatus(
                     >
 
                         <a
-                            href="archived.php"
+                            href="inventory.php"
                             class="archive-report-back-btn"
                         >
 
@@ -483,7 +483,7 @@ function archivedInventoryStockStatus(
                                 class="fa-solid fa-arrow-left"
                             ></i>
 
-                            Back to Archive
+                            Back to Inventory
 
                         </a>
 

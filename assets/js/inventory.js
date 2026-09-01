@@ -76,29 +76,250 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    document.addEventListener("click", function (event) {
-        const actionButton = event.target.closest(".inventory-more-btn");
+   /* =========================================================
+   INVENTORY ACTION DROPDOWN
+   Uses a body-level portal so the menu is not clipped
+   by the horizontally scrollable table.
+   ========================================================= */
 
-        document.querySelectorAll(".inventory-action-menu.show").forEach(function (menu) {
-            if (!actionButton || !actionButton.parentElement.contains(menu)) {
-                menu.classList.remove("show");
-                menu.previousElementSibling?.setAttribute("aria-expanded", "false");
-            }
-        });
+let activeInventoryActionMenu = null;
+let activeInventoryActionButton = null;
+let activeInventoryActionPlaceholder = null;
 
-        if (!actionButton) return;
+function closeInventoryActionMenu() {
 
-        event.preventDefault();
-        event.stopPropagation();
+    if (!activeInventoryActionMenu) {
+        return;
+    }
 
-        const menu = actionButton.nextElementSibling;
-        if (!menu) return;
+    const menu = activeInventoryActionMenu;
 
-        const willOpen = !menu.classList.contains("show");
-        menu.classList.toggle("show", willOpen);
-        actionButton.setAttribute("aria-expanded", willOpen ? "true" : "false");
-    });
+    menu.classList.remove("show");
 
+    /* Restore original position inside the table */
+    if (
+        activeInventoryActionPlaceholder &&
+        activeInventoryActionPlaceholder.parentNode
+    ) {
+
+        activeInventoryActionPlaceholder.parentNode.insertBefore(
+            menu,
+            activeInventoryActionPlaceholder
+        );
+
+        activeInventoryActionPlaceholder.remove();
+    }
+
+    /* Remove the inline styles added when opened */
+    menu.style.position = "";
+    menu.style.zIndex = "";
+    menu.style.display = "";
+    menu.style.top = "";
+    menu.style.left = "";
+    menu.style.right = "";
+
+    activeInventoryActionButton?.setAttribute(
+        "aria-expanded",
+        "false"
+    );
+
+    activeInventoryActionMenu = null;
+    activeInventoryActionButton = null;
+    activeInventoryActionPlaceholder = null;
+}
+
+
+function openInventoryActionMenu(actionButton) {
+
+    closeInventoryActionMenu();
+
+    const originalMenu = actionButton.nextElementSibling;
+
+    if (!originalMenu ||
+        !originalMenu.classList.contains("inventory-action-menu")) {
+        return;
+    }
+
+    /* Save original location */
+    const placeholder = document.createComment(
+        "inventory-action-menu-placeholder"
+    );
+
+    originalMenu.parentNode.insertBefore(
+        placeholder,
+        originalMenu
+    );
+
+    /* Move menu outside the table */
+    document.body.appendChild(originalMenu);
+
+    const buttonRect = actionButton.getBoundingClientRect();
+
+    originalMenu.style.position = "fixed";
+    originalMenu.style.zIndex = "99999";
+    originalMenu.style.display = "block";
+
+    /* Initial position */
+    originalMenu.style.top =
+        `${buttonRect.bottom + 6}px`;
+
+    originalMenu.style.right = "auto";
+    originalMenu.style.left =
+        `${buttonRect.right - originalMenu.offsetWidth}px`;
+
+    /* Keep dropdown inside viewport */
+    const menuRect =
+        originalMenu.getBoundingClientRect();
+
+    let left = buttonRect.right - menuRect.width;
+    let top = buttonRect.bottom + 6;
+
+    const padding = 10;
+
+    if (left < padding) {
+        left = padding;
+    }
+
+    if (left + menuRect.width >
+        window.innerWidth - padding) {
+
+        left =
+            window.innerWidth -
+            menuRect.width -
+            padding;
+    }
+
+    if (top + menuRect.height >
+        window.innerHeight - padding) {
+
+        top =
+            buttonRect.top -
+            menuRect.height -
+            6;
+    }
+
+    originalMenu.style.left = `${left}px`;
+    originalMenu.style.top = `${top}px`;
+
+    originalMenu.classList.add("show");
+
+    actionButton.setAttribute(
+        "aria-expanded",
+        "true"
+    );
+
+    activeInventoryActionMenu = originalMenu;
+    activeInventoryActionButton = actionButton;
+    activeInventoryActionPlaceholder = placeholder;
+}
+
+
+/* Open / close action menu */
+
+document.addEventListener("click", function (event) {
+
+    const actionButton =
+        event.target.closest(".inventory-more-btn");
+
+    /* Click outside */
+    if (!actionButton) {
+
+        if (
+            activeInventoryActionMenu &&
+            !activeInventoryActionMenu.contains(event.target)
+        ) {
+            closeInventoryActionMenu();
+        }
+
+        return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    /* Toggle */
+    if (
+        activeInventoryActionMenu &&
+        activeInventoryActionButton === actionButton
+    ) {
+        closeInventoryActionMenu();
+        return;
+    }
+
+    openInventoryActionMenu(actionButton);
+});
+
+/* =========================================================
+   PORTAL ACTION BUTTON HANDLER
+   ========================================================= */
+
+document.addEventListener("click", function (event) {
+
+    const action =
+        event.target.closest(".inventory-action-menu button");
+
+    if (!action) {
+        return;
+    }
+
+    const actionType = action.dataset.action;
+    const itemId = action.dataset.id;
+
+    if (!actionType || !itemId) {
+        return;
+    }
+
+    /*
+     * The <tr> does not have data-id.
+     * The original .inventory-more-btn does.
+     */
+    const originalActionButton =
+        document.querySelector(
+            `.inventory-more-btn[data-id="${CSS.escape(itemId)}"]`
+        );
+
+    if (!originalActionButton) {
+        console.error(
+            "Inventory action button not found for item:",
+            itemId
+        );
+        return;
+    }
+
+    /* Close dropdown after selecting an action */
+    closeInventoryActionMenu();
+
+    /* VIEW */
+    if (actionType === "view") {
+        openViewItemModal(itemId);
+        return;
+    }
+
+    /* STOCK IN */
+    if (actionType === "stock-in") {
+        openStockInModal(
+            itemId,
+            originalActionButton
+        );
+        return;
+    }
+
+    /* STOCK OUT */
+    if (actionType === "stock-out") {
+        openStockOutModal(
+            itemId,
+            originalActionButton
+        );
+        return;
+    }
+
+    /* EDIT */
+    if (actionType === "edit") {
+        openEditItemModal(itemId);
+        return;
+    }
+
+});
     /* =========================================================
        STOCK IN MODAL
        ========================================================= */
@@ -143,7 +364,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
 
                         <div class="inventory-form-group">
-                            <label for="stockInQuantity">Quantity <span>*</span></label>
+                            <label for="stockInQuantity">
+                                Quantity <span id="stockInQuantityUnit"></span> <span>*</span>
+                            </label>
                             <input type="number" id="stockInQuantity" name="quantity" min="0.01" step="0.01" placeholder="0" required>
                         </div>
 
@@ -203,14 +426,20 @@ document.addEventListener("DOMContentLoaded", function () {
         const row = actionButton?.closest("tr");
         const cells = row?.querySelectorAll("td") || [];
 
-        const itemName = cells[1]?.textContent.trim() || "Inventory Item";
-        const itemCode = cells[0]?.textContent.trim() || `Item #${itemId}`;
-        const unit = cells[3]?.textContent.trim() || "";
+        const itemName = cells[2]?.textContent.trim() || "Inventory Item";
+        const itemCode = cells[1]?.textContent.trim() || `Item #${itemId}`;
+        const unit = cells[4]?.textContent.trim() || "";
 
         modal.querySelector("#stockInForm").reset();
         modal.querySelector("#stockInItemId").value = itemId;
         modal.querySelector("#stockInItemName").textContent = itemName;
         modal.querySelector("#stockInItemMeta").textContent = `${itemCode}${unit ? ` • ${unit}` : ""}`;
+
+        const quantityUnit = modal.querySelector("#stockInQuantityUnit");
+
+        if (quantityUnit) {
+            quantityUnit.textContent = unit ? `(${unit})` : "";
+        }
 
         const today = new Date();
         const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
@@ -266,9 +495,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error(data.message || "Unable to record Stock In.");
             }
 
-            alert(data.message || "Stock In recorded successfully.");
             closeStockInModal();
-            window.location.reload();
+            showInventorySuccessModal(
+                "Stock In Successful",
+                data.message || "Stock In has been recorded successfully."
+            );
+
+
         } catch (error) {
             alert(error.message || "Something went wrong while recording Stock In.");
             saveButton.disabled = false;
@@ -400,9 +633,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const row = actionButton?.closest("tr");
         const cells = row?.querySelectorAll("td") || [];
 
-        const itemName = cells[1]?.textContent.trim() || "Inventory Item";
-        const itemCode = cells[0]?.textContent.trim() || `Item #${itemId}`;
-        const unit = cells[3]?.textContent.trim() || "";
+        const itemName = cells[2]?.textContent.trim() || "Inventory Item";
+        const itemCode = cells[1]?.textContent.trim() || `Item #${itemId}`;
+        const unit = cells[4]?.textContent.trim() || "";
 
         const form = modal.querySelector("#stockOutForm");
         const batchSelect = modal.querySelector("#stockOutBatch");
@@ -559,9 +792,87 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error(data.message || "Unable to record Stock Out.");
             }
 
-            alert(data.message || "Stock Out recorded successfully.");
-            closeStockOutModal();
-            window.location.reload();
+           closeStockOutModal();
+           showInventorySuccessModal(
+            "Stock Out Successful",
+            data.message || "Stock Out has been recorded successfully."
+           );
+
+           /* =========================================================
+   INVENTORY SUCCESS MODAL
+   ========================================================= */
+
+function showInventorySuccessModal(title, message) {
+
+    let modal = document.getElementById("inventorySuccessModal");
+
+    if (!modal) {
+
+        modal = document.createElement("div");
+
+        modal.id = "inventorySuccessModal";
+        modal.className = "inventory-success-overlay";
+
+        modal.innerHTML = `
+            <div class="inventory-success-modal"
+                 role="dialog"
+                 aria-modal="true">
+
+                <div class="inventory-success-icon">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+
+                <h3 id="inventorySuccessTitle">
+                    Success
+                </h3>
+
+                <p id="inventorySuccessMessage">
+                    Transaction completed successfully.
+                </p>
+
+                <button type="button"
+                        id="inventorySuccessOk">
+                    OK
+                </button>
+
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        modal.querySelector("#inventorySuccessOk")
+            ?.addEventListener("click", function () {
+
+                modal.classList.remove("show");
+
+                window.location.reload();
+
+            });
+
+        modal.addEventListener("click", function (event) {
+
+            if (event.target === modal) {
+
+                modal.classList.remove("show");
+
+                window.location.reload();
+
+            }
+
+        });
+    }
+
+    modal.querySelector("#inventorySuccessTitle").textContent =
+        title;
+
+    modal.querySelector("#inventorySuccessMessage").textContent =
+        message;
+
+    modal.classList.add("show");
+}
+
+
+
         } catch (error) {
             alert(error.message || "Something went wrong while recording Stock Out.");
             saveButton.disabled = false;

@@ -746,10 +746,14 @@
 
 .archive-btn{
 
+    text-decoration: none !important;
     background:#f3f4f6;
-
     color:#374151;
 
+}
+
+.archive-btn:hover {
+    filter: brightness(0.9);
 }
 
 .add-btn{

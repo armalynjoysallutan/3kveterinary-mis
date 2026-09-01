@@ -3,6 +3,8 @@ include("../config/database.php");
 
 header("Content-Type: application/json");
 
+
+
 $events = [];
 
 /* =========================

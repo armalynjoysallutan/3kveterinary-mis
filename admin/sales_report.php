@@ -635,6 +635,163 @@ $salesReportChartData = [
 
 ];
 
+/* =========================================================
+   17. PRINT REPORT INTERPRETATIONS
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   SALES TREND INTERPRETATION
+--------------------------------------------------------- */
+
+$salesTrendInterpretation =
+    "The Sales Trend chart presents the total paid sales "
+    . "recorded for each day within the selected reporting period.";
+
+if (!empty($salesTrend)) {
+
+    $highestSalesDay = $salesTrend[0];
+
+    foreach ($salesTrend as $row) {
+
+        if (
+            (float) $row['daily_sales']
+            > (float) $highestSalesDay['daily_sales']
+        ) {
+            $highestSalesDay = $row;
+        }
+    }
+
+    $highestSalesDate =
+        date(
+            'F j, Y',
+            strtotime($highestSalesDay['sale_date'])
+        );
+
+    $salesTrendInterpretation .=
+        " The highest recorded daily sales occurred on "
+        . $highestSalesDate
+        . " with "
+        . money($highestSalesDay['daily_sales'])
+        . " in paid sales.";
+} else {
+
+    $salesTrendInterpretation .=
+        " No paid sales were recorded within the selected period.";
+}
+
+
+/* ---------------------------------------------------------
+   SALES BY ITEM TYPE
+--------------------------------------------------------- */
+
+$salesTypeInterpretation =
+    "The Sales by Item Type chart shows how paid revenue "
+    . "was distributed across the different item types.";
+
+if (!empty($salesByType)) {
+
+    $topSalesType = $salesByType[0];
+
+    $salesTypeInterpretation .=
+        " "
+        . htmlspecialchars($topSalesType['item_type'])
+        . " generated the highest recorded revenue at "
+        . money($topSalesType['total_amount'])
+        . " among the displayed item types.";
+} else {
+
+    $salesTypeInterpretation .=
+        " No paid item-type sales were recorded within "
+        . "the selected period.";
+}
+
+
+/* ---------------------------------------------------------
+   TOP ITEMS
+--------------------------------------------------------- */
+
+$topItemsInterpretation =
+    "The Top 10 Services & Items chart identifies the "
+    . "services or items that generated the highest paid revenue.";
+
+if (!empty($topItems)) {
+
+    $topItem = $topItems[0];
+
+    $topItemsInterpretation .=
+        " "
+        . htmlspecialchars($topItem['item_name'])
+        . " ranked first with "
+        . money($topItem['total_amount'])
+        . " in recorded paid revenue.";
+} else {
+
+    $topItemsInterpretation .=
+        " No paid services or items were recorded within "
+        . "the selected period.";
+}
+
+
+/* ---------------------------------------------------------
+   PAYMENT STATUS
+--------------------------------------------------------- */
+
+$statusInterpretation =
+    "The Transaction Status chart shows the distribution "
+    . "of billing transactions according to payment status.";
+
+if ($salesTransactions > 0) {
+
+    $paidPercentage =
+        ($paidTransactions / $salesTransactions) * 100;
+
+    $pendingPercentage =
+        ($pendingTransactions / $salesTransactions) * 100;
+
+    $statusInterpretation .=
+        " Of the "
+        . number_format($salesTransactions)
+        . " recorded transaction(s), "
+        . number_format($paidPercentage, 1)
+        . "% were paid and "
+        . number_format($pendingPercentage, 1)
+        . "% remained pending.";
+} else {
+
+    $statusInterpretation .=
+        " No billing transactions were recorded "
+        . "within the selected period.";
+}
+
+
+/* ---------------------------------------------------------
+   OVERALL SALES SUMMARY
+--------------------------------------------------------- */
+
+if ($salesTransactions > 0) {
+
+    $salesSummaryInterpretation =
+        "For the selected reporting period, the system "
+        . "recorded "
+        . number_format($salesTransactions)
+        . " billing transaction(s), including "
+        . number_format($paidTransactions)
+        . " paid and "
+        . number_format($pendingTransactions)
+        . " pending transaction(s). Total recorded paid "
+        . "sales amounted to "
+        . money($totalSales)
+        . ", with an average paid transaction value of "
+        . money($averageSale)
+        . ".";
+
+} else {
+
+    $salesSummaryInterpretation =
+        "No billing transactions were recorded within "
+        . "the selected reporting period.";
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -1164,6 +1321,13 @@ $salesReportChartData = [
 
                     </div>
 
+                    <div class="print-interpretation">
+                        <h3>Interpretation</h3>
+                        <p>
+                            <?= htmlspecialchars($salesTrendInterpretation) ?>
+                        </p>
+                    </div>
+
 
                 </article>
 
@@ -1196,6 +1360,13 @@ $salesReportChartData = [
                             id="salesTypeChart"
                         ></canvas>
 
+                    </div>
+
+                    <div class="print-interpretation">
+                        <h3>Interpretation</h3>
+                        <p>
+                            <?= htmlspecialchars($salesTypeInterpretation) ?>
+                        </p>
                     </div>
 
 
@@ -1232,6 +1403,14 @@ $salesReportChartData = [
 
                     </div>
 
+                    <div class="print-interpretation">
+                        <h3>Interpretation</h3>
+                        <p>
+                            <?= htmlspecialchars($topItemsInterpretation) ?>
+                        </p>
+                        
+                    </div>
+
 
                 </article>
 
@@ -1264,6 +1443,13 @@ $salesReportChartData = [
                             id="statusChart"
                         ></canvas>
 
+                    </div>
+
+                    <div class="print-interpretation">
+                        <h3>Interpretation</h3>
+                        <p>
+                            <?= htmlspecialchars($statusInterpretation) ?>
+                        </p>
                     </div>
 
 
@@ -1300,6 +1486,10 @@ $salesReportChartData = [
                             <?= money($averageSale) ?>
                         </strong>
 
+                    </p>
+
+                    <p class="print-summary-interpretation">
+                        <?= htmlspecialchars($salesSummaryInterpretation) ?>
                     </p>
 
                 </div>

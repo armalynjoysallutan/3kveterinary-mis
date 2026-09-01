@@ -1,8 +1,35 @@
 <?php
 
+session_start();
+
 require_once "../config/database.php";
 
 header("Content-Type: application/json");
+
+/* =========================================================
+   ADMIN / STAFF AUTHENTICATION
+========================================================= */
+
+if (
+    !(
+        isset($_SESSION["admin_id"]) ||
+        isset($_SESSION["admin_username"]) ||
+        (
+            isset($_SESSION["account_id"]) &&
+            isset($_SESSION["role"]) &&
+            $_SESSION["role"] === "Staff"
+        )
+    )
+) {
+    http_response_code(401);
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Unauthorized access."
+    ]);
+
+    exit();
+}
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 

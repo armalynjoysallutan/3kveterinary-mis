@@ -612,3 +612,209 @@
     }
 
 }
+
+/* =========================================================
+   PRINT INTERPRETATIONS
+========================================================= */
+
+.print-interpretation,
+.print-summary-interpretation {
+    display: none;
+}
+
+
+/* =========================================================
+   PRINT REPORT
+========================================================= */
+
+@media print {
+
+    .print-interpretation {
+        display: block;
+
+        margin: 10px 16px 18px;
+        padding: 10px 12px;
+
+        border-left: 3px solid #2563eb;
+        background: #f8fafc;
+
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .print-interpretation h3 {
+        margin: 0 0 5px;
+
+        color: #172b4d;
+
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .print-interpretation p {
+        margin: 0;
+
+        color: #475569;
+
+        font-size: 9px;
+        line-height: 1.55;
+
+        text-align: justify;
+    }
+
+
+    /* Overall Sales Interpretation */
+
+    .print-summary-interpretation {
+        display: block;
+
+        margin: 8px 0 0;
+
+        color: #475569;
+
+        font-size: 9px;
+        line-height: 1.55;
+
+        text-align: justify;
+    }
+
+
+    /* Keep each chart + interpretation together */
+
+    .sales-chart-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+}
+
+/* =========================================================
+   PRINT REPORT
+========================================================= */
+
+@media print {
+
+    /* Hide system navigation and page controls */
+
+    .sidebar,
+    .sidebar-overlay,
+    .topbar,
+    .sales-report-actions,
+    .sales-filter-card,
+    .sales-report-footer {
+        display: none !important;
+    }
+
+
+    /* Reset page layout */
+
+    html,
+    body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: #fff !important;
+    }
+
+
+    .container {
+        width: 100%;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+
+    .content {
+        width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
+
+    .sales-report-page {
+        width: 100%;
+        min-height: 0;
+
+        margin: 0;
+        padding: 20px 25px;
+
+        box-sizing: border-box;
+    }
+
+
+    /* Hide interactive elements */
+
+    button,
+    input,
+    select,
+    a {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+
+    /* Keep report cards clean */
+
+    .sales-summary-card,
+    .sales-chart-card,
+    .sales-insight-card,
+    .recent-sales-card,
+    .sales-about-card {
+        box-shadow: none !important;
+    }
+
+
+    /* Keep chart + interpretation together */
+
+    .sales-chart-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+
+    /* Show interpretations only when printing */
+
+    .print-interpretation {
+        display: block !important;
+    }
+
+    .print-summary-interpretation {
+        display: block !important;
+    }
+
+
+    /* Remove unnecessary page spacing */
+
+    .sales-report-header {
+        margin-bottom: 15px;
+    }
+
+
+    /* Better printed tables */
+
+    .sales-table-wrapper {
+        overflow: visible !important;
+    }
+
+    .sales-report-table {
+        min-width: 0;
+    }
+
+
+    /* Prevent awkward chart splitting */
+
+    .sales-chart-grid {
+        break-inside: auto;
+    }
+
+
+    /* Browser print colors */
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+}

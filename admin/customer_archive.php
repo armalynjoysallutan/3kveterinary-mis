@@ -397,12 +397,12 @@ foreach ($petsByCustomer as $customerPets) {
                     <button
                         type="button"
                         class="back-records-btn"
-                        onclick="window.location.href='archived.php'"
+                        onclick="window.location.href='customer_records.php'"
                     >
 
                         <i class="fa-solid fa-arrow-left"></i>
 
-                        Back to Archive
+                        Back to Customer Records
 
                     </button>
 

@@ -117,9 +117,8 @@
 
 .vaccination-table {
     width: 100%;
-
+    table-layout: fixed;
     border-collapse: collapse;
-
     font-size: 13px;
 }
 
@@ -673,4 +672,300 @@
         width: calc(100vw - 24px);
     }
 
+}
+
+/* =========================================================
+   SEARCH + ACTION TOOLBAR
+   ========================================================= */
+
+.toolbar-card {
+    width: 100%;
+    min-height: 58px;
+    margin-bottom: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    box-sizing: border-box;
+}
+
+.toolbar-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.toolbar-right {
+    flex-shrink: 0;
+}
+
+.search-box {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #94a3b8;
+    font-size: 13px;
+
+    pointer-events: none;
+}
+
+.search-box input {
+    width: 100%;
+    height: 40px;
+
+    padding: 0 14px 0 38px;
+
+    border: 1px solid #dce3eb;
+    border-radius: 9px;
+
+    background: #ffffff;
+    color: #334155;
+
+    font-size: 12px;
+
+    outline: none;
+    box-sizing: border-box;
+
+    transition: .2s ease;
+}
+
+.search-box input::placeholder {
+    color: #94a3b8;
+}
+
+.search-box input:focus {
+    border-color: transparent;
+    box-shadow: none;
+}
+
+
+/* =========================================================
+   TOOLBAR RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .toolbar-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        max-width: none;
+    }
+
+    .toolbar-right {
+        width: 100%;
+    }
+
+    .toolbar-right .add-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+}
+
+/* TEMP FIX - FORCE VACCINATION TOOLBAR VISIBLE */
+
+.vaccination-certificate-content > .toolbar-card {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    position: relative !important;
+    z-index: 50 !important;
+
+    width: 100% !important;
+    height: auto !important;
+    min-height: 64px !important;
+
+    margin: 0 0 24px 0 !important;
+    padding: 20px 24px !important;
+
+    overflow: visible !important;
+
+    background: #fff !important;
+    border: 1px solid #e5e9f0 !important;
+    border-radius: 20px !important;
+
+    box-sizing: border-box !important;
+}
+
+.vaccination-certificate-content > .toolbar-card .toolbar-left,
+.vaccination-certificate-content > .toolbar-card .toolbar-right {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.vaccination-certificate-content > .toolbar-card .search-box {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 420px !important;
+    height: 42px !important;
+
+    position: relative !important;
+
+    background: #fff !important;
+    border: 1px solid #dfe5ee !important;
+    border-radius: 8px !important;
+}
+
+.vaccination-certificate-content > .toolbar-card .search-box input {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    background: transparent !important;
+    border: 0 !important;
+    outline: 0 !important;
+}
+
+/* =========================================================
+   VACCINATION CERTIFICATE - LAYOUT POSITIONING FIX
+   Keep content below the shared topbar
+   ========================================================= */
+
+.content > .page-content {
+    position: relative !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.content > .page-content > .vaccination-certificate-content {
+    position: relative !important;
+    display: block !important;
+
+    width: 100% !important;
+    min-height: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+/* Keep search toolbar in normal document flow */
+.content > .page-content > .vaccination-certificate-content > .toolbar-card {
+    position: relative !important;
+
+    display: flex !important;
+
+    width: 100% !important;
+    min-height: 64px !important;
+
+    margin: 0 0 22px 0 !important;
+
+    z-index: 10 !important;
+
+    box-sizing: border-box !important;
+}
+
+/* Make sure the search itself is visible */
+.content > .page-content > .vaccination-certificate-content
+.toolbar-card .search-box {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    position: relative !important;
+
+    width: 420px !important;
+    height: 42px !important;
+}
+
+/* Search input */
+.content > .page-content > .vaccination-certificate-content
+.toolbar-card .search-box input {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* =========================================================
+   PAGE POSITION - KEEP CONTENT BELOW FIXED TOPBAR
+   ========================================================= */
+
+.content > .page-content {
+    padding-top: 120px !important;
+    box-sizing: border-box !important;
+}
+
+.vaccination-certificate-content {
+    width: 100% !important;
+    padding-top: 0 !important;
+}
+
+/* Keep vaccination table columns stable while searching */
+.vaccination-table th,
+.vaccination-table td {
+    box-sizing: border-box;
+}
+
+.vaccination-table th:nth-child(1),
+.vaccination-table td:nth-child(1) {
+    width: 10%;
+}
+
+.vaccination-table th:nth-child(2),
+.vaccination-table td:nth-child(2) {
+    width: 13%;
+}
+
+.vaccination-table th:nth-child(3),
+.vaccination-table td:nth-child(3) {
+    width: 17%;
+}
+
+.vaccination-table th:nth-child(4),
+.vaccination-table td:nth-child(4) {
+    width: 18%;
+}
+
+.vaccination-table th:nth-child(5),
+.vaccination-table td:nth-child(5) {
+    width: 15%;
+}
+
+.vaccination-table th:nth-child(6),
+.vaccination-table td:nth-child(6) {
+    width: 15%;
+}
+
+.vaccination-table th:nth-child(7),
+.vaccination-table td:nth-child(7) {
+    width: 12%;
+}
+
+/* =========================================================
+   VACCINATION LIST - STABLE SIZE
+   ========================================================= */
+
+.vaccination-list-card .table-wrapper {
+    min-height: 420px;
+    overflow-x: auto;
+}
+
+.vaccination-list-card .vaccination-table {
+    width: 100%;
+    table-layout: fixed;
 }

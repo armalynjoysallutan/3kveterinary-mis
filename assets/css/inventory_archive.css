@@ -1173,3 +1173,19 @@ body {
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+/* =========================================================
+   ARCHIVE TOPBAR - MATCH MAIN SYSTEM
+   ========================================================= */
+
+.content > .topbar-wrapper {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.content > .topbar-wrapper .topbar {
+    width: 100% !important;
+    height: 75px !important;
+    min-height: 75px !important;
+    box-sizing: border-box !important;
+}

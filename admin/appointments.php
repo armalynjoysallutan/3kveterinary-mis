@@ -219,10 +219,10 @@ if ($appointmentBreedCatalogJson === false) {
                         Add Appointment
                     </button>
 
-                    <button class="archive-btn">
+                    <a href="appointments_archive.php" class="archive-btn">
                         <i class="fa-solid fa-box-archive"></i>
                         Archived
-                    </button>
+                    </a>
 
                 </div>
 
@@ -259,6 +259,19 @@ if ($appointmentBreedCatalogJson === false) {
             <div class="card appointment-list-card">
                 <div class="section-header">
                     <h3>Appointment Lists</h3>
+                </div>
+
+                <div class="appointment-status-filter">
+                    <label for="appointmentStatusFilter">Status</label>
+
+                    <select id="appointmentStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Arrived">Arrived</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
                 </div>
 
                 <div class="table-wrapper">

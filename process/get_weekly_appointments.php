@@ -1,4 +1,6 @@
 <?php
+
+
 include("../config/database.php");
 
 $startOfWeek = date("Y-m-d", strtotime("monday this week"));

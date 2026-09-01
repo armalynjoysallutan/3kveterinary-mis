@@ -3,7 +3,17 @@ session_start();
 
 header("Content-Type: application/json; charset=utf-8");
 
-if (!isset($_SESSION["admin_username"])) {
+if (
+    !(
+        isset($_SESSION["admin_id"]) ||
+        isset($_SESSION["admin_username"]) ||
+        (
+            isset($_SESSION["account_id"]) &&
+            isset($_SESSION["role"]) &&
+            $_SESSION["role"] === "Staff"
+        )
+    )
+) {
     http_response_code(401);
 
     echo json_encode([
@@ -13,7 +23,6 @@ if (!isset($_SESSION["admin_username"])) {
 
     exit();
 }
-
 require_once "../config/database.php";
 
 $medicalRecordId = isset($_GET["medical_record_id"])

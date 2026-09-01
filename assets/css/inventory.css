@@ -276,7 +276,7 @@
 
 .inventory-table {
     width: 100%;
-    min-width: 0;
+    min-width: 1180px;
     table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0;
@@ -1771,4 +1771,387 @@ body.inventory-modal-open {
 .inventory-archive-confirm-btn:hover {
     background: #b91c1c;
     border-color: #b91c1c;
+}
+
+/* =========================================================
+   INVENTORY TABLE - HORIZONTAL SCROLL
+========================================================= */
+
+.table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+/* Keep table columns readable */
+.inventory-table {
+    min-width: 1180px;
+}
+
+/* Prevent text from squeezing columns */
+.inventory-table th,
+.inventory-table td {
+    white-space: nowrap;
+}
+
+/* Horizontal scrollbar */
+.table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* =========================================================
+   INVENTORY TABLE - FINAL COLUMN LAYOUT FIX
+   ========================================================= */
+
+/* The table is intentionally wider than the card.
+   The .table-wrapper handles horizontal scrolling. */
+.table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Fixed readable table width */
+.inventory-table {
+    width: 1260px !important;
+    min-width: 1260px !important;
+    max-width: none !important;
+    table-layout: fixed !important;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* =========================================================
+   COLUMN WIDTHS
+   ========================================================= */
+
+/* 1. CHECKBOX */
+.inventory-table th:nth-child(1),
+.inventory-table td:nth-child(1) {
+    width: 50px !important;
+    min-width: 50px !important;
+    max-width: 50px !important;
+}
+
+/* 2. ITEM ID */
+.inventory-table th:nth-child(2),
+.inventory-table td:nth-child(2) {
+    width: 105px !important;
+    min-width: 105px !important;
+    max-width: 105px !important;
+}
+
+/* 3. ITEM NAME */
+.inventory-table th:nth-child(3),
+.inventory-table td:nth-child(3) {
+    width: 210px !important;
+    min-width: 210px !important;
+    max-width: 210px !important;
+}
+
+/* 4. CATEGORY */
+.inventory-table th:nth-child(4),
+.inventory-table td:nth-child(4) {
+    width: 130px !important;
+    min-width: 130px !important;
+    max-width: 130px !important;
+}
+
+/* 5. UNIT */
+.inventory-table th:nth-child(5),
+.inventory-table td:nth-child(5) {
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+}
+
+/* 6. STOCK */
+.inventory-table th:nth-child(6),
+.inventory-table td:nth-child(6) {
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+}
+
+/* 7. UNIT COST */
+.inventory-table th:nth-child(7),
+.inventory-table td:nth-child(7) {
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
+
+/* 8. RETAIL PRICE */
+.inventory-table th:nth-child(8),
+.inventory-table td:nth-child(8) {
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
+}
+
+/* 9. BATCH NO. */
+.inventory-table th:nth-child(9),
+.inventory-table td:nth-child(9) {
+    width: 125px !important;
+    min-width: 125px !important;
+    max-width: 125px !important;
+}
+
+/* 10. EXPIRY DATE */
+.inventory-table th:nth-child(10),
+.inventory-table td:nth-child(10) {
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
+}
+
+/* 11. STATUS */
+.inventory-table th:nth-child(11),
+.inventory-table td:nth-child(11) {
+    width: 105px !important;
+    min-width: 105px !important;
+    max-width: 105px !important;
+}
+
+/* 12. ACTIONS */
+.inventory-table th:nth-child(12),
+.inventory-table td:nth-child(12) {
+    width: 75px !important;
+    min-width: 75px !important;
+    max-width: 75px !important;
+}
+
+/* =========================================================
+   CELL ALIGNMENT
+   ========================================================= */
+
+.inventory-table th,
+.inventory-table td {
+    box-sizing: border-box;
+}
+
+/* Keep headers readable */
+.inventory-table th {
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Keep normal cells readable */
+.inventory-table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Item name can wrap */
+.inventory-table td:nth-child(3) {
+    white-space: normal !important;
+    overflow-wrap: break-word;
+    word-break: normal;
+    line-height: 1.35;
+}
+
+/* Center compact values */
+.inventory-table td:nth-child(1),
+.inventory-table td:nth-child(5),
+.inventory-table td:nth-child(6),
+.inventory-table td:nth-child(11),
+.inventory-table td:nth-child(12) {
+    text-align: center;
+}
+
+/* Prices */
+.inventory-table td:nth-child(7),
+.inventory-table td:nth-child(8) {
+    text-align: right;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.inventory-table td:nth-child(11) .inventory-status {
+    display: inline-flex;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.inventory-table th:nth-child(12),
+.inventory-table td:nth-child(12) {
+    position: sticky;
+    right: 0;
+    z-index: 5;
+    background: #fff;
+    text-align: center;
+    box-shadow: -5px 0 8px rgba(15, 23, 42, 0.05);
+}
+
+.inventory-table th:nth-child(12) {
+    background: #f8fafc;
+}
+
+/* =========================================================
+   HORIZONTAL SCROLLBAR
+   ========================================================= */
+
+.table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.table-wrapper {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* =========================================================
+   INVENTORY SUCCESS MODAL
+   ========================================================= */
+
+.inventory-success-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.inventory-success-overlay.show {
+    display: flex;
+}
+
+.inventory-success-modal {
+    width: min(390px, 100%);
+    padding: 30px 28px 26px;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 20px 55px rgba(15, 23, 42, 0.20);
+    text-align: center;
+}
+
+.inventory-success-icon {
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #eaf8ef;
+    color: #16a34a;
+    font-size: 24px;
+}
+
+.inventory-success-modal h3 {
+    margin: 0;
+    color: #26354a;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.inventory-success-modal p {
+    margin: 8px 0 22px;
+    color: #667085;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.inventory-success-modal button {
+    min-width: 90px;
+    height: 38px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.inventory-success-modal button:hover {
+    background: #1d4ed8;
+}
+
+/* =========================================================
+   ACTION DROPDOWN - FINAL
+   ========================================================= */
+
+.inventory-table th:last-child,
+.inventory-table td:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 20;
+    background: #fff;
+    text-align: center;
+}
+
+.inventory-table th:last-child {
+    background: #f8fafc;
+    z-index: 21;
+}
+
+.inventory-table td:last-child {
+    overflow: visible !important;
+}
+
+/* Dropdown */
+.inventory-action-menu {
+    position: absolute;
+    top: calc(100% - 2px);
+    right: -90px;
+    z-index: 10020;
+    width: 165px;
+    padding: 6px;
+    display: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    background: #fff;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14);
+}
+
+.inventory-action-menu.show {
+    display: block;
 }

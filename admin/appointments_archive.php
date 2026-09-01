@@ -250,9 +250,9 @@ $archivedCount = count($archivedAppointments);
 
                     <div class="archive-report-actions">
 
-                        <a href="archived.php" class="archive-report-back-btn">
+                        <a href="appointments.php" class="archive-report-back-btn">
                             <i class="fa-solid fa-arrow-left"></i>
-                            Back to Archive
+                            Back to Appointment
                         </a>
 
                     </div>

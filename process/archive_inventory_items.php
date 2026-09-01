@@ -5,11 +5,20 @@ session_start();
 header("Content-Type: application/json; charset=UTF-8");
 
 /* =========================================================
-   CHECK ADMIN SESSION
-   ========================================================= */
+   ADMIN / STAFF AUTHENTICATION
+========================================================= */
 
-if (!isset($_SESSION["admin_username"])) {
-
+if (
+    !(
+        isset($_SESSION["admin_id"]) ||
+        isset($_SESSION["admin_username"]) ||
+        (
+            isset($_SESSION["account_id"]) &&
+            isset($_SESSION["role"]) &&
+            $_SESSION["role"] === "Staff"
+        )
+    )
+) {
     http_response_code(401);
 
     echo json_encode([
@@ -19,7 +28,6 @@ if (!isset($_SESSION["admin_username"])) {
 
     exit();
 }
-
 
 /* =========================================================
    DATABASE

@@ -1,8 +1,15 @@
 <?php
-/* =========================================================
-   ARCHIVE MODULE - MAIN PAGE
-   File: admin/archive.php
-   ========================================================= */
+session_start();
+
+if (
+    !isset($_SESSION["admin_id"]) ||
+    !isset($_SESSION["admin_username"]) ||
+    !isset($_SESSION["admin_role"]) ||
+    $_SESSION["admin_role"] !== "Admin"
+) {
+    header("Location: ../auth/login.php");
+    exit();
+}
 
 $pageTitle = "Archive";
 $showAdminInfo = false;

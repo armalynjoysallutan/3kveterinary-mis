@@ -160,11 +160,11 @@ $billingStatusCount = count($billingStatuses);
                     <div class="archive-report-actions">
 
                         <a
-                            href="archived.php"
+                            href="billing.php"
                             class="archive-report-back-btn"
                         >
                             <i class="fa-solid fa-arrow-left"></i>
-                            Back to Archive
+                            Back to Billing
                         </a>
 
                     </div>

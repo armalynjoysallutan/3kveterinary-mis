@@ -184,6 +184,134 @@ if ($previousMonthPets > 0) {
 $insightText = "There were {$currentMonthPets} pets registered this month with a {$changeText} compared to last month.";
 
 /* =========================================================
+   7A. PRINT REPORT INTERPRETATIONS
+   ========================================================= */
+
+/* PET REGISTRATION TREND */
+
+$petTrendInterpretation =
+    "The chart presents the number of pets registered "
+    . "over the last 12 months.";
+
+if (!empty($petTrendRows)) {
+
+    $highestPetMonth = $petTrendRows[0];
+    $lowestPetMonth = $petTrendRows[0];
+
+    foreach ($petTrendRows as $row) {
+
+        if ((int)$row['total'] > (int)$highestPetMonth['total']) {
+            $highestPetMonth = $row;
+        }
+
+        if ((int)$row['total'] < (int)$lowestPetMonth['total']) {
+            $lowestPetMonth = $row;
+        }
+    }
+
+    $petTrendInterpretation .=
+        " The highest number of pet registrations was "
+        . "recorded in {$highestPetMonth['month_label']} "
+        . "with " . number_format((int)$highestPetMonth['total'])
+        . " registration(s), while the lowest was recorded "
+        . "in {$lowestPetMonth['month_label']} with "
+        . number_format((int)$lowestPetMonth['total'])
+        . " registration(s).";
+}
+
+
+/* PET BREED */
+
+$breedInterpretation =
+    "The chart shows the top pet breeds recorded in the system.";
+
+if (!empty($breedRows)) {
+
+    $topBreed = $breedRows[0];
+
+    $breedInterpretation .=
+        " {$topBreed['breed_name']} has the highest number "
+        . "of recorded pets with "
+        . number_format((int)$topBreed['total'])
+        . " pet(s), making it the most frequently recorded "
+        . "breed among the displayed results.";
+}
+
+
+/* CUSTOMER REGISTRATION TREND */
+
+$customerTrendInterpretation =
+    "The chart presents customer registrations over the "
+    . "last 12 months.";
+
+if (!empty($customerTrendRows)) {
+
+    $highestCustomerMonth = $customerTrendRows[0];
+    $lowestCustomerMonth = $customerTrendRows[0];
+
+    foreach ($customerTrendRows as $row) {
+
+        if ((int)$row['total'] > (int)$highestCustomerMonth['total']) {
+            $highestCustomerMonth = $row;
+        }
+
+        if ((int)$row['total'] < (int)$lowestCustomerMonth['total']) {
+            $lowestCustomerMonth = $row;
+        }
+    }
+
+    $customerTrendInterpretation .=
+        " The highest customer registration activity "
+        . "was recorded in {$highestCustomerMonth['month_label']} "
+        . "with "
+        . number_format((int)$highestCustomerMonth['total'])
+        . " registration(s), while the lowest activity "
+        . "was recorded in {$lowestCustomerMonth['month_label']} "
+        . "with "
+        . number_format((int)$lowestCustomerMonth['total'])
+        . " registration(s).";
+}
+
+
+/* RECORD STATUS */
+
+$statusInterpretation =
+    "The chart presents the current distribution of customer "
+    . "records according to their status.";
+
+if (!empty($statusRows)) {
+
+    $totalStatusRecords = 0;
+    $largestStatus = $statusRows[0];
+
+    foreach ($statusRows as $row) {
+
+        $totalStatusRecords +=
+            (int)$row['total'];
+
+        if ((int)$row['total'] > (int)$largestStatus['total']) {
+            $largestStatus = $row;
+        }
+    }
+
+    $statusPercentage = 0;
+
+    if ($totalStatusRecords > 0) {
+
+        $statusPercentage =
+            ((int)$largestStatus['total']
+            / $totalStatusRecords) * 100;
+    }
+
+    $statusInterpretation .=
+        " {$largestStatus['status_name']} records represent "
+        . number_format($statusPercentage, 1)
+        . "% of the total customer records, with "
+        . number_format((int)$largestStatus['total'])
+        . " record(s).";
+}
+
+/* =========================================================
    8. CHART ARRAYS
    ========================================================= */
 $petTrendLabels = [];
@@ -350,81 +478,6 @@ foreach ($statusRows as $row) {
             </section>
 
             <!-- =====================================================
-                 MAIN CHARTS
-                 ===================================================== -->
-            <section class="chart-grid">
-
-                <article class="report-card chart-card wide-chart">
-                    <div class="report-card-header">
-                        <div>
-                            <h2>Pets Registered Over Time</h2>
-                            <p>Monthly pet registrations during the last 12 months.</p>
-                        </div>
-                        <span class="report-badge">
-                            <i class="fa-solid fa-chart-line"></i>
-                            Pet Trend
-                        </span>
-                    </div>
-                    <div class="chart-wrap">
-                        <canvas id="petsTrendChart"></canvas>
-                    </div>
-                </article>
-
-                <article class="report-card chart-card">
-                    <div class="report-card-header">
-                        <div>
-                            <h2>Pets by Breed</h2>
-                            <p>Top 10 breeds in the system.</p>
-                        </div>
-                        <span class="report-badge purple-badge">
-                            <i class="fa-solid fa-chart-column"></i>
-                            Top 10
-                        </span>
-                    </div>
-                    <div class="chart-wrap breed-chart-wrap">
-                        <canvas id="breedChart"></canvas>
-                    </div>
-                </article>
-
-            </section>
-
-            <section class="chart-grid second-chart-row">
-
-                <article class="report-card chart-card wide-chart">
-                    <div class="report-card-header">
-                        <div>
-                            <h2>Customers Registered Over Time</h2>
-                            <p>Monthly customer registrations during the last 12 months.</p>
-                        </div>
-                        <span class="report-badge green-badge">
-                            <i class="fa-solid fa-users"></i>
-                            Customer Trend
-                        </span>
-                    </div>
-                    <div class="chart-wrap">
-                        <canvas id="customersTrendChart"></canvas>
-                    </div>
-                </article>
-
-                <article class="report-card chart-card">
-                    <div class="report-card-header">
-                        <div>
-                            <h2>Record Status Distribution</h2>
-                            <p>Current customer record status.</p>
-                        </div>
-                        <span class="report-badge orange-badge">
-                            <i class="fa-solid fa-chart-pie"></i>
-                            Status
-                        </span>
-                    </div>
-                    <div class="status-chart-wrap">
-                        <canvas id="statusChart"></canvas>
-                    </div>
-                </article>
-
-            </section>
-
-            <!-- =====================================================
                  FILTERS
                  ===================================================== -->
             <section class="report-card filters-card">
@@ -479,6 +532,113 @@ foreach ($statusRows as $row) {
 
                 </div>
             </section>
+
+            <!-- =====================================================
+                 MAIN CHARTS
+                 ===================================================== -->
+            <section class="chart-grid">
+
+                <article class="report-card chart-card wide-chart">
+                    <div class="report-card-header">
+                        <div>
+                            <h2>Pets Registered Over Time</h2>
+                            <p>Monthly pet registrations during the last 12 months.</p>
+                        </div>
+                        <span class="report-badge">
+                            <i class="fa-solid fa-chart-line"></i>
+                            Pet Trend
+                        </span>
+                    </div>
+
+                    <div class="chart-wrap">
+                        <canvas id="petsTrendChart"></canvas>
+                    </div>
+
+                    <div class="print-interpretation">
+                        <h3>Interpretation</h3>
+                        <p>
+                            <?= htmlspecialchars($petTrendInterpretation) ?>
+                        </p>
+                    </div>
+                </article>
+
+                <article class="report-card chart-card">
+                    <div class="report-card-header">
+                        <div>
+                            <h2>Pets by Breed</h2>
+                            <p>Top 10 breeds in the system.</p>
+                        </div>
+                        <span class="report-badge purple-badge">
+                            <i class="fa-solid fa-chart-column"></i>
+                            Top 10
+                        </span>
+                    </div>
+                    <div class="chart-wrap breed-chart-wrap">
+                        <canvas id="breedChart"></canvas>
+                    </div>
+
+                    <div class="print-interpretation">
+                        <h3>Interpretation</h3>
+                        <p>
+                            <?= htmlspecialchars($breedInterpretation) ?>
+                        </p>
+                    </div>
+                </article>
+
+            </section>
+
+            <section class="chart-grid second-chart-row">
+
+                <article class="report-card chart-card wide-chart">
+                    <div class="report-card-header">
+                        <div>
+                            <h2>Customers Registered Over Time</h2>
+                            <p>Monthly customer registrations during the last 12 months.</p>
+                        </div>
+                        <span class="report-badge green-badge">
+                            <i class="fa-solid fa-users"></i>
+                            Customer Trend
+                        </span>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="customersTrendChart"></canvas>
+                    </div>
+
+                    <div class="print-interpretation">
+                        <h3>Interpretation</h3>
+                        <p>
+                            <?= htmlspecialchars($customerTrendInterpretation) ?>
+                        </p>
+
+                    </div>
+                </article>
+
+                <article class="report-card chart-card">
+                    <div class="report-card-header">
+                        <div>
+                            <h2>Record Status Distribution</h2>
+                            <p>Current customer record status.</p>
+                        </div>
+                        <span class="report-badge orange-badge">
+                            <i class="fa-solid fa-chart-pie"></i>
+                            Status
+                        </span>
+                    </div>
+                    <div class="status-chart-wrap">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+
+                    <div class="print-interpretation">
+                        <h3>Interpretation</h3>
+                        <p>
+                            <?= htmlspecialchars($statusInterpretation) ?>
+                        </p>
+                    </div>
+                </article>
+
+            </section>
+
+
 
             <!-- =====================================================
                  INSIGHTS

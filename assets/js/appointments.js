@@ -70,7 +70,15 @@ function loadAppointmentList(){
                         .toLowerCase()
                     : "";
 
+            const statusFilter =
+                document.getElementById("appointmentStatusFilter");
 
+            const selectedStatus =
+                statusFilter
+                    ? (statusFilter.value || "")
+                        .trim()
+                        .toLowerCase()
+                    : "";        
             // ==================================
             // FILTER APPOINTMENTS
             // ==================================
@@ -78,6 +86,21 @@ function loadAppointmentList(){
             const filteredAppointments =
                 result.data.filter(
                     function(appointment){
+
+                        const appointmentStatus =
+                            String(appointment.status || "" )
+                                .trim()
+                                .toLowerCase();
+
+                        // STATUS FILTER
+                        if(
+                           selectedStatus &&
+                           appointmentStatus !== selectedStatus
+
+                        ){
+                            return false;
+                        }       
+
 
                         if(searchValue === ""){
                             return true;
@@ -465,6 +488,28 @@ if(appointmentSearch){
 
     appointmentSearch.addEventListener(
         "input",
+        function(){
+
+            loadAppointmentList();
+
+        }
+    );
+
+}
+
+// ===========================
+// APPOINTMENT STATUS FILTER
+// ===========================
+
+const appointmentStatusFilter =
+    document.getElementById(
+        "appointmentStatusFilter"
+    );
+
+if(appointmentStatusFilter){
+
+    appointmentStatusFilter.addEventListener(
+        "change",
         function(){
 
             loadAppointmentList();
