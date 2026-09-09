@@ -2,60 +2,102 @@
 
 session_start();
 
-require_once "../config/database.php";
-require_once "../config/audit_log.php";
+
+// =========================================================
+// SAVE CURRENT ROLE BEFORE CLEARING SESSION
+// =========================================================
+
+$role = $_SESSION["role"] ?? "";
 
 
-// ========================================
-// AUDIT LOG — LOGOUT
-// ========================================
+// =========================================================
+// DESTROY ALL SESSION DATA
+// =========================================================
 
-if (isset($_SESSION["admin_id"])) {
+$_SESSION = [];
 
-    logAudit(
-        $conn,
-        "Authentication",
-        "Logout",
-        "User logged out of the system.",
-        null
+
+// Delete session cookie if cookies are being used
+
+if (ini_get("session.use_cookies")) {
+
+    $params = session_get_cookie_params();
+
+    setcookie(
+        session_name(),
+        "",
+        time() - 42000,
+        $params["path"],
+        $params["domain"],
+        $params["secure"],
+        $params["httponly"]
     );
 
 }
 
 
-// ========================================
-// REMOVE ALL SESSION VARIABLES
-// ========================================
-
-$_SESSION = [];
-
-
-// ========================================
-// DESTROY SESSION
-// ========================================
-
 session_destroy();
 
 
-// ========================================
+// =========================================================
 // PREVENT BROWSER CACHE
-// ========================================
+// =========================================================
 
 header(
-    "Cache-Control: no-store, no-cache, must-revalidate"
+    "Cache-Control: no-store, no-cache, must-revalidate, max-age=0"
 );
 
 header(
-    "Pragma: no-cache"
+    "Cache-Control: post-check=0, pre-check=0",
+    false
 );
 
+header("Pragma: no-cache");
 
-// ========================================
-// REDIRECT TO LOGIN
-// ========================================
+header("Expires: 0");
+
+
+// =========================================================
+// ROLE-BASED REDIRECT
+// =========================================================
+
+// CUSTOMER
+
+if ($role === "Customer") {
+
+    header(
+        "Location: ../customer/about.php"
+    );
+
+    exit();
+
+}
+
+
+// =========================================================
+// ADMIN / STAFF
+// =========================================================
+
+if (
+    $role === "Admin" ||
+    $role === "Staff"
+) {
+
+    header(
+        "Location: ../auth/login.php"
+    );
+
+    exit();
+
+}
+
+
+// =========================================================
+// FALLBACK
+// =========================================================
 
 header(
-    "Location: ../auth/login.php"
+    "Location: ../customer/about.php"
 );
 
 exit();

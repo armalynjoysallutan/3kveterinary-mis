@@ -1,5 +1,8 @@
 <?php
 session_start();
+
+$from = $_GET["from"] ?? "admin";
+
 ?>
 
 <!DOCTYPE html>
@@ -62,9 +65,19 @@ session_start();
 
         <br>
 
-        <a href="login.php">
-            ← Back to Login
-        </a>
+        <?php if ($from === "customer"): ?>
+
+            <a href="../customer/login.php">
+                ← Back to Login
+            </a>
+
+        <?php else: ?>
+
+            <a href="login.php">
+                ← Back to Login
+            </a>
+
+        <?php endif; ?>
 
     </div>
 

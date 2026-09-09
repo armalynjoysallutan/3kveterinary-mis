@@ -1,0 +1,1725 @@
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    color: #111;
+
+    background: #fff;
+
+    overflow-x: hidden;
+}
+
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.site-header {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 1000;
+
+    min-height: 110px;
+
+    background:
+        linear-gradient(
+            100deg,
+            #ffffff 0%,
+            #f8f1ff 48%,
+            #e9faff 100%
+        );
+
+    border-bottom:
+        1px solid #e5e5e5;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        0 6%;
+
+    gap: 30px;
+}
+
+
+.header-logo {
+
+    flex-shrink: 0;
+}
+
+
+.header-logo img {
+
+    width: 210px;
+
+    height: auto;
+}
+
+
+.main-nav {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: clamp(22px, 3vw, 55px);
+
+    flex: 1;
+}
+
+
+.main-nav a {
+
+    position: relative;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    padding:
+        42px 0;
+
+    transition:
+        color 0.2s ease;
+}
+
+
+.main-nav a:hover,
+.main-nav a.active {
+
+    color: #2468cf;
+}
+
+
+.main-nav a.active::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    right: 0;
+
+    bottom: 28px;
+
+    height: 3px;
+
+    border-radius: 5px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #19afe8,
+            #d529c9
+        );
+}
+
+
+.profile-area {
+
+    position: relative;
+
+    flex-shrink: 0;
+}
+
+
+.profile-button {
+
+    width: 58px;
+
+    height: 58px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    padding: 0;
+}
+
+
+.profile-button img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+}
+
+
+.profile-menu {
+
+    position: absolute;
+
+    right: 0;
+
+    top: calc(100% + 12px);
+
+    width: 190px;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0, 0, 0, 0.15);
+
+    padding: 10px;
+
+    display: none;
+}
+
+
+.profile-menu.show {
+    display: block;
+}
+
+
+.profile-menu a {
+
+    display: block;
+
+    padding:
+        11px 12px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+}
+
+
+.profile-menu a:hover {
+
+    background: #f2f5ff;
+}
+
+
+.profile-name {
+
+    padding:
+        10px 12px;
+
+    font-weight: 700;
+
+    font-size: 14px;
+
+    border-bottom:
+        1px solid #eee;
+
+    margin-bottom: 5px;
+
+    color: #333;
+}
+
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero-section {
+
+    min-height: 560px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            110deg,
+            #f7fcff 0%,
+            #ffffff 45%,
+            #fffaff 100%
+        );
+}
+
+
+.hero-section::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 430px;
+
+    height: 430px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(214, 240, 255, 0.45);
+
+    left: -190px;
+
+    top: 40px;
+}
+
+
+.hero-section::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 360px;
+
+    height: 360px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(249, 226, 255, 0.45);
+
+    right: -160px;
+
+    bottom: -170px;
+}
+
+
+.hero-content {
+
+    position: relative;
+
+    z-index: 2;
+
+    width: min(1200px, 90%);
+
+    min-height: 560px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    align-items: center;
+
+    gap: 40px;
+}
+
+
+.hero-text h1 {
+
+    font-size:
+        clamp(38px, 4.1vw, 58px);
+
+    line-height: 1.15;
+
+    font-weight: 800;
+
+    letter-spacing: -1px;
+
+    margin-bottom: 25px;
+}
+
+
+.hero-text h1 span {
+
+    color: #2768ce;
+}
+
+
+.hero-text p {
+
+    font-size:
+        clamp(19px, 2vw, 26px);
+
+    line-height: 1.4;
+
+    color: #151525;
+
+    max-width: 600px;
+
+    margin-bottom: 35px;
+}
+
+
+.hero-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 325px;
+
+    min-height: 65px;
+
+    padding:
+        12px 30px;
+
+    border-radius: 17px;
+
+    color: #fff;
+
+    font-size: 23px;
+
+    font-weight: 800;
+
+    background:
+        linear-gradient(
+            100deg,
+            #1bb3e8,
+            #d329cc
+        );
+
+    box-shadow:
+        0 8px 18px
+        rgba(100, 80, 200, 0.2);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.hero-button:hover {
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 12px 24px
+        rgba(100, 80, 200, 0.3);
+}
+
+
+.hero-image {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+}
+
+
+.hero-image img {
+
+    width: min(570px, 100%);
+
+    height: auto;
+}
+
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats-section {
+
+    position: relative;
+
+    z-index: 5;
+
+    margin-top: -5px;
+
+    padding:
+        0 20px;
+}
+
+
+.stats-container {
+
+    width: min(850px, 90%);
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 55px;
+}
+
+
+.stat-card {
+
+    min-height: 155px;
+
+    border-radius: 28px;
+
+    padding:
+        25px 20px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #28aee9,
+            #c92bd0
+        );
+
+    box-shadow:
+        0 8px 18px
+        rgba(100, 70, 150, 0.22);
+}
+
+
+.stat-card strong {
+
+    font-size:
+        clamp(28px, 3vw, 39px);
+
+    line-height: 1.05;
+
+    margin-bottom: 10px;
+}
+
+
+.stat-card span {
+
+    font-size: 21px;
+
+    font-weight: 600;
+
+    line-height: 1.25;
+}
+
+
+
+/* =========================================================
+   CLINIC / MISSION / VISION
+========================================================= */
+
+.clinic-section {
+
+    margin-top: -75px;
+
+    padding-top: 155px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff 0%,
+            #f8fbfd 100%
+        );
+}
+
+
+.clinic-background {
+
+    position: relative;
+
+    padding:
+        0 5% 80px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff 0%,
+            #eefbff 100%
+        );
+
+    border-radius:
+        50% 50% 0 0 /
+        70px 70px 0 0;
+}
+
+
+.clinic-image-wrapper {
+
+    width: min(1050px, 90%);
+
+    margin: auto;
+
+    position: relative;
+
+    top: -5px;
+}
+
+
+.clinic-image-wrapper img {
+
+    width: 100%;
+
+    height: 500px;
+
+    object-fit: cover;
+
+    border-radius: 0 0 30px 30px;
+}
+
+
+.mission-vision {
+
+    width: min(950px, 90%);
+
+    margin:
+        -10px auto 0;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 90px;
+
+    position: relative;
+
+    z-index: 2;
+}
+
+
+.mission-card,
+.vision-card {
+
+    min-height: 260px;
+
+    padding:
+        25px 35px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(241, 214, 255, 0.85),
+            rgba(211, 153, 244, 0.9)
+        );
+
+    box-shadow:
+        0 8px 18px
+        rgba(100, 60, 130, 0.15);
+}
+
+
+.mission-card h2,
+.vision-card h2 {
+
+    text-align: center;
+
+    font-size: 25px;
+
+    margin-bottom: 20px;
+}
+
+
+.mission-card p,
+.vision-card p {
+
+    font-size: 16px;
+
+    font-weight: 500;
+
+    line-height: 1.45;
+
+    text-align: justify;
+}
+
+
+
+/* =========================================================
+   WHY CHOOSE US
+========================================================= */
+
+.why-section {
+
+    position: relative;
+
+    padding:
+        80px 5% 120px;
+
+    overflow: hidden;
+
+    background: #fff;
+}
+
+
+.why-section::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: -15%;
+
+    bottom: -150px;
+
+    width: 65%;
+
+    height: 320px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(247, 235, 255, 0.75);
+}
+
+
+.why-section::after {
+
+    content: "";
+
+    position: absolute;
+
+    right: -15%;
+
+    bottom: -100px;
+
+    width: 60%;
+
+    height: 280px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(225, 248, 255, 0.8);
+}
+
+
+.section-title {
+
+    position: relative;
+
+    z-index: 2;
+
+    text-align: center;
+
+    font-size:
+        clamp(38px, 4vw, 52px);
+
+    margin-bottom: 70px;
+}
+
+
+.why-cards {
+
+    position: relative;
+
+    z-index: 2;
+
+    width: min(1000px, 92%);
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    align-items: start;
+
+    gap: 70px;
+}
+
+
+.why-card {
+
+    background: white;
+
+    border-radius: 0 28px 28px 28px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 5px 18px
+        rgba(0, 0, 0, 0.08);
+}
+
+
+.trust-card {
+
+    border:
+        4px solid #8272d8;
+
+    margin-top: 90px;
+}
+
+
+.medical-card {
+
+    border:
+        4px solid #d981f2;
+
+    margin-top: 0;
+}
+
+
+.pets-card {
+
+    border:
+        4px solid #ed67cb;
+
+    margin-top: 90px;
+}
+
+
+.why-card img {
+
+    width: 100%;
+
+    height: 215px;
+
+    object-fit: cover;
+}
+
+
+.why-card-content {
+
+    padding:
+        25px 35px 30px;
+
+    min-height: 150px;
+}
+
+
+.why-card h3 {
+
+    font-size: 19px;
+
+    margin-bottom: 18px;
+
+    color: #a72dd2;
+}
+
+
+.trust-card h3 {
+    color: #1587d7;
+}
+
+
+.pets-card h3 {
+    color: #a72c91;
+}
+
+
+.why-card p {
+
+    font-size: 16px;
+
+    line-height: 1.45;
+
+    color: #333;
+}
+
+
+
+/* =========================================================
+   ABOUT US
+========================================================= */
+
+.about-section {
+
+    position: relative;
+
+    padding:
+        110px 6% 100px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 35%,
+            #f5eefe 100%
+        );
+}
+
+
+.about-content {
+
+    width: min(1100px, 92%);
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    align-items: center;
+
+    gap: 70px;
+}
+
+
+.about-text h2 {
+
+    font-size:
+        clamp(38px, 4vw, 50px);
+
+    margin-bottom: 35px;
+}
+
+
+.about-text p {
+
+    font-size: 18px;
+
+    line-height: 1.5;
+
+    margin-bottom: 30px;
+
+    max-width: 580px;
+}
+
+
+.about-images {
+
+    position: relative;
+
+    min-height: 420px;
+}
+
+
+.about-images img {
+
+    position: absolute;
+
+    width: 63%;
+
+    height: 270px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+    border: 8px solid white;
+
+    box-shadow:
+        0 8px 20px
+        rgba(0, 0, 0, 0.15);
+}
+
+
+.about-image-one {
+
+    top: 10px;
+
+    left: 10px;
+
+    transform:
+        rotate(-4deg);
+}
+
+
+.about-image-two {
+
+    right: 0;
+
+    bottom: 25px;
+
+    transform:
+        rotate(4deg);
+}
+
+
+
+/* =========================================================
+   CLINIC CARE
+========================================================= */
+
+.clinic-care-section {
+
+    padding:
+        55px 7% 70px;
+
+    background:
+        #eafbff;
+}
+
+
+.clinic-care-container {
+
+    width: min(1000px, 92%);
+
+    margin: auto;
+
+    overflow: hidden;
+
+    border-radius: 20px;
+}
+
+
+.clinic-care-container img {
+
+    width: 100%;
+
+    height: 430px;
+
+    object-fit: cover;
+}
+
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.site-footer {
+
+    background:
+        linear-gradient(
+            110deg,
+            #f8f0ff 0%,
+            #edfaff 100%
+        );
+
+    padding:
+        55px 6% 0;
+}
+
+
+.footer-container {
+
+    width: min(1150px, 94%);
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        1.35fr
+        1.2fr
+        0.9fr
+        0.9fr
+        1.2fr;
+
+    gap: 45px;
+
+    padding-bottom: 40px;
+}
+
+
+.footer-column h3 {
+
+    font-size: 17px;
+
+    margin-bottom: 15px;
+}
+
+
+.footer-column p {
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    margin-bottom: 9px;
+}
+
+
+.footer-column a {
+
+    display: block;
+
+    width: fit-content;
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+
+.footer-column a:hover {
+
+    color: #2871d5;
+}
+
+
+.footer-about hr {
+
+    border: none;
+
+    border-top:
+        1px solid rgba(0, 0, 0, 0.12);
+
+    margin:
+        20px 0;
+}
+
+
+.footer-logo {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: center;
+}
+
+
+.footer-logo img {
+
+    width: 240px;
+
+    max-width: 100%;
+}
+
+
+.footer-hours p {
+
+    font-weight: 500;
+}
+
+
+.facebook-link {
+
+    display: flex !important;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.facebook-icon {
+
+    width: 30px;
+
+    height: 30px;
+
+    border-radius: 50%;
+
+    background: #287be0;
+
+    color: white;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 21px;
+
+    font-weight: bold;
+
+    font-family: Arial;
+}
+
+
+.footer-bottom {
+
+    width: min(1000px, 92%);
+
+    margin: auto;
+
+    padding:
+        20px 0;
+
+    border-top:
+        1px solid rgba(0, 0, 0, 0.12);
+
+    text-align: center;
+}
+
+
+.footer-bottom p {
+
+    font-size: 13px;
+}
+
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .site-header {
+
+        padding:
+            15px 4%;
+
+        flex-wrap: wrap;
+
+        min-height: auto;
+    }
+
+
+    .header-logo img {
+
+        width: 180px;
+    }
+
+
+    .main-nav {
+
+        order: 3;
+
+        width: 100%;
+
+        flex-basis: 100%;
+
+        overflow-x: auto;
+
+        justify-content: flex-start;
+
+        padding-bottom: 5px;
+    }
+
+
+    .main-nav a {
+
+        padding:
+            12px 0;
+    }
+
+
+    .main-nav a.active::after {
+
+        bottom: 2px;
+    }
+
+
+    .hero-content {
+
+        width: 90%;
+
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+
+    .hero-text h1 {
+
+        font-size: 42px;
+    }
+
+
+    .stats-container {
+
+        gap: 20px;
+    }
+
+
+    .why-cards {
+
+        gap: 25px;
+    }
+
+
+    .mission-vision {
+
+        gap: 25px;
+    }
+
+
+    .footer-container {
+
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+}
+
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    body {
+
+        overflow-x: hidden;
+    }
+
+
+    .site-header {
+
+        padding:
+            12px 18px;
+
+        gap: 10px;
+    }
+
+
+    .header-logo img {
+
+        width: 155px;
+    }
+
+
+    .profile-button {
+
+        width: 48px;
+
+        height: 48px;
+    }
+
+
+    .main-nav {
+
+        gap: 25px;
+
+        padding:
+            8px 0 5px;
+    }
+
+
+    .main-nav a {
+
+        font-size: 14px;
+
+        padding: 8px 0;
+    }
+
+
+    .hero-section {
+
+        min-height: auto;
+
+        padding:
+            55px 0 65px;
+    }
+
+
+    .hero-content {
+
+        min-height: auto;
+
+        grid-template-columns: 1fr;
+
+        text-align: center;
+
+        gap: 30px;
+    }
+
+
+    .hero-text h1 {
+
+        font-size:
+            clamp(31px, 9vw, 42px);
+
+        letter-spacing: -0.5px;
+    }
+
+
+    .hero-text p {
+
+        font-size: 18px;
+
+        margin:
+            0 auto 28px;
+    }
+
+
+    .hero-button {
+
+        min-width: 0;
+
+        width: 100%;
+
+        max-width: 330px;
+
+        font-size: 19px;
+    }
+
+
+    .hero-image img {
+
+        width: 90%;
+
+        margin: auto;
+    }
+
+
+    .stats-section {
+
+        margin-top: 0;
+
+        padding:
+            20px 18px 0;
+    }
+
+
+    .stats-container {
+
+        width: 100%;
+
+        grid-template-columns: 1fr;
+
+        gap: 18px;
+    }
+
+
+    .stat-card {
+
+        min-height: 130px;
+
+        border-radius: 20px;
+    }
+
+
+    .clinic-section {
+
+        margin-top: -30px;
+
+        padding-top: 80px;
+    }
+
+
+    .clinic-image-wrapper {
+
+        width: 100%;
+    }
+
+
+    .clinic-image-wrapper img {
+
+        height: 300px;
+
+        border-radius: 0 0 20px 20px;
+    }
+
+
+    .mission-vision {
+
+        width: 100%;
+
+        grid-template-columns: 1fr;
+
+        gap: 20px;
+    }
+
+
+    .mission-card,
+    .vision-card {
+
+        min-height: auto;
+
+        padding:
+            25px 22px;
+    }
+
+
+    .why-section {
+
+        padding:
+            65px 18px 80px;
+    }
+
+
+    .section-title {
+
+        margin-bottom: 45px;
+
+        font-size: 36px;
+    }
+
+
+    .why-cards {
+
+        width: 100%;
+
+        grid-template-columns: 1fr;
+
+        gap: 30px;
+    }
+
+
+    .trust-card,
+    .medical-card,
+    .pets-card {
+
+        margin-top: 0;
+    }
+
+
+    .why-card img {
+
+        height: 220px;
+    }
+
+
+    .about-section {
+
+        padding:
+            70px 18px;
+    }
+
+
+    .about-content {
+
+        width: 100%;
+
+        grid-template-columns: 1fr;
+
+        gap: 35px;
+    }
+
+
+    .about-text h2 {
+
+        font-size: 36px;
+
+        margin-bottom: 25px;
+    }
+
+
+    .about-text p {
+
+        font-size: 16px;
+    }
+
+
+    .about-images {
+
+        min-height: 390px;
+    }
+
+
+    .about-images img {
+
+        width: 72%;
+
+        height: 220px;
+    }
+
+
+    .clinic-care-section {
+
+        padding:
+            30px 18px 50px;
+    }
+
+
+    .clinic-care-container {
+
+        width: 100%;
+    }
+
+
+    .clinic-care-container img {
+
+        height: 280px;
+    }
+
+
+    .footer-container {
+
+        width: 100%;
+
+        grid-template-columns: 1fr;
+
+        gap: 30px;
+    }
+
+
+    .footer-logo {
+
+        justify-content: flex-start;
+
+        order: -1;
+    }
+
+
+    .footer-logo img {
+
+        width: 200px;
+    }
+
+
+    .footer-bottom {
+
+        width: 100%;
+    }
+
+    .guest-auth-button {
+        min-width: 125px;
+        min-height: 42px;
+
+        padding: 8px 14px;
+
+        font-size: 13px;
+
+        border-radius: 11px;
+    }
+
+}
+
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+    .header-logo img {
+
+        width: 135px;
+    }
+
+
+    .profile-button {
+
+        width: 43px;
+
+        height: 43px;
+    }
+
+
+    .main-nav {
+
+        gap: 20px;
+    }
+
+
+    .main-nav a {
+
+        font-size: 13px;
+    }
+
+
+    .hero-text h1 {
+
+        font-size: 30px;
+    }
+
+
+    .hero-button {
+
+        min-height: 56px;
+
+        font-size: 17px;
+    }
+
+
+    .about-images {
+
+        min-height: 330px;
+    }
+
+
+    .about-images img {
+
+        height: 185px;
+
+        border-width: 5px;
+    }
+
+
+    .clinic-care-container img {
+
+        height: 230px;
+    }
+
+    .guest-auth-button {
+        min-width: 115px;
+        min-height: 40px;
+
+        padding: 7px 11px;
+
+        font-size: 12px;
+    }   
+
+}
+
+/* =========================================================
+   GUEST AUTH BUTTON
+========================================================= */
+
+.guest-auth-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 155px;
+    min-height: 48px;
+
+    padding: 10px 22px;
+
+    border-radius: 14px;
+
+    color: #ffffff;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    background:
+        linear-gradient(
+            100deg,
+            #19afe8,
+            #d529c9
+        );
+
+    box-shadow:
+        0 6px 16px
+        rgba(100, 80, 200, 0.18);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.guest-auth-button:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 9px 20px
+        rgba(100, 80, 200, 0.28);
+}

@@ -71,7 +71,9 @@
                     Remember me
                 </label>
 
-                <a href="forgot_password.php">Forgot Password?</a>
+                <a href="forgot_password.php?from=admin">
+                    Forgot Password?
+                </a>
 
             </div>
 
