@@ -151,6 +151,11 @@ $batchSql = "
 
         batch_number,
 
+        packaging_type,
+        package_quantity,
+        units_per_package,
+        quantity_received,
+
         quantity,
 
         expiration_date,
@@ -334,6 +339,23 @@ if ($batchStmt) {
                 "batch_number" =>
                     $batch["batch_number"],
 
+                "packaging_type" =>
+                    (
+                        empty($batch["packaging_type"]) ||
+                        $batch["packaging_type"] === "0"
+                    )
+                        ? "—"
+                        : $batch["packaging_type"] ?? "",
+
+                "package_quantity" =>
+                    (float)$batch["package_quantity"],
+
+                "units_per_package" =>
+                    (float)$batch["units_per_package"],
+
+                "quantity_received" =>
+                    (float)$batch["quantity_received"],
+    
                 "quantity" =>
                     $quantity,
 
@@ -346,8 +368,13 @@ if ($batchStmt) {
                 "date_received" =>
                     $batch["date_received"],
 
-                "date_received_display" =>
-                    $dateReceived,
+                "date_received_display" => 
+                    (
+                        empty($batch["date_received"]) ||
+                        $batch["date_received"] === "0000-00-00"
+                    )
+                        ? "—"
+                        : $dateReceived,
 
                 "unit_cost" =>
                     (float)$batch["unit_cost"],

@@ -13,229 +13,944 @@ document.addEventListener("DOMContentLoaded", function () {
     const currentMonth = document.getElementById("currentMonth");
 
     function openCalendarModal(dateStr) {
-        const modalDate = document.getElementById("calendarModalDate");
-        const modalBody = document.getElementById("calendarModalBody");
 
-        if (modalDate) {
-            const clickedDate = new Date(dateStr + "T00:00:00");
-            modalDate.textContent = clickedDate.toLocaleDateString("en-US", {
+    const modalDate =
+        document.getElementById("calendarModalDate");
+
+    const modalBody =
+        document.getElementById("calendarModalBody");
+
+
+    /* =========================
+       MODAL DATE
+    ========================= */
+
+    if (modalDate) {
+
+        const clickedDate =
+            new Date(dateStr + "T00:00:00");
+
+        modalDate.textContent =
+            clickedDate.toLocaleDateString("en-US", {
+
                 year: "numeric",
                 month: "long",
                 day: "numeric"
+
             });
+
+    }
+
+
+    /* =========================
+       LOADING
+    ========================= */
+
+    if (modalBody) {
+
+        modalBody.innerHTML =
+            `<div class="modal-empty">
+                Loading events...
+             </div>`;
+
+    }
+
+
+    /* =========================
+       GET EVENTS
+    ========================= */
+
+    fetch(
+        `../process/get_day_events.php?date=${encodeURIComponent(dateStr)}`
+    )
+
+    .then(response => {
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load events."
+            );
+
         }
 
-        if (modalBody) {
-            modalBody.innerHTML = `<div class="modal-empty">Loading events...</div>`;
-        }
+        return response.json();
 
-        fetch(`../process/get_day_events.php?date=${dateStr}`)
-            .then(response => response.json())
-            .then(data => {
-                let appointmentsHTML = "";
-                let deliveryHTML = "";
-                let restockHTML = "";
-                let otherHTML = "";
+    })
 
-                /* =========================
-                   APPOINTMENTS
-                ========================= */
-                if (data.appointments && data.appointments.length > 0) {
-                    data.appointments.forEach(item => {
-                        const rawTime = item.appointment_time;
-                        const timeObj = new Date(`1970-01-01T${rawTime}`);
-                        const formattedTime = timeObj.toLocaleTimeString("en-US", {
+
+    .then(data => {
+
+        let appointmentsHTML = "";
+
+        let deliveryHTML = "";
+
+        let restockHTML = "";
+
+        let otherHTML = "";
+
+
+        /* =========================
+           APPOINTMENTS
+        ========================= */
+
+        if (
+            data.appointments &&
+            data.appointments.length > 0
+        ) {
+
+            data.appointments.forEach(item => {
+
+                const rawTime =
+                    item.appointment_time;
+
+                const timeObj =
+                    new Date(
+                        `1970-01-01T${rawTime}`
+                    );
+
+                const formattedTime =
+                    timeObj.toLocaleTimeString(
+                        "en-US",
+                        {
                             hour: "numeric",
                             minute: "2-digit",
                             hour12: true
-                        });
-
-                        appointmentsHTML += `
-                            <div class="modal-event-card">
-                                <div class="modal-event-time">${formattedTime}</div>
-                                <div class="modal-event-details">
-                                    <strong>${item.pet_name} - ${item.service}</strong>
-                                    <small>Owner: ${item.owner_name}</small>
-                                    <small>Status: ${item.status}</small>
-                                </div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    appointmentsHTML = `
-                        <div class="modal-empty">
-                            No appointments for this day.
-                        </div>
-                    `;
-                }
-
-                /* =========================
-                   DELIVERY EVENTS
-                ========================= */
-                if (data.delivery_events && data.delivery_events.length > 0) {
-                    data.delivery_events.forEach(item => {
-                        let formattedTime = "No time set";
-
-                        if (item.event_time) {
-                            const timeObj = new Date(`1970-01-01T${item.event_time}`);
-                            formattedTime = timeObj.toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                hour12: true
-                            });
                         }
+                    );
 
-                        deliveryHTML += `
-                            <div class="modal-event-card">
-                                <div class="modal-event-time">${formattedTime}</div>
-                                <div class="modal-event-details">
-                                    <strong>${item.event_title}</strong>
-                                    <small>${item.notes ? item.notes : "No notes available."}</small>
-                                </div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    deliveryHTML = `
-                        <div class="modal-empty">
-                            No delivery events for this day.
+
+                appointmentsHTML += `
+
+                    <div class="modal-event-card">
+
+                        <div class="modal-event-time">
+                            ${formattedTime}
                         </div>
-                    `;
-                }
 
-                /* =========================
-                   RESTOCK EVENTS
-                ========================= */
-                if (data.restock_events && data.restock_events.length > 0) {
-                    data.restock_events.forEach(item => {
-                        let formattedTime = "No time set";
+                        <div class="modal-event-details">
 
-                        if (item.event_time) {
-                            const timeObj = new Date(`1970-01-01T${item.event_time}`);
-                            formattedTime = timeObj.toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                hour12: true
-                            });
-                        }
+                            <strong>
+                                ${escapeCalendarHTML(item.pet_name)}
+                                -
+                                ${escapeCalendarHTML(item.service)}
+                            </strong>
 
-                        restockHTML += `
-                            <div class="modal-event-card">
-                                <div class="modal-event-time">${formattedTime}</div>
-                                <div class="modal-event-details">
-                                    <strong>${item.event_title}</strong>
-                                    <small>${item.notes ? item.notes : "No notes available."}</small>
-                                </div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    restockHTML = `
-                        <div class="modal-empty">
-                            No order/restock events for this day.
+                            <small>
+                                Owner:
+                                ${escapeCalendarHTML(item.owner_name)}
+                            </small>
+
+                            <small>
+                                Status:
+                                ${escapeCalendarHTML(item.status)}
+                            </small>
+
                         </div>
-                    `;
-                }
 
-                /* =========================
-                   OTHER EVENTS
-                ========================= */
-                if (data.other_events && data.other_events.length > 0) {
-                    data.other_events.forEach(item => {
-                        let formattedTime = "No time set";
-
-                        if (item.event_time) {
-                            const timeObj = new Date(`1970-01-01T${item.event_time}`);
-                            formattedTime = timeObj.toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                hour12: true
-                            });
-                        }
-
-                        otherHTML += `
-                            <div class="modal-event-card">
-                                <div class="modal-event-time">${formattedTime}</div>
-                                <div class="modal-event-details">
-                                    <strong>${item.event_title}</strong>
-                                    <small>${item.notes ? item.notes : "No notes available."}</small>
-                                </div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    otherHTML = `
-                        <div class="modal-empty">
-                            No other events for this day.
-                        </div>
-                    `;
-                }
-
-                /* =========================
-                   RENDER MODAL BODY
-                ========================= */
-                modalBody.innerHTML = `
-                    <div class="modal-section">
-                        <div class="modal-section-title">
-                            <span class="modal-dot appointments"></span>
-                            <span>Appointments</span>
-                        </div>
-                        <div class="modal-event-list">
-                            ${appointmentsHTML}
-                        </div>
                     </div>
 
-                    <div class="modal-section">
-                        <div class="modal-section-title">
-                            <span class="modal-dot delivery"></span>
-                            <span>Delivery Day</span>
-                        </div>
-                        <div class="modal-event-list">
-                            ${deliveryHTML}
-                        </div>
-                    </div>
-
-                    <div class="modal-section">
-                        <div class="modal-section-title">
-                            <span class="modal-dot restock"></span>
-                            <span>Order / Restock</span>
-                        </div>
-                        <div class="modal-event-list">
-                            ${restockHTML}
-                        </div>
-                    </div>
-
-                    <div class="modal-section">
-                        <div class="modal-section-title">
-                            <span class="modal-dot other"></span>
-                            <span>Other Event</span>
-                        </div>
-                        <div class="modal-event-list">
-                            ${otherHTML}
-                        </div>
-                    </div>
                 `;
 
-                if (calendarModal) {
-                    calendarModal.classList.add("show");
-                }
-            })
-            .catch(error => {
-                console.error("Error loading day events:", error);
-
-                if (modalBody) {
-                    modalBody.innerHTML = `
-                        <div class="modal-empty">
-                            Failed to load events for this day.
-                        </div>
-                    `;
-                }
-
-                if (calendarModal) {
-                    calendarModal.classList.add("show");
-                }
             });
+
+        } else {
+
+            appointmentsHTML = `
+
+                <div class="modal-empty">
+                    No appointments for this day.
+                </div>
+
+            `;
+
+        }
+
+
+        /* =========================
+           DELIVERY
+        ========================= */
+
+        if (
+            data.delivery_events &&
+            data.delivery_events.length > 0
+        ) {
+
+            data.delivery_events.forEach(item => {
+
+                deliveryHTML +=
+                    buildCalendarEventCard(item);
+
+            });
+
+        } else {
+
+            deliveryHTML = `
+
+                <div class="modal-empty">
+                    No delivery events for this day.
+                </div>
+
+            `;
+
+        }
+
+
+        /* =========================
+           RESTOCK
+        ========================= */
+
+        if (
+            data.restock_events &&
+            data.restock_events.length > 0
+        ) {
+
+            data.restock_events.forEach(item => {
+
+                restockHTML +=
+                    buildCalendarEventCard(item);
+
+            });
+
+        } else {
+
+            restockHTML = `
+
+                <div class="modal-empty">
+                    No order/restock events for this day.
+                </div>
+
+            `;
+
+        }
+
+
+        /* =========================
+           OTHER EVENTS
+        ========================= */
+
+        if (
+            data.other_events &&
+            data.other_events.length > 0
+        ) {
+
+            data.other_events.forEach(item => {
+
+                otherHTML +=
+                    buildCalendarEventCard(item);
+
+            });
+
+        } else {
+
+            otherHTML = `
+
+                <div class="modal-empty">
+                    No other events for this day.
+                </div>
+
+            `;
+
+        }
+
+
+        /* =========================
+           RENDER MODAL
+        ========================= */
+
+        modalBody.innerHTML = `
+
+
+            <!-- APPOINTMENTS -->
+
+            <div class="modal-section">
+
+                <div class="modal-section-title">
+
+                    <span class="modal-dot appointments"></span>
+
+                    <span>
+                        Appointments
+                    </span>
+
+                </div>
+
+
+                <div class="modal-event-list">
+
+                    ${appointmentsHTML}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- DELIVERY -->
+
+            <div class="modal-section">
+
+                <div class="modal-section-title">
+
+                    <span class="modal-dot delivery"></span>
+
+                    <span>
+                        Delivery Day
+                    </span>
+
+
+                    <button
+                        type="button"
+                        class="modal-add-event"
+
+                        data-event-type="Delivery Day"
+
+                        data-event-date="${dateStr}"
+                    >
+
+                        <i class="fa-solid fa-plus"></i>
+
+                        Add
+
+                    </button>
+
+                </div>
+
+
+                <div class="modal-event-list">
+
+                    ${deliveryHTML}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- RESTOCK -->
+
+            <div class="modal-section">
+
+                <div class="modal-section-title">
+
+                    <span class="modal-dot restock"></span>
+
+                    <span>
+                        Order / Restock
+                    </span>
+
+
+                    <button
+                        type="button"
+                        class="modal-add-event"
+
+                        data-event-type="Order/Restock"
+
+                        data-event-date="${dateStr}"
+                    >
+
+                        <i class="fa-solid fa-plus"></i>
+
+                        Add
+
+                    </button>
+
+                </div>
+
+
+                <div class="modal-event-list">
+
+                    ${restockHTML}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- OTHER -->
+
+            <div class="modal-section">
+
+                <div class="modal-section-title">
+
+                    <span class="modal-dot other"></span>
+
+                    <span>
+                        Other Event
+                    </span>
+
+
+                    <button
+                        type="button"
+                        class="modal-add-event"
+
+                        data-event-type="Other Event"
+
+                        data-event-date="${dateStr}"
+                    >
+
+                        <i class="fa-solid fa-plus"></i>
+
+                        Add
+
+                    </button>
+
+                </div>
+
+
+                <div class="modal-event-list">
+
+                    ${otherHTML}
+
+                </div>
+
+            </div>
+
+
+        `;
+
+
+        if (calendarModal) {
+
+            calendarModal.classList.add("show");
+
+        }
+
+    })
+
+
+    .catch(error => {
+
+        console.error(
+            "Error loading day events:",
+            error
+        );
+
+
+        if (modalBody) {
+
+            modalBody.innerHTML = `
+
+                <div class="modal-empty">
+
+                    Failed to load events for this day.
+
+                </div>
+
+            `;
+
+        }
+
+
+        if (calendarModal) {
+
+            calendarModal.classList.add("show");
+
+        }
+
+    });
+
+}
+
+/* =========================
+   CALENDAR EVENT HELPERS
+========================= */
+
+function escapeCalendarHTML(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        value == null ? "" : String(value);
+
+    return div.innerHTML;
+}
+
+
+function buildCalendarEventCard(item) {
+
+    let formattedTime =
+        "No time set";
+
+
+    if (item.event_time) {
+
+        const timeObj =
+            new Date(
+                `1970-01-01T${item.event_time}`
+            );
+
+
+        if (!Number.isNaN(timeObj.getTime())) {
+
+            formattedTime =
+                timeObj.toLocaleTimeString(
+                    "en-US",
+                    {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true
+                    }
+                );
+
+        }
+
     }
+
+
+    return `
+
+        <div class="modal-event-card">
+
+            <div class="modal-event-time">
+
+                ${formattedTime}
+
+            </div>
+
+
+            <div class="modal-event-details">
+
+                <strong>
+
+                    ${escapeCalendarHTML(
+                        item.event_title
+                    )}
+
+                </strong>
+
+
+                <small>
+
+                    ${
+                        item.notes
+                            ? escapeCalendarHTML(item.notes)
+                            : "No notes available."
+                    }
+
+                </small>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+
+/* =========================
+   OPEN ADD EVENT FORM
+========================= */
+
+function openCalendarEventForm(
+    eventType,
+    dateStr
+) {
+
+    const formModal =
+        document.getElementById(
+            "calendarEventFormModal"
+        );
+
+
+    const form =
+        document.getElementById(
+            "calendarEventForm"
+        );
+
+
+    if (!formModal || !form) {
+
+        return;
+
+    }
+
+
+    form.reset();
+
+
+    document.getElementById(
+        "calendarEventType"
+    ).value = eventType;
+
+
+    document.getElementById(
+        "calendarEventDate"
+    ).value = dateStr;
+
+
+    const dateObj =
+        new Date(
+            dateStr + "T00:00:00"
+        );
+
+
+    document.getElementById(
+        "calendarEventFormDate"
+    ).textContent =
+
+        dateObj.toLocaleDateString(
+            "en-US",
+            {
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+
+
+    document.getElementById(
+        "calendarEventFormTitle"
+    ).textContent =
+
+        `Add ${eventType}`;
+
+
+    formModal.classList.add("show");
+
+
+    setTimeout(() => {
+
+        document
+            .getElementById(
+                "calendarEventTitle"
+            )
+            .focus();
+
+    }, 100);
+
+}
+
+
+
+/* =========================
+   CLOSE ADD EVENT FORM
+========================= */
+
+function closeCalendarEventForm() {
+
+    const formModal =
+        document.getElementById(
+            "calendarEventFormModal"
+        );
+
+
+    const form =
+        document.getElementById(
+            "calendarEventForm"
+        );
+
+
+    if (formModal) {
+
+        formModal.classList.remove(
+            "show"
+        );
+
+    }
+
+
+    if (form) {
+
+        form.reset();
+
+    }
+
+}
+
+
+
+/* =========================
+   ADD BUTTON CLICK
+========================= */
+
+document.addEventListener(
+    "click",
+    function(e) {
+
+        const addButton =
+            e.target.closest(
+                ".modal-add-event"
+            );
+
+
+        if (!addButton) {
+
+            return;
+
+        }
+
+
+        openCalendarEventForm(
+
+            addButton.dataset.eventType,
+
+            addButton.dataset.eventDate
+
+        );
+
+    }
+);
+
+
+
+/* =========================
+   CLOSE BUTTONS
+========================= */
+
+const closeCalendarEventFormBtn =
+    document.getElementById(
+        "closeCalendarEventForm"
+    );
+
+
+const cancelCalendarEventBtn =
+    document.getElementById(
+        "cancelCalendarEvent"
+    );
+
+
+if (closeCalendarEventFormBtn) {
+
+    closeCalendarEventFormBtn.addEventListener(
+        "click",
+        closeCalendarEventForm
+    );
+
+}
+
+
+if (cancelCalendarEventBtn) {
+
+    cancelCalendarEventBtn.addEventListener(
+        "click",
+        closeCalendarEventForm
+    );
+
+}
+
+
+
+/* =========================
+   CLICK OUTSIDE
+========================= */
+
+const calendarEventFormModal =
+    document.getElementById(
+        "calendarEventFormModal"
+    );
+
+
+if (calendarEventFormModal) {
+
+    calendarEventFormModal.addEventListener(
+        "click",
+        function(e) {
+
+            if (
+                e.target ===
+                calendarEventFormModal
+            ) {
+
+                closeCalendarEventForm();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+/* =========================
+   SAVE EVENT
+========================= */
+
+const calendarEventForm =
+    document.getElementById(
+        "calendarEventForm"
+    );
+
+
+if (calendarEventForm) {
+
+    calendarEventForm.addEventListener(
+        "submit",
+        function(e) {
+
+            e.preventDefault();
+
+
+            const saveButton =
+                document.getElementById(
+                    "saveCalendarEvent"
+                );
+
+
+            const selectedDate =
+                document.getElementById(
+                    "calendarEventDate"
+                ).value;
+
+
+            const formData =
+                new FormData(
+                    calendarEventForm
+                );
+
+
+            saveButton.disabled = true;
+
+
+            saveButton.innerHTML =
+
+                '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+
+            fetch(
+                "../process/save_calendar_event.php",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            )
+
+
+            .then(response => {
+
+                return response.json();
+
+            })
+
+
+            .then(data => {
+
+                if (!data.success) {
+
+                    throw new Error(
+                        data.message ||
+                        "Unable to save event."
+                    );
+
+                }
+
+
+                /* CLOSE FORM */
+
+                closeCalendarEventForm();
+
+
+                /* CLOSE DAY MODAL */
+
+                if (calendarModal) {
+
+                    calendarModal.classList.remove(
+                        "show"
+                    );
+
+                }
+
+
+                /* REFRESH CALENDAR */
+
+                calendar.refetchEvents();
+
+
+                /* REOPEN DAY MODAL */
+
+                openCalendarModal(
+                    selectedDate
+                );
+
+
+                /* SUCCESS MESSAGE */
+
+                if (
+                    typeof Swal !==
+                    "undefined"
+                ) {
+
+                    Swal.fire({
+
+                        icon: "success",
+
+                        title: "Event Added",
+
+                        text:
+                            "The event was added to the calendar.",
+
+                        confirmButtonColor:
+                            "#18aef5"
+
+                    });
+
+                } else {
+
+                    alert(
+                        "Event added successfully."
+                    );
+
+                }
+
+            })
+
+
+            .catch(error => {
+
+                console.error(
+                    "Error saving calendar event:",
+                    error
+                );
+
+
+                if (
+                    typeof Swal !==
+                    "undefined"
+                ) {
+
+                    Swal.fire({
+
+                        icon: "error",
+
+                        title: "Unable to Save",
+
+                        text: error.message,
+
+                        confirmButtonColor:
+                            "#18aef5"
+
+                    });
+
+                } else {
+
+                    alert(error.message);
+
+                }
+
+            })
+
+
+            .finally(() => {
+
+                saveButton.disabled =
+                    false;
+
+
+                saveButton.innerHTML =
+
+                    '<i class="fa-solid fa-check"></i> Save Event';
+
+            });
+
+        }
+    );
+
+}
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
@@ -708,6 +1423,74 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 `;
             });
-    }    
+    }  
+    
+     /* =========================
+      CALENDAR MODAL CLOSE FIX
+     ========================= */
+
+     document.addEventListener("click", function (e) {
+
+        /* MAIN CALENDAR MODAL X */
+        const mainClose =
+            e.target.closest("#closeCalendarModal");
+
+        if (mainClose) {
+
+            const calendarModal =
+            document.getElementById("calendarModal");
+
+                if (calendarModal) {
+
+                    calendarModal.classList.remove("show");
+
+                }
+
+           return;
+        }
+
+
+         /* ADD EVENT MODAL X */
+         const eventClose =
+             e.target.closest("#closeCalendarEventForm");
+
+         if (eventClose) {
+
+            const eventModal =
+                document.getElementById(
+                    "calendarEventFormModal"
+                );
+
+            if (eventModal) {
+
+                eventModal.classList.remove("show");
+
+            }
+
+             return;
+        }
+
+
+        /* CANCEL BUTTON OF ADD EVENT */
+        const cancelButton =
+            e.target.closest("#cancelCalendarEvent");
+
+        if (cancelButton) {
+
+            const eventModal =
+                document.getElementById(
+                    "calendarEventFormModal"
+                );
+
+            if (eventModal) {
+
+                eventModal.classList.remove("show");
+
+            }
+
+             return;
+        }
+
+    });
 
 });

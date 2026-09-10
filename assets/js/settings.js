@@ -4,26 +4,33 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const settingsButtons =
-        document.querySelectorAll(".settings-open-btn");
+    const settingsCards =
+    document.querySelectorAll(".settings-card");
 
+settingsCards.forEach(function (card) {
 
-    settingsButtons.forEach(function (button) {
+    const footer =
+        card.querySelector(".settings-card-footer");
 
-        button.addEventListener("click", function () {
+    if (!footer) {
+        return;
+    }
 
-            const target =
-                button.getAttribute("href");
+    const link =
+        card.querySelector("a[href]");
 
+    const target =
+        footer.getAttribute("data-href") ||
+        (link ? link.getAttribute("href") : "");
 
-            if (!target || target === "#") {
+    if (!target) {
+        return;
+    }
 
-                return;
-
-            }
-
-        });
-
+    card.addEventListener("click", function () {
+        window.location.href = target;
     });
+
+});
 
 });

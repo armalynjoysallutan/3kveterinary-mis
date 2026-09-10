@@ -535,6 +535,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 .medical-record-detail-card.full {
                     grid-column: 1 / -1;
+                    align-self: start;
+                    height:fit-content;
+                    min-height: 0;
                 }
 
                 .medical-record-detail-label {
@@ -547,6 +550,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 .medical-record-detail-value {
+                    display: block;
+                    min-height: 0;
+                    height: auto;
                     color: #1e293b;
                     font-size: 11px;
                     font-weight: 600;
@@ -586,6 +592,84 @@ document.addEventListener("DOMContentLoaded", function () {
                     margin-top: 2px;
                     color: #64748b;
                     font-size: 9px;
+                }
+
+                .medical-record-service-schedule {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 12px;
+                    margin-top: 5px;
+                    color: #475569;
+                    font-size: 9px;
+                }
+
+               .medical-record-vaccination-card {
+    grid-column: 1 / -1;
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    align-self: start !important;
+    display: block !important;
+    box-sizing: border-box;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #f8fafc;
+}
+
+.medical-record-vaccination-content {
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    display: block !important;
+}
+
+.medical-record-vaccination-item {
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 4px 0;
+}
+
+.medical-record-vaccination-item + .medical-record-vaccination-item {
+    border-top: 1px solid #e2e8f0;
+}
+
+.medical-record-vaccination-name {
+    color: #1e293b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.medical-record-vaccination-schedule {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 4px;
+    color: #475569;
+    font-size: 9px;
+}
+
+.medical-record-vaccination-schedule span {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.medical-record-vaccination-schedule strong {
+    font-weight: 700;
+    color: #64748b;
+}
+
+
+                .medical-record-service-schedule span {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 3px;
+                }
+
+                .medical-record-service-schedule strong {
+                    font-weight: 700;
+                    color: #64748b;
                 }
 
                 .medical-record-service-amount {
@@ -637,7 +721,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     .medical-record-detail-card.full {
                         grid-column: 1 / -1;
+                        
                     }
+
+                    .medical-record-detail-card.full .medical-record-detail-value {
+    height: auto;
+    min-height: 0;
+}
+
+.medical-record-vaccination-item {
+    height: auto;
+    min-height: 0;
+    padding: 4px 0;
+}
+
+.medical-record-vaccination-schedule {
+    margin-top: 3px;
+}
                 }
             `;
 
@@ -730,24 +830,44 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </div>
 
                                 <div class="medical-record-service-meta">
-                                    ${escapeHtml(
-                                        service.service_category || "Service"
-                                    )}
-                                    ·
-                                    ${Number(service.quantity || 1)}
-                                    qty
-                                    ${
-                                        service.pet_weight !== null &&
-                                        service.pet_weight !== undefined &&
-                                        service.pet_weight !== ""
-                                            ? " · " +
-                                              escapeHtml(
-                                                  service.pet_weight
-                                              ) +
-                                              " kg"
-                                            : ""
-                                    }
-                                </div>
+    ${escapeHtml(
+        service.service_category || "Service"
+    )}
+    ·
+    ${Number(service.quantity || 1)}
+    qty
+    ${
+        service.pet_weight !== null &&
+        service.pet_weight !== undefined &&
+        service.pet_weight !== ""
+            ? " · " +
+              escapeHtml(
+                  service.pet_weight
+              ) +
+              " kg"
+            : ""
+    }
+</div>
+
+<div class="medical-record-service-schedule">
+    <span>
+        <strong>Next Visit:</strong>
+        ${value(service.next_visit)}
+    </span>
+
+    <span>
+        <strong>Days Return:</strong>
+        ${
+            service.no_days_return !== null &&
+            service.no_days_return !== undefined &&
+            service.no_days_return !== ""
+                ? escapeHtml(
+                    service.no_days_return
+                ) + " days"
+                : "—"
+        }
+    </span>
+</div>
                             </div>
 
                             <div class="medical-record-service-amount">
@@ -761,6 +881,61 @@ document.addEventListener("DOMContentLoaded", function () {
                         No services recorded for this medical record.
                     </div>
                 `;
+
+            const vaccinationServices =
+    services.filter(function (service) {
+        return (
+            String(
+                service.service_category || ""
+            )
+                .trim()
+                .toLowerCase() === "vaccination"
+        );
+    });
+
+const vaccinationHtml =
+    vaccinationServices.length
+        ? vaccinationServices
+              .map(function (service) {
+                  return `
+                      <div class="medical-record-vaccination-item">
+
+                          <div class="medical-record-vaccination-name">
+                              ${escapeHtml(
+                                  service.service_name ||
+                                  "Vaccination"
+                              )}
+                          </div>
+
+                          <div class="medical-record-vaccination-schedule">
+
+                              <span>
+                                  <strong>Next Visit:</strong>
+                                  ${value(
+                                      service.next_visit
+                                  )}
+                              </span>
+
+                              <span>
+                                  <strong>Days Return:</strong>
+                                  ${
+                                      service.no_days_return !== null &&
+                                      service.no_days_return !== undefined &&
+                                      service.no_days_return !== ""
+                                          ? escapeHtml(
+                                              service.no_days_return
+                                          ) + " days"
+                                          : "—"
+                                  }
+                              </span>
+
+                          </div>
+
+                      </div>
+                  `;
+              })
+              .join("")
+        : "—";    
 
             body.innerHTML = `
                 <div class="medical-record-details-grid">
@@ -804,14 +979,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     </div>
 
-                    <div class="medical-record-detail-card">
-                        <span class="medical-record-detail-label">
-                            Amount Paid
-                        </span>
-                        <div class="medical-record-detail-value">
-                            ${money(record.amount_paid || 0)}
-                        </div>
-                    </div>
 
                     <div class="medical-record-detail-card full">
                         <span class="medical-record-detail-label">
@@ -835,28 +1002,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         <span class="medical-record-detail-label">
                             Vaccination (VX)
                         </span>
-                        <div class="medical-record-detail-value">
-                            ${value(record.vaccination)}
+                        
+                        <div class="medical-record-vaccination-content">
+                                ${vaccinationHtml}
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="medical-record-detail-card">
-                        <span class="medical-record-detail-label">
-                            Next Visit
-                        </span>
-                        <div class="medical-record-detail-value">
-                            ${value(record.next_visit)}
-                        </div>
-                    </div>
-
-                    <div class="medical-record-detail-card">
-                        <span class="medical-record-detail-label">
-                            No. of Days of Return
-                        </span>
-                        <div class="medical-record-detail-value">
-                            ${value(record.no_days_return)}
-                        </div>
-                    </div>
 
                 </div>
 
@@ -1071,6 +1222,158 @@ document.addEventListener("DOMContentLoaded", function () {
                 ? difference
                 : "";
     }
+
+    /* =========================================================
+   SERVICE NEXT VISIT -> DAYS RETURN
+   ========================================================= */
+
+document.addEventListener("change", function (event) {
+
+    if (event.target.id !== "serviceNextVisit") {
+        return;
+    }
+
+    calculateServiceDaysReturn();
+
+});
+
+
+function calculateServiceDaysReturn() {
+
+    const nextVisit =
+        document.getElementById("serviceNextVisit");
+
+    const daysField =
+        document.getElementById("serviceNoDaysReturn");
+
+    const form =
+        document.getElementById("medicalRecordForm");
+
+    if (!nextVisit || !daysField || !form) {
+        return;
+    }
+
+    if (!nextVisit.value) {
+
+        daysField.value = "";
+
+        return;
+    }
+
+    const recordDateField =
+        form.querySelector(
+            'input[name="record_date"]'
+        );
+
+    const recordDate =
+        recordDateField?.value ||
+        new Date().toISOString().split("T")[0];
+
+    const start =
+        new Date(recordDate + "T00:00:00");
+
+    const end =
+        new Date(nextVisit.value + "T00:00:00");
+
+    const difference =
+        Math.round(
+            (end - start) /
+            (1000 * 60 * 60 * 24)
+        );
+
+    daysField.value =
+        difference >= 0
+            ? difference
+            : "";
+
+}
+
+document.addEventListener("change", function (event) {
+
+    if (
+        event.target.id !==
+        "appointmentServiceNextVisit"
+    ) {
+        return;
+    }
+
+    calculateAppointmentServiceDaysReturn();
+
+});
+
+
+function calculateAppointmentServiceDaysReturn() {
+
+    const nextVisit =
+        document.getElementById(
+            "appointmentServiceNextVisit"
+        );
+
+    const daysField =
+        document.getElementById(
+            "appointmentServiceNoDaysReturn"
+        );
+
+    const form =
+        document.getElementById(
+            "medicalRecordForm"
+        );
+
+    if (
+        !nextVisit ||
+        !daysField ||
+        !form
+    ) {
+        return;
+    }
+
+    if (!nextVisit.value) {
+
+        daysField.value = "";
+
+        return;
+    }
+
+    const recordDateField =
+        form.querySelector(
+            'input[name="record_date"]'
+        );
+
+    const recordDate =
+        recordDateField?.value ||
+        new Date()
+            .toISOString()
+            .split("T")[0];
+
+    const start =
+        new Date(
+            recordDate + "T00:00:00"
+        );
+
+    const end =
+        new Date(
+            nextVisit.value + "T00:00:00"
+        );
+
+    const difference =
+        Math.round(
+            (
+                end - start
+            ) /
+            (
+                1000 *
+                60 *
+                60 *
+                24
+            )
+        );
+
+    daysField.value =
+        difference >= 0
+            ? difference
+            : "";
+
+}
 
     /* =========================================================
        ADD SERVICE MODAL
@@ -1603,8 +1906,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const quantity =
             document.getElementById("serviceQuantity");
 
-        const price =
-            document.getElementById("serviceUnitPrice");
+        const nextVisit =
+            document.getElementById("serviceNextVisit");
+
+        const daysReturn =
+            document.getElementById("serviceNoDaysReturn");
 
         if (category) {
             category.value = "";
@@ -1630,8 +1936,12 @@ document.addEventListener("DOMContentLoaded", function () {
             quantity.value = "1";
         }
 
-        if (price) {
-            price.value = "0.00";
+        if (nextVisit) {
+            nextVisit.value = "";
+        }
+
+        if (daysReturn) {
+            daysReturn.value = "";
         }
     }
 
@@ -1660,86 +1970,114 @@ document.addEventListener("DOMContentLoaded", function () {
         const quantityInput =
             document.getElementById("serviceQuantity");
 
-        const priceInput =
-            document.getElementById("serviceUnitPrice");
-
         const selectedServices =
-            document.getElementById("selectedServices");
+    document.getElementById("selectedServices");
 
-        const form =
-            document.getElementById("medicalRecordForm");
+const form =
+    document.getElementById("medicalRecordForm");
 
-        if (
-            !categorySelect ||
-            !serviceSelect ||
-            !weightInput ||
-            !quantityInput ||
-            !priceInput ||
-            !selectedServices
-        ) {
-            console.error(
-                "Add Service: required form elements are missing."
-            );
-            return;
-        }
+const nextVisitInput =
+    document.getElementById("serviceNextVisit");
 
-        const category =
-            categorySelect.value;
+const daysReturnInput =
+    document.getElementById("serviceNoDaysReturn");
 
-        const service =
-            getSelectedService();
+if (
+    !categorySelect ||
+    !serviceSelect ||
+    !weightInput ||
+    !quantityInput ||
+    !selectedServices ||
+    !nextVisitInput ||
+    !daysReturnInput
+) {
+    console.error(
+        "Add Service: required form elements are missing."
+    );
+    return;
+}
 
-        const weight =
-            parseFloat(weightInput.value);
+const category =
+    categorySelect.value;
 
-        const quantity =
-            parseFloat(quantityInput.value);
+const service =
+    getSelectedService();
 
-        const price =
-            parseFloat(priceInput.value);
+const weight =
+    parseFloat(weightInput.value);
 
-        if (!category) {
-            showSystemMessage(
-                "Please select a service category.",
-                "warning"
-            );
-            
-            categorySelect.focus();
-            return;
-        }
+const quantity =
+    parseFloat(quantityInput.value);
 
-        if (!service) {
-            alert("Please select a service.");
-            serviceSelect.focus();
-            return;
-        }
+const nextVisit =
+    nextVisitInput.value;
 
-        if (!Number.isFinite(weight) || weight <= 0) {
-            alert("Please enter the pet weight.");
-            weightInput.focus();
-            return;
-        }
+const daysReturn =
+    parseInt(daysReturnInput.value, 10);
 
-        if (!Number.isFinite(quantity) || quantity <= 0) {
-            alert("Please enter a valid quantity.");
-            quantityInput.focus();
-            return;
-        }
+const price =
+    calculateServicePrice(
+        service,
+        weight
+    );
 
-        if (!Number.isFinite(price) || price < 0) {
-            alert("Unable to determine the service price.");
-            return;
-        }
+if (!category) {
+    alert("Please select a service category.");
+    categorySelect.focus();
+    return;
+}
 
-        addSelectedService({
-            service_id: service.service_id,
-            category: category,
-            service_name: service.service_name,
-            pet_weight: weight,
-            quantity: quantity,
-            unit_price: price,
-            amount: quantity * price
-        });
+if (!service) {
+    alert("Please select a service.");
+    serviceSelect.focus();
+    return;
+}
+
+if (!Number.isFinite(weight) || weight <= 0) {
+    alert("Please enter the pet weight.");
+    weightInput.focus();
+    return;
+}
+
+if (!Number.isFinite(quantity) || quantity <= 0) {
+    alert("Please enter a valid quantity.");
+    quantityInput.focus();
+    return;
+}
+
+/* REQUIRED: NEXT VISIT */
+if (!nextVisit) {
+    alert("Please select the next visit date.");
+    nextVisitInput.focus();
+    return;
+}
+
+/* DAYS RETURN MUST BE VALID */
+if (!Number.isFinite(daysReturn) || daysReturn < 0) {
+    alert("Unable to calculate the days of return.");
+    nextVisitInput.focus();
+    return;
+}
+
+if (!Number.isFinite(price) || price < 0) {
+    alert("Unable to determine the service price.");
+    return;
+}
+
+addSelectedService({
+    service_id: service.service_id,
+    category: category,
+    service_name: service.service_name,
+    pet_weight: weight,
+    quantity: quantity,
+    unit_price: price,
+    amount: quantity * price,
+
+    service_source: "Additional",
+
+    next_visit: nextVisit,
+    no_days_return: daysReturn
+});
 
         closeModal(getAddServiceModal());
         resetAddServiceForm();
@@ -1752,6 +2090,65 @@ document.addEventListener("DOMContentLoaded", function () {
     function getSelectedServicesContainer() {
         return document.getElementById("selectedServices");
     }
+
+    function prepareAppointmentServiceData() {
+
+    const appointmentNextVisit =
+        document.getElementById(
+            "appointmentServiceNextVisit"
+        );
+
+    const appointmentDaysReturn =
+        document.getElementById(
+            "appointmentServiceNoDaysReturn"
+        );
+
+    const appointmentService =
+        document.querySelector(
+            '.selected-service-item[data-source="appointment"]'
+        );
+
+    if (
+        !appointmentService ||
+        !appointmentNextVisit ||
+        !appointmentDaysReturn
+    ) {
+        return null;
+    }
+
+    const serviceName =
+        appointmentService
+            .querySelector(".selected-service-info strong")
+            ?.textContent
+            ?.trim() || "";
+
+    const category =
+        appointmentService
+            .querySelector(".selected-service-info small")
+            ?.textContent
+            ?.trim() || "";
+
+    return {
+        service_id: null,
+        category: category,
+        service_name: serviceName,
+        pet_weight: 0,
+        quantity: 1,
+        unit_price: 0,
+        amount: 0,
+
+        service_source: "Appointment",
+
+        next_visit:
+            appointmentNextVisit.value || "",
+        no_days_return:
+            appointmentDaysReturn.value
+                ? Number(
+                    appointmentDaysReturn.value
+                )
+                : 0
+    };
+}
 
     function addSelectedService(serviceData) {
         const container =
@@ -1782,10 +2179,24 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="selected-service-info">
                 <strong>${escapeHtml(serviceData.service_name)}</strong>
                 <span>
-                    ${escapeHtml(serviceData.category)}
-                    · ${Number(serviceData.pet_weight).toFixed(2)} kg
-                    · Qty ${Number(serviceData.quantity)}
-                </span>
+    ${escapeHtml(serviceData.category)}
+    · ${Number(serviceData.pet_weight).toFixed(2)} kg
+    · Qty ${Number(serviceData.quantity)}
+</span>
+
+<div class="selected-service-schedule">
+
+    <span>
+        <strong>Next Visit:</strong>
+        ${escapeHtml(serviceData.next_visit)}
+    </span>
+
+    <span>
+        <strong>Days Return:</strong>
+        ${Number(serviceData.no_days_return)} days
+    </span>
+
+</div>
             </div>
 
             <div class="selected-service-action">
@@ -1903,6 +2314,36 @@ document.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const form = event.target;
+
+    const appointmentServiceData =
+        prepareAppointmentServiceData();
+    if (appointmentServiceData) {
+
+    let appointmentHidden =
+        form.querySelector(
+            'input[name="services[]"][data-service-source="appointment"]'
+        );
+
+    if (!appointmentHidden) {
+
+        appointmentHidden =
+            document.createElement("input");
+
+        appointmentHidden.type = "hidden";
+        appointmentHidden.name = "services[]";
+        appointmentHidden.dataset.serviceSource =
+            "appointment";
+
+        form.appendChild(
+            appointmentHidden
+        );
+    }
+
+    appointmentHidden.value =
+        JSON.stringify(
+            appointmentServiceData
+        );
+}    
 
     const weight =
         form.querySelector('[name="weight"]');
@@ -2945,5 +3386,1688 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "customer_archive.php";
 
     });
+
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const archivedBtn =
+        document.getElementById("archivedBtn");
+
+    if (!archivedBtn) {
+        return;
+    }
+
+    archivedBtn.addEventListener("click", function () {
+        window.location.href = "customer_archive.php";
+    });
+
+});
+/* =========================================================
+   CUSTOMER RECORDS - SEARCH + FILTERS
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput =
+        document.getElementById("customerSearch");
+
+    const speciesSelect =
+        document.getElementById("customerFilterSpecies");
+
+    const breedSelect =
+        document.getElementById("customerFilterBreed");
+
+    const genderSelect =
+        document.getElementById("customerFilterGender");
+
+    const dateTypeSelect =
+        document.getElementById("customerFilterDateType");
+
+    const fromInput =
+        document.getElementById("customerFilterFrom");
+
+    const toInput =
+        document.getElementById("customerFilterTo");
+
+    const applyButton =
+        document.getElementById("applyCustomerFilters");
+
+    const clearButton =
+        document.getElementById("clearCustomerFilters");
+
+    const customerCards =
+        document.querySelectorAll(".customer-card");
+
+    const visibleCount =
+        document.getElementById("visibleCustomerCount");
+
+
+    /* =====================================================
+       CHECK IF PET MATCHES SPECIES / BREED / SEX
+       ===================================================== */
+
+    function petMatchesFilters(pet) {
+
+        const selectedSpecies =
+            speciesSelect
+                ? speciesSelect.value
+                    .toLowerCase()
+                    .trim()
+                : "";
+
+        const selectedBreed =
+            breedSelect
+                ? breedSelect.value
+                    .toLowerCase()
+                    .trim()
+                : "";
+
+        const selectedGender =
+            genderSelect
+                ? genderSelect.value
+                    .toLowerCase()
+                    .trim()
+                : "";
+
+
+        /* Species */
+        if (
+            selectedSpecies !== "" &&
+            pet.species !== selectedSpecies
+        ) {
+            return false;
+        }
+
+
+        /* Breed */
+        if (
+            selectedBreed !== "" &&
+            pet.breed !== selectedBreed
+        ) {
+            return false;
+        }
+
+
+        /* Sex */
+        if (
+            selectedGender !== "" &&
+            pet.gender !== selectedGender
+        ) {
+            return false;
+        }
+
+
+        return true;
+    }
+
+
+    /* =====================================================
+       CHECK IF CUSTOMER MATCHES PET FILTERS
+       ===================================================== */
+
+    function customerMatchesPetFilters(card) {
+
+        const selectedSpecies =
+            speciesSelect
+                ? speciesSelect.value
+                    .toLowerCase()
+                    .trim()
+                : "";
+
+        const selectedBreed =
+            breedSelect
+                ? breedSelect.value
+                    .toLowerCase()
+                    .trim()
+                : "";
+
+        const selectedGender =
+            genderSelect
+                ? genderSelect.value
+                    .toLowerCase()
+                    .trim()
+                : "";
+
+
+        /*
+         * No pet filters selected.
+         */
+        if (
+            selectedSpecies === "" &&
+            selectedBreed === "" &&
+            selectedGender === ""
+        ) {
+            return true;
+        }
+
+
+        let pets = [];
+
+        try {
+            pets = JSON.parse(
+                card.getAttribute("data-pets") || "[]"
+            );
+        } catch (error) {
+            console.error(
+                "Invalid customer pet filter data:",
+                error
+            );
+
+            return false;
+        }
+
+
+        /*
+         * At least ONE pet must match
+         * all selected pet filters.
+         */
+        return pets.some(function (pet) {
+            return petMatchesFilters({
+                species:
+                    String(pet.species || "")
+                        .toLowerCase()
+                        .trim(),
+
+                breed:
+                    String(pet.breed || "")
+                        .toLowerCase()
+                        .trim(),
+
+                gender:
+                    String(pet.gender || "")
+                        .toLowerCase()
+                        .trim()
+            });
+        });
+    }
+
+
+    /* =====================================================
+       CHECK DATE RANGE
+       ===================================================== */
+
+    function customerMatchesDateFilter(card) {
+
+        const dateType =
+            dateTypeSelect
+                ? dateTypeSelect.value
+                : "registered";
+
+        const fromDate =
+            fromInput
+                ? fromInput.value
+                : "";
+
+        const toDate =
+            toInput
+                ? toInput.value
+                : "";
+
+
+        /*
+         * No date range selected.
+         */
+        if (
+            fromDate === "" &&
+            toDate === ""
+        ) {
+            return true;
+        }
+
+
+        let customerDate = "";
+
+
+        if (dateType === "last_visit") {
+
+            customerDate =
+                card.getAttribute(
+                    "data-last-visit"
+                ) || "";
+
+        } else {
+
+            customerDate =
+                card.getAttribute(
+                    "data-created-at"
+                ) || "";
+
+        }
+
+
+        /*
+         * Last Visit has no completed visit.
+         * Therefore it cannot match a date range.
+         */
+        if (customerDate === "") {
+            return false;
+        }
+
+
+        /*
+         * FROM
+         */
+        if (
+            fromDate !== "" &&
+            customerDate < fromDate
+        ) {
+            return false;
+        }
+
+
+        /*
+         * TO
+         */
+        if (
+            toDate !== "" &&
+            customerDate > toDate
+        ) {
+            return false;
+        }
+
+
+        return true;
+    }
+
+
+    /* =====================================================
+       APPLY ALL FILTERS
+       ===================================================== */
+
+    function applyAllCustomerFilters() {
+
+        const keyword =
+            searchInput
+                ? searchInput.value
+                    .toLowerCase()
+                    .trim()
+                : "";
+
+        let visible = 0;
+
+        const selectedSpecies =
+    speciesSelect
+        ? speciesSelect.value
+            .toLowerCase()
+            .trim()
+        : "";
+
+const selectedBreed =
+    breedSelect
+        ? breedSelect.value
+            .toLowerCase()
+            .trim()
+        : "";
+
+const selectedGender =
+    genderSelect
+        ? genderSelect.value
+            .toLowerCase()
+            .trim()
+        : "";
+
+
+        customerCards.forEach(function (card) {
+
+            /* =========================================
+               SEARCH
+               ========================================= */
+
+            const text =
+                card.textContent
+                    .toLowerCase()
+                    .replace(/\s+/g, " ")
+                    .trim();
+
+            const customerId =
+                (
+                    card.getAttribute(
+                        "data-customer-id"
+                    ) || ""
+                ).toLowerCase();
+
+            const searchableText =
+                text + " " + customerId;
+
+
+            const matchesSearch =
+                keyword === "" ||
+                searchableText.includes(keyword);
+
+
+            /* =========================================
+               PET FILTERS
+               ========================================= */
+
+            const matchesPetFilters =
+                customerMatchesPetFilters(card);
+
+
+            
+            /* =========================================
+   UPDATE REGISTERED PET COUNT
+   ========================================= */
+
+const petCountElement =
+    card.querySelector(".filtered-pet-count");
+
+if (petCountElement) {
+
+    let cardPets = [];
+
+    try {
+
+        cardPets = JSON.parse(
+            card.getAttribute("data-pets") || "[]"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Invalid pet count data:",
+            error
+        );
+
+        cardPets = [];
+
+    }
+
+
+    /*
+     * If no pet filters are selected,
+     * show the original total number of pets.
+     */
+    if (
+        selectedSpecies === "" &&
+        selectedBreed === "" &&
+        selectedGender === ""
+    ) {
+
+        petCountElement.textContent =
+            cardPets.length;
+
+    } else {
+
+        /*
+         * Count only pets that match
+         * ALL selected pet filters.
+         */
+        const matchingPetCount =
+            cardPets.filter(function (pet) {
+
+                const petSpecies =
+                    String(pet.species || "")
+                        .toLowerCase()
+                        .trim();
+
+                const petBreed =
+                    String(pet.breed || "")
+                        .toLowerCase()
+                        .trim();
+
+                const petGender =
+                    String(pet.gender || "")
+                        .toLowerCase()
+                        .trim();
+
+
+                const speciesMatch =
+                    selectedSpecies === "" ||
+                    petSpecies === selectedSpecies;
+
+                const breedMatch =
+                    selectedBreed === "" ||
+                    petBreed === selectedBreed;
+
+                const genderMatch =
+                    selectedGender === "" ||
+                    petGender === selectedGender;
+
+
+                return (
+                    speciesMatch &&
+                    breedMatch &&
+                    genderMatch
+                );
+
+            }).length;
+
+
+        petCountElement.textContent =
+            matchingPetCount;
+
+    }
+
+}    
+            /* =========================================
+   SHOW ONLY PETS THAT MATCH THE FILTERS
+   ========================================= */
+
+const petRows =
+    card.querySelectorAll(".pet-row");
+
+petRows.forEach(function (petRow) {
+
+    const petSpecies =
+        (
+            petRow.getAttribute(
+                "data-pet-species"
+            ) || ""
+        )
+            .toLowerCase()
+            .trim();
+
+    const petBreed =
+        (
+            petRow.getAttribute(
+                "data-pet-breed"
+            ) || ""
+        )
+            .toLowerCase()
+            .trim();
+
+    const petGender =
+        (
+            petRow.getAttribute(
+                "data-pet-gender"
+            ) || ""
+        )
+            .toLowerCase()
+            .trim();
+
+
+    const speciesMatch =
+        selectedSpecies === "" ||
+        petSpecies === selectedSpecies;
+
+    const breedMatch =
+        selectedBreed === "" ||
+        petBreed === selectedBreed;
+
+    const genderMatch =
+        selectedGender === "" ||
+        petGender === selectedGender;
+
+
+    if (
+        speciesMatch &&
+        breedMatch &&
+        genderMatch
+    ) {
+
+        petRow.style.removeProperty(
+            "display"
+        );
+
+    } else {
+
+        petRow.style.setProperty(
+            "display",
+            "none",
+            "important"
+        );
+
+    }
+
+});    
+            /* =========================================
+               DATE FILTER
+               ========================================= */
+
+            const matchesDate =
+                customerMatchesDateFilter(card);
+
+
+            /* =========================================
+               FINAL RESULT
+               ========================================= */
+
+            if (
+                matchesSearch &&
+                matchesPetFilters &&
+                matchesDate
+            ) {
+
+                card.style.removeProperty(
+                    "display"
+                );
+
+                visible++;
+
+            } else {
+
+                card.style.setProperty(
+                    "display",
+                    "none",
+                    "important"
+                );
+            }
+
+        });
+
+
+        if (visibleCount) {
+            visibleCount.textContent =
+                visible;
+        }
+    }
+
+
+    /* =====================================================
+       SEARCH - LIVE
+       ===================================================== */
+
+    if (searchInput) {
+
+        searchInput.addEventListener(
+            "input",
+            function () {
+                applyAllCustomerFilters();
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       APPLY BUTTON
+       ===================================================== */
+
+    if (applyButton) {
+
+        applyButton.addEventListener(
+            "click",
+            function () {
+
+                applyAllCustomerFilters();
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       CLEAR BUTTON
+       ===================================================== */
+
+    if (clearButton) {
+
+        clearButton.addEventListener(
+            "click",
+            function () {
+
+                if (speciesSelect) {
+                    speciesSelect.value = "";
+                }
+
+                if (breedSelect) {
+
+                    breedSelect.innerHTML = "";
+
+                    const allBreedsOption =
+                        document.createElement("option");
+
+                    allBreedsOption.value = "";
+                    allBreedsOption.textContent =
+                        "All Breeds";
+
+                    breedSelect.appendChild(
+                        allBreedsOption
+                    );
+
+                    breedSelect.disabled = false;
+                }
+
+                if (genderSelect) {
+                    genderSelect.value = "";
+                }
+
+                if (dateTypeSelect) {
+                    dateTypeSelect.value =
+                        "registered";
+                }
+
+                if (fromInput) {
+                    fromInput.value = "";
+                }
+
+                if (toInput) {
+                    toInput.value = "";
+                }
+
+                applyAllCustomerFilters();
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       INITIAL FILTER STATE
+       ===================================================== */
+
+    applyAllCustomerFilters();
+
+});
+/* =========================================================
+   ADD CUSTOMER MODAL
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const addCustomerBtn =
+        document.getElementById("addCustomerBtn");
+
+    const addCustomerModal =
+        document.getElementById("addCustomerModal");
+
+    const closeAddCustomer =
+        document.getElementById("closeAddCustomer");
+
+    const cancelAddCustomer =
+        document.getElementById("cancelAddCustomer");
+
+    const addSpecies =
+        document.getElementById("addSpecies");
+        
+    const addBreed =
+        document.getElementById("addBreed");  
+        
+    const addOtherBreedGroup =
+        document.getElementById("addOtherBreedGroup");
+        
+    const addOtherBreed =    
+        document.getElementById("addOtherBreed");
+
+    const saveCustomer =
+        document.getElementById("saveCustomer");
+
+        
+    const customerSuccessModal =
+        document.getElementById("customerSuccessModal");
+        
+    const customerSuccessDone =
+        document.getElementById("customerSuccessDone");
+
+    function showCustomerSuccess() {
+
+    if (customerSuccessModal) {
+
+        customerSuccessModal.classList.add(
+            "show"
+        );
+
+    }
+
+}
+
+
+function closeCustomerSuccess() {
+
+    if (customerSuccessModal) {
+
+        customerSuccessModal.classList.remove(
+            "show"
+        );
+
+    }
+
+}
+
+
+if (customerSuccessDone) {
+
+    customerSuccessDone.addEventListener(
+        "click",
+        function () {
+
+            closeCustomerSuccess();
+
+            window.location.reload();
+
+        }
+    );
+
+}    
+
+
+
+    if (!addCustomerBtn) {
+        console.error("Add Customer button not found.");
+        return;
+    }
+
+    if (!addCustomerModal) {
+        console.error("Add Customer modal not found.");
+        return;
+    }
+
+   /* =====================================================
+   DYNAMIC BREED DROPDOWN
+   Breeds depend on selected Species
+===================================================== */
+
+if (addSpecies && addBreed) {
+
+    const breedOptions = Array.from(
+        addBreed.querySelectorAll("option[data-species-id]")
+    );
+
+    addSpecies.addEventListener("change", function () {
+
+        const selectedSpeciesId = this.value;
+
+        addBreed.value = "";
+
+        if (addOtherBreedGroup) {
+            addOtherBreedGroup.style.display = "none";
+        }
+
+        if (addOtherBreed) {
+            addOtherBreed.value = "";
+            addOtherBreed.required = false;
+        }
+
+        if (!selectedSpeciesId) {
+            addBreed.disabled = true;
+            return;
+        }
+
+        addBreed.disabled = false;
+
+        breedOptions.forEach(function (option) {
+
+            const optionSpeciesId =
+                option.getAttribute("data-species-id");
+
+            option.style.display =
+                optionSpeciesId === selectedSpeciesId
+                    ? ""
+                    : "none";
+
+        });
+
+    });
+
+
+    /* =================================================
+       OTHER BREED
+    ================================================= */
+
+    addBreed.addEventListener("change", function () {
+
+    if (this.value === "Others") {
+
+        if (addOtherBreedGroup) {
+            addOtherBreedGroup.style.display = "block";
+        }
+
+        if (addOtherBreed) {
+            addOtherBreed.required = true;
+            addOtherBreed.focus();
+        }
+
+    } else {
+
+        if (addOtherBreedGroup) {
+            addOtherBreedGroup.style.display = "none";
+        }
+
+        if (addOtherBreed) {
+            addOtherBreed.value = "";
+            addOtherBreed.required = false;
+        }
+
+    }
+
+});
+}
+
+ 
+    /* =====================================================
+       OPEN ADD CUSTOMER MODAL
+    ===================================================== */
+
+    addCustomerBtn.addEventListener(
+        "click",
+        function (event) {
+
+            event.preventDefault();
+
+            if (addSpecies) {
+    addSpecies.value = "";
+}
+
+if (addBreed) {
+    addBreed.value = "";
+    addBreed.disabled = true;
+
+    addBreed.querySelectorAll("option[data-species-id]")
+        .forEach(function (option) {
+            option.style.display = "";
+        });
+}
+
+if (addOtherBreedGroup) {
+    addOtherBreedGroup.style.display = "none";
+}
+
+if (addOtherBreed) {
+    addOtherBreed.value = "";
+    addOtherBreed.required = false;
+}
+
+            addCustomerModal.classList.add("open");
+            addCustomerModal.classList.add("active");
+
+            addCustomerModal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            document.body.classList.add(
+                "modal-open"
+            );
+        }
+    );
+
+
+    /* =====================================================
+       CLOSE ADD CUSTOMER MODAL
+    ===================================================== */
+
+    function closeAddCustomerModal() {
+
+        addCustomerModal.classList.remove("open");
+        addCustomerModal.classList.remove("active");
+
+        addCustomerModal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+        document.body.classList.remove(
+            "modal-open"
+        );
+    }
+
+
+    /* =====================================================
+       CLOSE - X
+    ===================================================== */
+
+    if (closeAddCustomer) {
+
+        closeAddCustomer.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                closeAddCustomerModal();
+            }
+        );
+    }
+
+
+    /* =====================================================
+       CLOSE - CANCEL
+    ===================================================== */
+
+    if (cancelAddCustomer) {
+
+        cancelAddCustomer.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                closeAddCustomerModal();
+            }
+        );
+    }
+
+
+    /* =====================================================
+       SAVE CUSTOMER
+    ===================================================== */
+
+    if (saveCustomer) {
+
+        saveCustomer.addEventListener(
+            "click",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                /* =========================================
+                   GET FORM VALUES
+                ========================================= */
+
+                const lastName =
+                    document.getElementById(
+                        "addOwnerLastName"
+                    ).value.trim();
+
+                const firstName =
+                    document.getElementById(
+                        "addOwnerFirstName"
+                    ).value.trim();
+
+                const middleName =
+                    document.getElementById(
+                        "addOwnerMiddleName"
+                    ).value.trim();
+
+                const contactNumber =
+                    document.getElementById(
+                        "addContactNumber"
+                    ).value.trim();
+
+                const email =
+                    document.getElementById(
+                        "addEmail"
+                    ).value.trim();
+
+                const address =
+                    document.getElementById(
+                        "addAddress"
+                    ).value.trim();
+
+                const petName =
+                    document.getElementById(
+                        "addPetName"
+                    ).value.trim();
+
+                const species =
+                    document.getElementById(
+                        "addSpecies"
+                    ).value;
+
+                const breed =
+                    document.getElementById(
+                        "addBreed"
+                    ).value.trim();
+
+                const color =
+                    document.getElementById(
+                        "addColor"
+                    ).value.trim();
+
+                const gender =
+                    document.getElementById(
+                        "addGender"
+                    ).value;
+
+                const weight =
+                    document.getElementById(
+                        "addWeight"
+                    ).value.trim();
+
+                const dateOfBirth =
+                    document.getElementById(
+                        "addDateOfBirth"
+                    ).value;
+
+
+                /* =========================================
+                   CLIENT-SIDE REQUIRED VALIDATION
+                ========================================= */
+
+                if (
+                    lastName === "" ||
+                    firstName === "" ||
+                    contactNumber === "" ||
+                    petName === "" ||
+                    species === ""
+                ) {
+
+                    alert(
+                        "Please complete all required fields."
+                    );
+
+                    return;
+                }
+
+
+                /* =========================================
+                   CONTACT NUMBER VALIDATION
+                ========================================= */
+
+                if (!/^[0-9]{11}$/.test(contactNumber)) {
+
+                    alert(
+                        "Contact number must contain exactly 11 digits."
+                    );
+
+                    return;
+                }
+
+
+                /* =========================================
+                   PREVENT DOUBLE CLICK
+                ========================================= */
+
+                saveCustomer.disabled = true;
+
+                saveCustomer.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+
+                /* =========================================
+                   PREPARE DATA
+                ========================================= */
+
+                const formData =
+                    new FormData();
+
+                formData.append(
+                    "owner_last_name",
+                    lastName
+                );
+
+                formData.append(
+                    "owner_first_name",
+                    firstName
+                );
+
+                formData.append(
+                    "owner_middle_name",
+                    middleName
+                );
+
+                formData.append(
+                    "contact_number",
+                    contactNumber
+                );
+
+                formData.append(
+                    "email",
+                    email
+                );
+
+                formData.append(
+                    "address",
+                    address
+                );
+
+                formData.append(
+                    "pet_name",
+                    petName
+                );
+
+                formData.append(
+                    "species",
+                    species
+                );
+
+                formData.append(
+                    "breed",
+                    breed
+                );
+
+                formData.append(
+                    "other_breed",
+                    addOtherBreed 
+                        ? addOtherBreed.value.trim() 
+                        : ""
+                );        
+
+                formData.append(
+                    "color",
+                    color
+                );
+
+                formData.append(
+                    "gender",
+                    gender
+                );
+
+                formData.append(
+                    "weight",
+                    weight
+                );
+
+                formData.append(
+                    "date_of_birth",
+                    dateOfBirth
+                );
+
+
+                /* =========================================
+                   SEND TO PHP
+                ========================================= */
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "../process/save_customer.php",
+                            {
+                                method: "POST",
+                                body: formData,
+                                cache: "no-store"
+                            }
+                        );
+
+
+                    const result =
+                        await response.json();
+
+
+                    console.log(
+                        "Save Customer Result:",
+                        result
+                    );
+
+
+                    /* =====================================
+                       FAILED
+                    ===================================== */
+
+                    if (
+                        !response.ok ||
+                        !result.success
+                    ) {
+
+                        throw new Error(
+                            result.message ||
+                            "Unable to save customer."
+                        );
+                    }
+
+
+                    /* =====================================
+                       SUCCESS
+                    ===================================== */
+
+                    showCustomerSuccess();
+
+                    /* =====================================
+                       RESET FORM
+                    ===================================== */
+
+                    document.getElementById(
+                        "addOwnerLastName"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addOwnerFirstName"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addOwnerMiddleName"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addContactNumber"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addEmail"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addAddress"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addPetName"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addSpecies"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addBreed"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addColor"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addGender"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addWeight"
+                    ).value = "";
+
+                    document.getElementById(
+                        "addDateOfBirth"
+                    ).value = "";
+
+                   
+
+                    /* =====================================
+                       CLOSE MODAL
+                    ===================================== */
+
+                    closeAddCustomerModal();
+
+                    showCustomerSuccess();
+
+
+                   
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Save Customer Error:",
+                        error
+                    );
+
+
+                    alert(
+                        error.message ||
+                        "Something went wrong while saving the customer."
+                    );
+
+
+                    /* Restore button */
+
+                    saveCustomer.disabled = false;
+
+                    saveCustomer.innerHTML =
+                        "Save Customer";
+                }
+
+            }
+        );
+    }
+
+
+    /* =====================================================
+       CLOSE - ESCAPE
+    ===================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Escape") {
+
+                if (
+                    addCustomerModal.classList.contains(
+                        "open"
+                    ) ||
+                    addCustomerModal.classList.contains(
+                        "active"
+                    )
+                ) {
+
+                    closeAddCustomerModal();
+                }
+            }
+        }
+    );
+
+});
+
+/* =========================================================
+   CUSTOMER RECORDS - FILTER PANEL TOGGLE
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const dateRangeBtn = document.getElementById("dateRangeBtn");
+    const filterBtn = document.getElementById("filterBtn");
+
+    const filterPanel = document.getElementById("customerFilterPanel");
+    const petFilterSection = document.getElementById("petFilterSection");
+    const dateFilterSection = document.getElementById("dateFilterSection");
+
+
+    if (!filterPanel) {
+        console.error("customerFilterPanel not found.");
+        return;
+    }
+
+
+    /* =====================================================
+       DATE RANGE BUTTON
+       ===================================================== */
+
+    if (dateRangeBtn) {
+
+        dateRangeBtn.addEventListener("click", function () {
+
+            const isHidden =
+                filterPanel.style.display === "none" ||
+                filterPanel.style.display === "";
+
+            if (isHidden) {
+
+                filterPanel.style.display = "block";
+
+                if (petFilterSection) {
+                    petFilterSection.style.display = "none";
+                }
+
+                if (dateFilterSection) {
+                    dateFilterSection.style.display = "flex";
+                }
+
+            } else {
+
+                filterPanel.style.display = "none";
+
+            }
+
+        });
+
+    }
+
+
+    /* =====================================================
+       FILTERS BUTTON
+       ===================================================== */
+
+    if (filterBtn) {
+
+        filterBtn.addEventListener("click", function () {
+
+            const isHidden =
+                filterPanel.style.display === "none" ||
+                filterPanel.style.display === "";
+
+            if (isHidden) {
+
+                filterPanel.style.display = "block";
+
+                if (petFilterSection) {
+                    petFilterSection.style.display = "flex";
+                }
+
+                if (dateFilterSection) {
+                    dateFilterSection.style.display = "none";
+                }
+
+            } else {
+
+                filterPanel.style.display = "none";
+
+            }
+
+        });
+
+    }
+
+});
+
+/* =========================================================
+   CUSTOMER RECORDS - SPECIES → BREED FILTER
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const speciesSelect =
+        document.getElementById("customerFilterSpecies");
+
+    const breedSelect =
+        document.getElementById("customerFilterBreed");
+
+    if (!speciesSelect || !breedSelect) {
+        console.error(
+            "Customer species/breed filter not found."
+        );
+        return;
+    }
+
+   function loadCustomerFilterBreeds() {
+
+    const selectedSpeciesName =
+        speciesSelect.value
+            .toLowerCase()
+            .trim();
+
+
+    /* Clear current breed options */
+    breedSelect.innerHTML = "";
+
+
+    /* Always show All Breeds */
+    const allBreedsOption =
+        document.createElement("option");
+
+    allBreedsOption.value = "";
+    allBreedsOption.textContent = "All Breeds";
+
+    breedSelect.appendChild(allBreedsOption);
+
+
+    /*
+     * Merge System Variable breeds
+     * and breeds actually used by pets.
+     */
+    const mergedBreeds = [];
+    const seenBreeds = new Set();
+
+
+    function addBreed(
+        breedName,
+        speciesName,
+        speciesId
+    ) {
+
+        const cleanBreed =
+            String(breedName || "").trim();
+
+        const cleanSpecies =
+            String(speciesName || "").trim();
+
+
+        /* Ignore incomplete data */
+        if (
+            cleanBreed === "" ||
+            cleanSpecies === ""
+        ) {
+            return;
+        }
+
+
+        /* Do not show generic Others */
+        if (
+            cleanBreed.toLowerCase() === "others"
+        ) {
+            return;
+        }
+
+
+        /*
+         * If a Species is selected,
+         * only show breeds for that Species.
+         */
+        if (
+            selectedSpeciesName !== "" &&
+            cleanSpecies.toLowerCase() !==
+                selectedSpeciesName
+        ) {
+            return;
+        }
+
+
+        /*
+         * Prevent duplicates.
+         *
+         * Example:
+         * Cat + Persian
+         * Cat + Persian
+         *
+         * will only appear once.
+         */
+        const breedKey =
+            cleanSpecies.toLowerCase() +
+            "|" +
+            cleanBreed.toLowerCase();
+
+
+        if (seenBreeds.has(breedKey)) {
+            return;
+        }
+
+        seenBreeds.add(breedKey);
+
+
+        mergedBreeds.push({
+            breed: cleanBreed,
+            species: cleanSpecies,
+            species_id: speciesId
+                ? String(speciesId)
+                : ""
+        });
+    }
+
+
+    /* =====================================================
+       1. ADD SYSTEM VARIABLE BREEDS
+       ===================================================== */
+
+    customerFilterBreeds.forEach(function (breed) {
+
+        const species =
+            customerFilterSpecies.find(
+                function (item) {
+
+                    return String(
+                        item.species_id
+                    ) === String(
+                        breed.species_id
+                    );
+
+                }
+            );
+
+
+        addBreed(
+            breed.breed,
+            species
+                ? species.species
+                : "",
+            breed.species_id
+        );
+
+    });
+
+
+    /* =====================================================
+       2. ADD ACTUAL PET BREEDS
+       Includes custom breeds
+       ===================================================== */
+
+    customerFilterCustomBreeds.forEach(
+        function (breed) {
+
+            addBreed(
+                breed.breed,
+                breed.species,
+                (function () {
+
+                    const species =
+                        customerFilterSpecies.find(
+                            function (item) {
+
+                                return String(
+                                    item.species
+                                )
+                                .toLowerCase()
+                                .trim() ===
+                                String(
+                                    breed.species
+                                )
+                                .toLowerCase()
+                                .trim();
+
+                            }
+                        );
+
+                    return species
+                        ? species.species_id
+                        : "";
+
+                })()
+            );
+
+        }
+    );
+
+
+    /* Sort alphabetically */
+    mergedBreeds.sort(
+        function (a, b) {
+
+            return a.breed.localeCompare(
+                b.breed
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       3. CREATE DROPDOWN OPTIONS
+       ===================================================== */
+
+    mergedBreeds.forEach(
+        function (breed) {
+
+            const option =
+                document.createElement("option");
+
+
+            option.value =
+                breed.breed
+                    .toLowerCase()
+                    .trim();
+
+
+            option.textContent =
+                breed.breed;
+
+
+            if (breed.species_id) {
+
+                option.dataset.speciesId =
+                    breed.species_id;
+
+            }
+
+
+            breedSelect.appendChild(option);
+
+        }
+    );
+
+
+    /* Keep Breed dropdown enabled */
+    breedSelect.disabled = false;
+}
+
+    /* ==============================================
+       WHEN SPECIES CHANGES
+       ============================================== */
+
+    speciesSelect.addEventListener(
+        "change",
+        function () {
+
+            loadCustomerFilterBreeds();
+
+        }
+    );
+
+
+    /* ==============================================
+       INITIAL LOAD
+       ============================================== */
+
+    loadCustomerFilterBreeds();
 
 });

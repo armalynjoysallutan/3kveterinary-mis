@@ -53,29 +53,20 @@ if (billingSearch) {
 // ========================================
 // ADD BILLING
 // ========================================
-
 const addBillingBtn =
     document.getElementById("addBillingBtn");
 
-
 if (addBillingBtn) {
-
     addBillingBtn.addEventListener(
         "click",
         function () {
 
-            console.log(
-                "Add Billing clicked."
-            );
-
-            // Walk-in Billing
-            // will be implemented later.
+            window.location.href =
+                "purchase_billing.php";
 
         }
     );
-
 }
-
 
 // ========================================
 // VIEW BILLING STATEMENT

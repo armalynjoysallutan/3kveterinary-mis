@@ -223,18 +223,24 @@
    BILLING GRID
 ========================================================= */
 
+/* =========================================================
+   FORCE BILLING STATEMENT TWO-COLUMN LAYOUT
+========================================================= */
+
 .billing-statement-grid {
-    display: grid;
-
-    grid-template-columns:
-        minmax(0, 1.65fr)
-        minmax(270px, .75fr);
-
-    gap: 20px;
-
-    align-items: start;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.65fr) minmax(270px, .75fr) !important;
+    gap: 20px !important;
+    align-items: start !important;
 }
 
+.statement-left {
+    min-width: 0;
+}
+
+.statement-right {
+    min-width: 0;
+}
 
 /* =========================================================
    SECTION TITLE
@@ -617,6 +623,8 @@
     width: 470px;
     max-width: calc(100vw - 40px);
 
+    max-height: calc(100vh - 40px);
+
     overflow: hidden;
 
     background: #ffffff;
@@ -627,7 +635,8 @@
         0 20px 50px
         rgba(15, 23, 42, .2);
 
-    display: block;
+    display: flex;
+    flex-direction: column;
 }
 
 .service-modal-header {
@@ -670,6 +679,7 @@
 
 .service-form {
     padding: 18px;
+    overflow-y: auto;
 }
 
 .form-group {
@@ -770,7 +780,7 @@
    RESPONSIVE
 ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 700px) {
 
     .billing-statement-grid {
         grid-template-columns: 1fr;
@@ -1069,3 +1079,635 @@
     }
 
 }
+
+/* =========================================================
+   BILLING DOCUMENT ACTIONS
+========================================================= */
+
+.billing-document-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+
+/* PRINT */
+
+.billing-print-btn,
+.billing-download-btn {
+
+    min-height: 42px;
+
+    padding: 0 17px;
+
+    border-radius: 9px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+
+.billing-print-btn {
+
+    background: #ffffff;
+
+    color: #2563eb;
+
+    border: 1px solid #bfdbfe;
+}
+
+
+.billing-print-btn:hover {
+
+    background: #eff6ff;
+
+    border-color: #2563eb;
+
+    transform: translateY(-1px);
+}
+
+
+/* DOWNLOAD */
+
+.billing-download-btn {
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    border: 1px solid #2563eb;
+}
+
+
+.billing-download-btn:hover {
+
+    background: #1d4ed8;
+
+    border-color: #1d4ed8;
+
+    transform: translateY(-1px);
+}
+
+
+.billing-print-btn:disabled,
+.billing-download-btn:disabled {
+
+    opacity: .6;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* =========================================================
+   PRINT VERSION
+========================================================= */
+
+@media print {
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    .billing-statement-container,
+    .billing-statement-container * {
+        visibility: visible !important;
+    }
+
+    .billing-document-actions {
+        display: none !important;
+    }
+
+    .sidebar,
+    .topbar,
+    nav {
+        display: none !important;
+    }
+
+    body {
+        background: #ffffff !important;
+    }
+
+}
+
+/* =========================================================
+   INVENTORY ITEM SEARCH RESULTS
+========================================================= */
+
+.item-search-results {
+    max-height: 225px;
+    overflow-y: auto;
+
+    margin-top: 6px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    box-sizing: border-box;
+}
+
+/* EACH INVENTORY ITEM */
+
+.inventory-search-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 8px 12px;
+
+    border-bottom: 1px solid #eef2f7;
+
+    cursor: pointer;
+
+    transition:
+        background .15s ease;
+}
+
+.inventory-search-item:last-child {
+    border-bottom: none;
+}
+
+.inventory-search-item:hover {
+    background: #f5faff;
+}
+
+/* ITEM NAME + CODE */
+
+.inventory-item-main {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.inventory-item-main strong {
+    color: #111827;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    line-height: 1.35;
+}
+
+.inventory-item-main small {
+    color: #9ca3af;
+
+    font-size: 9px;
+}
+
+/* STOCK + PRICE */
+
+.inventory-item-meta {
+    flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    gap: 3px;
+}
+
+.inventory-item-meta span {
+    color: #6b7280;
+
+    font-size: 9px;
+}
+
+.inventory-item-meta strong {
+    color: #18aef5;
+
+    font-size: 10px;
+}
+
+/* EMPTY SEARCH RESULT */
+
+.item-search-empty {
+    padding: 15px;
+
+    color: #9ca3af;
+
+    font-size: 10px;
+
+    text-align: center;
+}
+
+/* SCROLLBAR */
+
+.item-search-results::-webkit-scrollbar {
+    width: 6px;
+}
+
+.item-search-results::-webkit-scrollbar-track {
+    background: #f8fafc;
+}
+
+.item-search-results::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+
+    border-radius: 999px;
+}
+
+.item-search-results::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* =========================================================
+   SELECTED INVENTORY ITEM
+========================================================= */
+
+.selected-item-info {
+    display: none;
+
+    margin-top: 8px;
+    margin-bottom: 13px;
+
+    padding: 9px 11px;
+
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+
+    background: #f5faff;
+
+    box-sizing: border-box;
+}
+
+.selected-item-name {
+    margin-bottom: 3px;
+}
+
+.selected-item-name strong {
+    display: block;
+
+    color: #111827;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    line-height: 1.35;
+}
+
+.selected-item-stock {
+    color: #6b7280;
+
+    font-size: 9px;
+}
+
+.selected-item-stock span {
+    color: #18aef5;
+
+    font-weight: 700;
+}
+
+/* =========================================================
+   MULTIPLE ADD ITEMS MODAL
+========================================================= */
+
+/* Modal size */
+.service-modal {
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollable body */
+.service-form{
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* Sticky footer */
+.service-modal-actions{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 18px 20px;
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+    position: sticky;
+    bottom: 0;
+}
+
+/* Selected item */
+.selected-item-info{
+    background: #f8fbff;
+    border: 1px solid #d7e8ff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+}
+
+.selected-item-name{
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 6px;
+}
+
+.selected-item-stock{
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+/* Pending section */
+.pending-items-section{
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pending-items-header{
+    margin-bottom: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+/* Scroll kapag marami nang items */
+.pending-items-list{
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+/* Isang item row */
+.pending-item-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.pending-item-row:last-child{
+    border-bottom: none;
+}
+
+.pending-item-details{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.pending-item-details strong{
+    font-size: 14px;
+    color: #1f2937;
+    line-height: 1.3;
+}
+
+.pending-item-details small{
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.pending-item-details span{
+    color: #4b5563;
+    font-size: 13px;
+}
+
+.pending-item-right{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.pending-item-right strong{
+    color: #0ea5e9;
+    font-size: 14px;
+}
+
+.remove-pending-item{
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: #fee2e2;
+    color: #dc2626;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.remove-pending-item:hover{
+    background: #fecaca;
+}
+
+/* Total */
+.pending-items-total{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 15px;
+}
+
+.pending-items-total strong{
+    color: #0ea5e9;
+    font-size: 18px;
+}
+
+/* =========================================================
+   PENDING BILLING ITEMS - FINAL LAYOUT
+========================================================= */
+
+.pending-items-section {
+    width: 100%;
+    margin-top: 20px;
+    padding: 16px;
+    box-sizing: border-box;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.pending-items-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.pending-items-header strong {
+    display: block;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    line-height: 1.3 !important;
+}
+
+
+/* LIST */
+
+.pending-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+
+/* EACH ITEM */
+
+.pending-item-row {
+    width: 100%;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px;
+    padding: 11px 12px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+}
+
+
+/* LEFT SIDE */
+
+.pending-item-details {
+    flex: 1 1 auto !important;
+    min-width: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 3px !important;
+}
+
+
+.pending-item-details strong {
+    display: block !important;
+    width: 100%;
+    margin: 0 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    line-height: 1.35 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+}
+
+
+.pending-item-details small {
+    display: block !important;
+    margin: 0 !important;
+    font-size: 11px !important;
+    color: #64748b !important;
+    line-height: 1.3 !important;
+}
+
+
+.pending-item-details span {
+    display: block !important;
+    margin: 0 !important;
+    font-size: 12px !important;
+    color: #475569 !important;
+    line-height: 1.3 !important;
+}
+
+
+/* RIGHT SIDE */
+
+.pending-item-right {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+}
+
+
+.pending-item-right strong {
+    display: block !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #0284c7 !important;
+}
+
+
+/* DELETE BUTTON */
+
+.remove-pending-item {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    border-radius: 7px !important;
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+    cursor: pointer;
+}
+
+
+.remove-pending-item i {
+    font-size: 12px;
+}
+
+
+.remove-pending-item:hover {
+    background: #fecaca !important;
+}
+
+
+/* TOTAL */
+
+.pending-items-total {
+    width: 100%;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+
+.pending-items-total span {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+}
+
+
+.pending-items-total strong {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #0284c7 !important;
+    white-space: nowrap !important;
+}
+

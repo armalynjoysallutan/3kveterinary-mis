@@ -35,7 +35,7 @@ $petSql = "
         p.color,
         p.gender,
         p.weight,
-        p.estimated_age,
+        p.date_of_birth,
 
         c.owner_name,
         c.address,
@@ -456,11 +456,12 @@ $initial = strtoupper(substr(trim($pet["pet_name"]), 0, 1));
                                 </div>
 
                                 <div class="record-field">
-                                    <span>Estimated Age</span>
+                                    <span>Date of Birth</span>
                                     <strong>
-                                        <?= htmlspecialchars(
-                                            $pet["estimated_age"] ?: "Not specified"
-                                        ) ?>
+                                        <?= !empty($pet["date_of_birth"])
+                                            ? date("m/Y", strtotime($pet["date_of_birth"]))
+                                            : "Not specified"
+                                        ?>
                                     </strong>
                                 </div>
 
@@ -529,7 +530,6 @@ $initial = strtoupper(substr(trim($pet["pet_name"]), 0, 1));
                                     <th>DX</th>
                                     <th>TX</th>
                                     <th>VX</th>
-                                    <th>AMOUNT (₱)</th>
                                     <th>NEXT VISIT</th>
                                     <th>NO. DAYS OF RETURN</th>
                                     <th>ACTIONS</th>
@@ -607,13 +607,6 @@ $initial = strtoupper(substr(trim($pet["pet_name"]), 0, 1));
                                         <td>
                                             <?= htmlspecialchars(
                                                 $record["vaccination"] ?: "—"
-                                            ) ?>
-                                        </td>
-
-                                        <td>
-                                            ₱<?= number_format(
-                                                (float) $record["amount_paid"],
-                                                2
                                             ) ?>
                                         </td>
 
@@ -1179,25 +1172,38 @@ $initial = strtoupper(substr(trim($pet["pet_name"]), 0, 1));
 
             </div>
 
+            <!-- NEXT VISIT -->
+            <div class="service-form-row">
 
-            <!-- UNIT PRICE -->
-            <div class="service-form-group">
-
-                <label for="serviceUnitPrice">
-                    Unit Price
-                </label>
+                <div class="service-form-group">
+                    <label for="serviceNextVisit">
+                        Next Visit
+                        <span>*</span>
+                    </label>
+                </div>
 
                 <input
-                    type="number"
-                    id="serviceUnitPrice"
-                    value="0.00"
-                    step="0.01"
-                    min="0"
-                    readonly
+                    type="date"
+                    id="serviceNextVisit"
                 >
-
             </div>
 
+            <div class="service-form-group">
+
+                <label for="serviceNoDaysReturn">
+                
+                    Days of Return
+                </label>
+                
+                <input
+                    type="number"
+                    id="serviceNoDaysReturn"
+                    min="0"
+                    readonly
+                    placeholder="Automatically calculated"
+                >    
+            </div>
+            
         </div>
 
 

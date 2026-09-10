@@ -10,7 +10,6 @@ if (
     header("Location: ../auth/login.php");
     exit();
 }
-
 require_once __DIR__ . '/../config/database.php';
 
 
@@ -79,13 +78,13 @@ $sql = "
 
     FROM billing b
 
-    INNER JOIN customers c
+    LEFT JOIN customers c
         ON b.customer_id = c.customer_id
 
-    INNER JOIN pets p
+    LEFT JOIN pets p
         ON b.pet_id = p.pet_id
 
-    WHERE LOWER(TRIM(b.payment_status)) <> 'paid'
+    WHERE LOWER(TRIM(b.billing_status)) <> 'archived'
 
     ORDER BY b.billing_id DESC
 ";
@@ -696,7 +695,7 @@ if ($result) {
 <!-- BILLING JAVASCRIPT -->
 
 <script
-    <script src="js/billing.js"></script>
+    src="../assets/js/billing.js"
 ></script>
 
 

@@ -102,7 +102,29 @@ $otherBreed = trim($_POST["otherBreed"] ?? "");
 $color = trim($_POST["color"] ?? "");
 $gender = trim($_POST["gender"] ?? "");
 $weight = $_POST["weight"] ?? null;
-$estimatedAge = trim($_POST["estimatedAge"] ?? "");
+
+$dateOfBirthInput = trim($_POST["dateOfBirth"] ?? "");
+$dateOfBirth = null;
+
+if ($dateOfBirthInput !== "") {
+
+    if (
+        !preg_match(
+            '/^\d{4}-(0[1-9]|1[0-2])$/',
+            $dateOfBirthInput
+        )
+    ) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Invalid date of birth format."
+        ]);
+
+        exit;
+    }
+
+    $dateOfBirth = $dateOfBirthInput . "-01";
+}
+
 
 
 // ======================================
@@ -195,11 +217,9 @@ if ($isExistingClient) {
             $petName === "" ||
             $species === "" ||
             $breed === "" ||
-            $color === "" ||
             $gender === "" ||
             $weight === null ||
-            $weight === "" ||
-            $estimatedAge === ""
+            $weight === "" 
         ) {
 
             echo json_encode([
@@ -355,7 +375,8 @@ try {
                     color,
                     gender,
                     weight,
-                    estimated_age
+                    date_of_birth
+                    
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ";
@@ -383,7 +404,8 @@ try {
                 $color,
                 $gender,
                 $weight,
-                $estimatedAge
+                $dateOfBirth,
+                
             );
 
 
@@ -524,7 +546,8 @@ try {
                 color,
                 gender,
                 weight,
-                estimated_age
+                date_of_birth
+                
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ";
@@ -552,7 +575,8 @@ try {
             $color,
             $gender,
             $weight,
-            $estimatedAge
+            $dateOfBirth,
+
         );
 
 
@@ -636,7 +660,7 @@ try {
     ]);
 
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
 
 
     // Undo everything if something fails

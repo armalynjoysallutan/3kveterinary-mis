@@ -453,10 +453,10 @@
 }
 
 .large-modal{
-    width: 100%;
-    max-width:1250px;
-    max-height:90vh;
-    overflow-y:auto;
+    width: 90%;
+    max-width: 800px;
+    max-height: 85vh;
+    overflow-y: auto;
 }
 
 .modal-header{
@@ -533,10 +533,24 @@
 
 .form-grid{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:18px 22px;
+    grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);
+    gap:18px 16px;
+}
+#petSection .form-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 16px;
 }
 
+#petSection .form-group {
+    min-width: 0;
+}
+
+#petSection input,
+#petSection select {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
 .form-group{
     display:flex;
     flex-direction:column;
@@ -590,12 +604,14 @@
     font-size:12px;
 }
 
-.modal-footer{
-    display:flex;
-    justify-content:flex-end;
-    gap:12px;
-    padding:20px 28px;
-    border-top:1px solid #edf2f7;
+.modal-footer {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;
+    padding: 18px 26px;
 }
 
 .cancel-btn{
@@ -1061,10 +1077,11 @@ SERVICE AVAILABILITY
 .appointment-client-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 30px;
+    gap: 20px;
     align-items: start;
+    padding: 0 30px 20px;
+    box-sizing: border-box;
 }
-
 
 /* -----------------------------------------
    APPOINTMENT INFORMATION
@@ -1095,6 +1112,15 @@ SERVICE AVAILABILITY
 .appointment-client-layout #petSection {
     grid-column: 1 / -1;
     grid-row: 2;
+    min-width: 0;
+}
+
+.appointment-client-layout #petSection
+.form-group input,
+.appointment-client-layout #petSection
+.form-group select {
+    min-width: 1;
+    box-sizing: border-box;
 }
 
 
@@ -1109,6 +1135,16 @@ SERVICE AVAILABILITY
 .appointment-client-layout.existing-client #petSection {
     grid-column: 2;
     grid-row: 1;
+    padding-right: 30px;
+    box-sizing: border-box;
+}
+
+/* ADD APPOINTMENT - INNER SPACING */
+.large-modal > .form-section,
+.large-modal > .appointment-client-layout {
+    padding-left: 30px;
+    padding-right: 30px;
+    box-sizing: border-box;
 }
 
 
@@ -1121,6 +1157,8 @@ SERVICE AVAILABILITY
     justify-content: flex-end;
     align-items: center;
     gap: 12px;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 /* ===========================
@@ -1771,3 +1809,44 @@ SERVICE AVAILABILITY
 .pet-section-notice.show {
     display: block;
 }
+
+
+
+/* =========================================
+   APPOINTMENT LIST HEADER + STATUS FILTER
+   ========================================= */
+
+.appointment-list-card > .section-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 20px !important;
+}
+
+.appointment-list-card > .section-header h3 {
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+}
+
+.appointment-list-card .appointment-status-filter {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 0 0 auto !important;
+    width: auto !important;
+}
+
+.appointment-list-card .appointment-status-filter label {
+    margin: 0 !important;
+    white-space: nowrap !important;
+}
+
+.appointment-list-card .appointment-status-filter select {
+    width: auto !important;
+    min-width: 150px !important;
+    height: 40px !important;
+}
+

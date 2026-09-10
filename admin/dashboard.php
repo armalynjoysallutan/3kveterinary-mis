@@ -203,7 +203,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
                     <div>
 
-                        <h4>Revenue (MTD)</h4>
+                        <h4>Total Sales</h4>
 
                         <h2 id="dashboardRevenue">₱0.00</h2>
 
@@ -250,12 +250,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
                         <div>
 
-                            <h4>Registered Clients</h4>
+                            <h4>Registered Customers</h4>
 
                             <h2 id="dashboardRegisteredClients">0</h2>
 
                             <small class="green-text">
-                                Active registered clients
+                                Active registered customers
                             </small>
 
                         </div>
@@ -337,6 +337,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
             </div>
 
             <button
+                type="button"
                 class="calendar-modal-close"
                 id="closeCalendarModal"
             >
@@ -357,6 +358,108 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
         </div>
 
     </div>
+
+    <!-- ADD CALENDAR EVENT MODAL -->
+    <div class="calendar-event-form-modal" id="calendarEventFormModal">
+
+        <div class="calendar-event-form-content">
+
+            <div class="calendar-event-form-header">
+
+                <div> 
+                    <h3 id="calendarEventFormTitle">Add Event</h3>
+                    <p id="calendarEventFormDate"></p>
+                </div>
+
+                <button
+                    type="button"
+                    class="calendar-modal-close"
+                    id= "closeCalendarEventForm"
+                >
+                    <i class="fa-solid fa-xmark"></i>    
+                </button>
+            </div>
+
+            <form id="calendarEventForm">
+               <input
+                   type="hidden"
+                   id="calendarEventType"
+                   name="event_type"
+
+                >
+
+                <input
+                    type="hidden"
+                    id="calendarEventDate"
+                    name="event_date"   
+                >
+                
+                <div class="calendar-form-group">
+                    <label for="calendarEventTitle">
+                        Event Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="calendarEventTitle"
+                        name="event_title"
+                        maxlength="255"
+                        placeholder="Enter event title"
+                        required
+                    >  
+
+                </div>
+
+                <div class="calendar-form-group">
+                    <label for="calendarEventTime">
+                        Time
+                    </label>
+
+                    <input
+                        type="time"
+                        id="calendarEventTime"
+                        name="event_time"
+                    >   
+                        
+                </div>
+
+                <div class="calendar-form-group">
+                    <label for="calendarEventNotes">
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="calendarEventNotes"
+                        name="notes"
+                        rows="4"
+                        placeholder="Add notes (optional)"
+                    ></textarea>    
+
+                </div>
+
+                <div class="calendar-form-actions">
+                    <button
+                        type="button"
+                        class="calendar-form-cancel"
+                        id="cancelCalendarEvent"
+                    >
+                        Cancel
+                    </button>
+                    
+                    <button
+                        type="submit"
+                        class="calendar-form-save"
+                        id="saveCalendarEvent"
+                    >
+                        Save Event
+                    </button>    
+            
+                </div>
+
+            </form>
+
+        </div>
+
 
 </div>
 

@@ -54,7 +54,7 @@ $sql = "
         color,
         gender,
         weight,
-        estimated_age
+        date_of_birth
     FROM pets
     WHERE customer_id = ?
     ORDER BY pet_name ASC

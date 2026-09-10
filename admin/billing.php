@@ -75,13 +75,13 @@ $sql = "
 
     FROM billing b
 
-    INNER JOIN customers c
+    LEFT JOIN customers c
         ON b.customer_id = c.customer_id
 
-    INNER JOIN pets p
+    LEFT JOIN pets p
         ON b.pet_id = p.pet_id
 
-    WHERE LOWER(TRIM(b.payment_status)) <> 'paid'
+    WHERE LOWER(TRIM(b.billing_status)) <> 'archived'
 
     ORDER BY b.billing_id DESC
 ";

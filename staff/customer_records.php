@@ -14,6 +14,71 @@ if (
 require_once "../config/database.php";
 
 /* =====================================================
+   PET REFERENCE DATA
+   Species and Breeds come from System Variables
+===================================================== */
+
+$customerSpeciesList = [];
+
+$customerSpeciesQuery = "
+    SELECT species_id, species
+    FROM pet_species
+    WHERE status = 'Active'
+    ORDER BY species ASC
+";
+
+$customerSpeciesResult = mysqli_query($conn, $customerSpeciesQuery);
+
+if ($customerSpeciesResult) {
+    while ($speciesRow = mysqli_fetch_assoc($customerSpeciesResult)) {
+        $customerSpeciesList[] = $speciesRow;
+    }
+}
+
+
+$customerBreedList = [];
+
+$customerBreedQuery = "
+    SELECT breed_id, species_id, breed
+    FROM pet_breeds
+    WHERE status = 'Active'
+    ORDER BY breed ASC
+";
+
+$customerBreedResult = mysqli_query($conn, $customerBreedQuery);
+
+if ($customerBreedResult) {
+    while ($breedRow = mysqli_fetch_assoc($customerBreedResult)) {
+        $customerBreedList[] = $breedRow;
+    }
+}
+
+?>
+
+<script>
+    const customerFilterSpecies = <?= json_encode(
+        $customerSpeciesList,
+        JSON_HEX_TAG |
+        JSON_HEX_APOS |
+        JSON_HEX_AMP |
+        JSON_HEX_QUOT
+    ) ?>;
+
+    const customerFilterBreeds = <?= json_encode(
+        $customerBreedList,
+        JSON_HEX_TAG |
+        JSON_HEX_APOS |
+        JSON_HEX_AMP |
+        JSON_HEX_QUOT
+    ) ?>;
+
+   
+</script>
+
+
+<?php
+
+/* =====================================================
    GET CUSTOMER RECORDS
 
    A customer appears in Customer Records when:
@@ -60,25 +125,6 @@ $sql = "
 
     WHERE c.record_status = 'Active'
 
-    AND (
-        EXISTS (
-            SELECT 1
-            FROM appointments ca
-            WHERE ca.customer_id = c.customer_id
-              AND ca.status = 'Completed'
-              AND ca.is_archived = 0
-        )
-
-        OR
-
-        EXISTS (
-            SELECT 1
-            FROM billing cb
-            WHERE cb.customer_id = c.customer_id
-              AND cb.payment_status = 'Paid'
-        )
-    )
-
     GROUP BY
         c.customer_id,
         c.owner_name,
@@ -119,7 +165,7 @@ $petSql = "
         p.color,
         p.gender,
         p.weight,
-        p.estimated_age
+        p.date_of_birth
 
     FROM pets p
 
@@ -146,7 +192,79 @@ while ($pet = mysqli_fetch_assoc($petResult)) {
     $petsByCustomer[$customerId][] = $pet;
 }
 
+
+/* =====================================================
+   GET BREEDS ACTUALLY USED BY PETS
+   Includes custom breeds entered by customers
+   ===================================================== */
+
+$customerCustomBreedList = [];
+$customBreedSeen = [];
+
+foreach ($petsByCustomer as $customerPets) {
+
+    foreach ($customerPets as $pet) {
+
+        $speciesName = trim($pet["species"] ?? "");
+        $breedName = trim($pet["breed"] ?? "");
+
+        if ($speciesName === "" || $breedName === "") {
+            continue;
+        }
+
+        /* Do not show generic "Others" */
+        if (strcasecmp($breedName, "Others") === 0) {
+            continue;
+        }
+
+        /*
+         * Prevent duplicate breeds under the same species.
+         * Example:
+         * Cat + Persian
+         * Cat + Persian
+         *
+         * will only appear once.
+         */
+        $breedKey =
+            strtolower($speciesName) . "|" .
+            strtolower($breedName);
+
+        if (isset($customBreedSeen[$breedKey])) {
+            continue;
+        }
+
+        $customBreedSeen[$breedKey] = true;
+
+        $customerCustomBreedList[] = [
+            "species" => $speciesName,
+            "breed" => $breedName
+        ];
+    }
+}
+
+
+/* Sort custom breeds alphabetically */
+usort(
+    $customerCustomBreedList,
+    function ($a, $b) {
+        return strcasecmp(
+            $a["breed"],
+            $b["breed"]
+        );
+    }
+);
+
 ?>
+
+<script>
+    const customerFilterCustomBreeds = <?= json_encode(
+        $customerCustomBreedList,
+        JSON_HEX_TAG |
+        JSON_HEX_APOS |
+        JSON_HEX_AMP |
+        JSON_HEX_QUOT
+    ) ?>;
+</script>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -541,6 +659,125 @@ while ($pet = mysqli_fetch_assoc($petResult)) {
                 </div>
 
                 <!-- =====================================================
+                CUSTOMER RECORDS FILTER PANEL
+                ===================================================== -->
+                <div class="customer-filter-panel" id="customerFilterPanel" style="display: none;">
+
+    
+                    <div class="customer-filter-section" id="petFilterSection">
+
+                        <div class="customer-filter-group">
+                            <label for="customerFilterSpecies">
+                                Species
+                            </label>
+
+                            <select id="customerFilterSpecies">
+                                <option value="">All Species</option>
+
+                                <?php foreach ($customerSpeciesList as $species): ?>
+                                    <option
+                                        value="<?= htmlspecialchars(strtolower(trim($species["species"]))) ?>"
+                                        data-species-id="<?= (int) $species["species_id"] ?>"
+                                    >
+                                        <?= htmlspecialchars($species["species"]) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    
+                       
+                        <div class="customer-filter-group">
+                            <label for="customerFilterBreed">
+                                Breed
+                            </label>
+
+                            <select id="customerFilterBreed" disabled>
+                                <option value="">All Breeds</option>
+                            </select>
+                        </div>
+
+
+                        <div class="customer-filter-group">
+                            <label for="customerFilterGender">
+                                Sex
+                            </label>
+
+                            <select id="customerFilterGender">
+                                <option value="">All Sex</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+
+                    <!-- DATE RANGE FILTERS -->
+                    <div class="customer-filter-section" id="dateFilterSection">
+
+                        <div class="customer-filter-group">
+                            <label for="customerFilterDateType">
+                                Date Type
+                            </label>
+
+                            <select id="customerFilterDateType">
+                                <option value="registered">Registered Since</option>
+                                <option value="last_visit">Last Visit</option>
+                            </select>
+                        </div>
+
+
+                        <div class="customer-filter-group">
+                            <label for="customerFilterFrom">
+                                From
+                            </label>
+
+                            <input
+                                type="date"
+                                id="customerFilterFrom"
+                            >
+                        </div>
+
+
+                        <div class="customer-filter-group">
+                            <label for="customerFilterTo">
+                                To
+                            </label>
+
+                            <input
+                                type="date"
+                                id="customerFilterTo"
+                            >
+                        </div>
+
+                    </div>
+
+
+                    <!-- FILTER ACTIONS -->
+                    <div class="customer-filter-actions">
+
+                        <button
+                            type="button"
+                            id="applyCustomerFilters"
+                            class="customer-filter-apply"
+                        >
+                            <i class="fa-solid fa-filter"></i>
+                            Apply
+                       </button>
+
+                       <button
+                           type="button"
+                           id="clearCustomerFilters"
+                           class="customer-filter-clear"
+                        >
+                           Clear
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- =====================================================
                      MULTIPLE CUSTOMER ARCHIVE
                     ===================================================== -->
                 <div class="customer-bulk-actions"> 
@@ -628,28 +865,90 @@ while ($pet = mysqli_fetch_assoc($petResult)) {
                             ?>
 
 
-                            <div
-                                class="customer-card"
-                                data-customer-id="<?= $customerId ?>"
-                                data-search="
-                                    <?= htmlspecialchars(
-                                        strtolower(
-                                            $customer["owner_name"]
-                                            . " "
-                                            . $customer["contact_number"]
-                                            . " "
-                                            . ($customer["email"] ?? "")
-                                            . " CUS-"
-                                            . str_pad(
-                                                $customerId,
-                                                3,
-                                                "0",
-                                                STR_PAD_LEFT
-                                            )
-                                        )
-                                    ) ?>
-                                "
-                            >
+                            <?php
+    /*
+     * FILTER DATA
+     * A customer can have multiple pets,
+     * so we store all their pet species, breeds, and genders.
+     */
+    $filterSpecies = [];
+$filterBreeds = [];
+$filterGenders = [];
+$filterPets = [];
+
+foreach ($customerPets as $filterPet) {
+
+    $petSpecies =
+        strtolower(trim($filterPet["species"] ?? ""));
+
+    $petBreed =
+        strtolower(trim($filterPet["breed"] ?? ""));
+
+    $petGender =
+        strtolower(trim($filterPet["gender"] ?? ""));
+
+    if ($petSpecies !== "") {
+        $filterSpecies[] = $petSpecies;
+    }
+
+    if ($petBreed !== "") {
+        $filterBreeds[] = $petBreed;
+    }
+
+    if ($petGender !== "") {
+        $filterGenders[] = $petGender;
+    }
+
+    /*
+     * Store the complete combination of each pet.
+     * This allows Species + Breed + Sex
+     * to match the SAME pet.
+     */
+    $filterPets[] = [
+        "species" => $petSpecies,
+        "breed" => $petBreed,
+        "gender" => $petGender
+    ];
+}
+
+$filterSpecies =
+    array_values(array_unique($filterSpecies));
+
+$filterBreeds =
+    array_values(array_unique($filterBreeds));
+
+$filterGenders =
+    array_values(array_unique($filterGenders));
+?>
+
+<div
+    class="customer-card"
+    data-customer-id="<?= $customerId ?>"
+    data-search="
+        <?= htmlspecialchars(
+            strtolower(
+                $customer["owner_name"]
+                . " "
+                . $customer["contact_number"]
+                . " "
+                . ($customer["email"] ?? "")
+                . " CUS-"
+                . str_pad(
+                    $customerId,
+                    3,
+                    "0",
+                    STR_PAD_LEFT
+                )
+            )
+        ) ?>
+    "
+    data-species="<?= htmlspecialchars(implode("|", $filterSpecies)) ?>"
+    data-breed="<?= htmlspecialchars(implode("|", $filterBreeds)) ?>"
+    data-gender="<?= htmlspecialchars(implode("|", $filterGenders)) ?>"
+    data-pets="<?= htmlspecialchars(json_encode($filterPets), ENT_QUOTES, 'UTF-8') ?>"
+    data-created-at="<?= htmlspecialchars(date("Y-m-d", strtotime($customer["created_at"]))) ?>"
+    data-last-visit="<?= !empty($customer["last_visit"]) ? htmlspecialchars(date("Y-m-d", strtotime($customer["last_visit"]))) : "" ?>"
+>
 
 
                                 <!-- =====================================
@@ -818,7 +1117,9 @@ while ($pet = mysqli_fetch_assoc($petResult)) {
                                     <div class="registered-pets-title">
 
                                         Registered Pets
-                                        (<?= count($customerPets) ?>)
+                                        (<span class="filtered-pet-count"><?= count($customerPets) ?></span>)
+                                        </span>)
+                                        
 
                                     </div>
 
@@ -836,7 +1137,12 @@ while ($pet = mysqli_fetch_assoc($petResult)) {
 
                                             <?php if ($petIndex >= 3) { continue; } ?>
 
-                                            <div class="pet-row">
+                                            <div 
+                                                class="pet-row"
+                                                data-pet-species="<?= htmlspecialchars(strtolower(trim($pet["species"] ?? ""))) ?>"
+                                                data-pet-breed="<?= htmlspecialchars(strtolower(trim($pet["breed"] ?? ""))) ?>"
+                                                data-pet-gender="<?= htmlspecialchars(strtolower(trim($pet["gender"] ?? ""))) ?>"
+                                            >
 
 
                                                 <!-- PET AVATAR -->
@@ -1153,6 +1459,433 @@ while ($pet = mysqli_fetch_assoc($petResult)) {
 
             </div>
         </div>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
+     ADD CUSTOMER MODAL
+     ========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="addCustomerModal"
+    aria-hidden="true"
+>
+    <div
+        class="modal-box large-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="addCustomerTitle"
+    >
+
+        <!-- MODAL HEADER -->
+        <div class="modal-header">
+
+            <h3 id="addCustomerTitle">
+                Add Customer
+            </h3>
+
+            <button
+                type="button"
+                class="modal-close"
+                id="closeAddCustomer"
+                aria-label="Close"
+            >
+                &times;
+            </button>
+
+        </div>
+
+
+        <!-- MODAL BODY -->
+        <div class="modal-body">
+
+            <!-- ===========================
+                 OWNER INFORMATION
+            =========================== -->
+
+            <div class="form-section">
+
+                <h4>Owner Information</h4>
+
+                <div class="form-grid">
+
+                    <!-- LAST NAME -->
+                    <div class="form-group">
+
+                        <label for="addOwnerLastName">
+                            Last Name
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="addOwnerLastName"
+                            name="owner_last_name"
+                            placeholder="Enter last name"
+                            autocomplete="family-name"
+                        >
+
+                    </div>
+
+
+                    <!-- FIRST NAME -->
+                    <div class="form-group">
+
+                        <label for="addOwnerFirstName">
+                            First Name
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="addOwnerFirstName"
+                            name="owner_first_name"
+                            placeholder="Enter first name"
+                            autocomplete="given-name"
+                        >
+
+                    </div>
+
+
+                    <!-- MIDDLE NAME -->
+                    <div class="form-group">
+
+                        <label for="addOwnerMiddleName">
+                            Middle Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="addOwnerMiddleName"
+                            name="owner_middle_name"
+                            placeholder="Enter middle name"
+                            autocomplete="additional-name"
+                        >
+
+                    </div>
+
+
+                    <!-- CONTACT NUMBER -->
+                    <div class="form-group">
+
+                        <label for="addContactNumber">
+                            Contact Number
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="addContactNumber"
+                            name="contact_number"
+                            maxlength="11"
+                            inputmode="numeric"
+                            placeholder="e.g. 09123456789"
+                        >
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+                    <div class="form-group">
+
+                        <label for="addEmail">
+                            Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            id="addEmail"
+                            name="email"
+                            placeholder="Enter email address"
+                            autocomplete="email"
+                        >
+
+                    </div>
+
+
+                    <!-- ADDRESS -->
+                    <div class="form-group">
+
+                        <label for="addAddress">
+                            Address
+                        </label>
+
+                        <input
+                            type="text"
+                            id="addAddress"
+                            name="address"
+                            placeholder="Enter address"
+                            autocomplete="street-address"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ===========================
+                 PET INFORMATION
+            =========================== -->
+
+            <div class="form-section">
+
+                <h4>Pet Information</h4>
+
+                <div class="form-grid">
+
+                    <!-- PET NAME -->
+                    <div class="form-group">
+
+                        <label for="addPetName">
+                            Pet Name
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="addPetName"
+                            name="pet_name"
+                            placeholder="Enter pet name"
+                        >
+
+                    </div>
+
+
+                    <!-- SPECIES -->
+                    <div class="form-group">
+
+                        <label for="addSpecies">
+                            Species
+                            <span class="required">*</span>
+                        </label>
+
+                        <select
+                            id="addSpecies"
+                            name="species_id"
+                        >
+                            <option value="">
+                                Select Species
+                            </option>
+
+                            <?php foreach ($customerSpeciesList as $species): ?>
+
+                                <option
+                                    value="<?= (int) $species["species_id"] ?>"
+                                    
+                                >
+                                   <?= htmlspecialchars($species["species"]) ?>
+                                </option>
+
+                            <?php endforeach; ?>
+                        </select>        
+
+
+                            
+                           
+                    </div>
+
+
+                    <!-- BREED -->
+                    <div class="form-group">
+
+                        <label for="addBreed">
+                            Breed
+                        </label>
+
+                        <select
+                            id="addBreed"
+                            name="breed_id"
+                            disabled
+                        >
+                            <option value="">
+                                Select Breed
+                            </option>
+
+                            <?php foreach ($customerBreedList as $breed): ?>
+                                <option
+                                    value="<?= (int)$breed["breed_id"] ?>"
+                                    data-species-id="<?= (int)$breed["species_id"] ?>"
+                                    data-breed-name="<?= htmlspecialchars($breed["breed"], ENT_QUOTES) ?>"
+                                >
+                                    <?= htmlspecialchars($breed["breed"]) ?>
+                                </option>
+                            <?php endforeach; ?>
+
+                            <option
+                                value="Others"
+                                data-other-breed="true"
+                            >
+                                Others
+                            </option>    
+                            
+                        </select>    
+
+                        <div 
+                            id="addOtherBreedGroup"
+                            style="display: none; margin-top: 12px;"
+                        >
+
+                            <label for="addOtherBreed">
+                                Specify Breed
+                                <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="addOtherBreed"
+                                name="other_breed"
+                            >
+                        </div>    
+
+                    </div>
+
+
+                    <!-- COLOR -->
+                    <div class="form-group">
+
+                        <label for="addColor">
+                            Color
+                        </label>
+
+                        <input
+                            type="text"
+                            id="addColor"
+                            name="color"
+                            placeholder="Enter pet's color"
+                        >
+
+                    </div>
+
+
+                    <!-- GENDER -->
+                    <div class="form-group">
+
+                        <label for="addGender">
+                            Sex
+                        </label>
+
+                        <select
+                            id="addGender"
+                            name="gender"
+                        >
+                            <option value="">
+                                Select Sex
+                            </option>
+
+                            <option value="male">
+                                Male
+                            </option>
+
+                            <option value="female">
+                                Female
+                            </option>
+                        </select>
+
+                    </div>
+
+
+                    <!-- WEIGHT -->
+                    <div class="form-group">
+
+                        <label for="addWeight">
+                            Weight (kg)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="addWeight"
+                            name="weight"
+                            min="0"
+                            step="0.01"
+                            placeholder="Enter weight"
+                        >
+
+                    </div>
+
+
+                    <!-- DATE OF BIRTH -->
+                    <div class="form-group">
+
+                        <label>
+                            Date of Birth
+                        </label>
+
+
+                        <input
+                            type="month"
+                            id="addDateOfBirth"
+                            name="date_of_birth"
+                            value=""
+                        >    
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- MODAL FOOTER -->
+        <div class="modal-footer">
+
+            <button
+                type="button"
+                class="cancel-btn"
+                id="cancelAddCustomer"
+            >
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                class="save-btn"
+                id="saveCustomer"
+            >
+                Save Customer
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- =========================================================
+     ADD CUSTOMER SUCCESS MODAL
+     ========================================================= -->
+
+<div
+    class="success-modal-overlay"
+    id="customerSuccessModal"
+>
+
+    <div class="success-modal">
+
+        <div class="success-icon">
+            <i class="fa-solid fa-check"></i>
+        </div>
+
+        <h3>
+            Customer Added Successfully!
+        </h3>
+
+        <p>
+            The customer and pet record have been
+            successfully added to Customer Records.
+        </p>
+
+        <button
+            type="button"
+            id="customerSuccessDone"
+            class="success-modal-btn"
+        >
+            Done
+        </button>
 
     </div>
 

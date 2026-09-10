@@ -221,6 +221,63 @@ function inventoryStatus($stock, $reorderLevel) {
                     </div>
 
                     <div class="toolbar-right">
+                        <div class="inventory-filter-wrapper">
+
+                    <button
+                        type="button"
+                        class="inventory-filter-btn"
+                        id="inventoryFilterBtn"
+                        aria-expanded="false"
+                    >
+                        <i class="fa-solid fa-filter"></i>
+                        <span id="inventoryFilterLabel">All Items</span>
+                        <i class="fa-solid fa-chevron-down inventory-filter-chevron"></i>
+                    </button>
+
+                    <div
+                        class="inventory-filter-menu"
+                        id="inventoryFilterMenu"
+                    >
+
+                        <div class="inventory-filter-menu-title">
+                            Filter by Category
+                        </div>
+
+                        <button
+                            type="button"
+                            class="inventory-category-tab active"
+                            data-category=""
+                            aria-selected="true"
+                        >
+                            All Items
+                        </button>
+
+                        <?php $preferredCategoryOrder = ['Clinic Supplies', 'Medicine', 'Supplements', 'Pet Food', 'Vaccines', 'Test Kits', 'Others']; ?>
+
+                        <?php foreach ($preferredCategoryOrder as $preferredName): ?>
+
+                            <?php foreach ($categories as $category): ?>
+
+                                <?php if (strcasecmp($category['category_name'], $preferredName) === 0): ?>
+
+                                    <button
+                                        type="button"
+                                        class="inventory-category-tab"
+                                        data-category="<?= (int)$category['category_id'] ?>"
+                                        aria-selected="false"
+                                    >
+                                        <?= htmlspecialchars($category['category_name']) ?>
+                                    </button>
+
+                                <?php break; endif; ?>
+
+                            <?php endforeach; ?>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                </div>
                         <button class="add-btn" type="button" id="addInventoryItemBtn">
                             <i class="fa-solid fa-plus"></i>
                             Add Item
@@ -239,90 +296,10 @@ function inventoryStatus($stock, $reorderLevel) {
                     </div>
                 </div>
 
-                <div class="inventory-category-tabs" id="inventoryCategoryTabs" role="tablist" aria-label="Inventory categories">
-                    <button type="button" class="inventory-category-tab active" data-category="" role="tab" aria-selected="true">All Items</button>
-                    <?php $preferredCategoryOrder = ['Clinic Supplies', 'Medicine', 'Supplements', 'Pet Food', 'Vaccines', 'Test Kits', 'Others']; ?>
-                    <?php foreach ($preferredCategoryOrder as $preferredName): ?>
-                        <?php foreach ($categories as $category): ?>
-                            <?php if (strcasecmp($category['category_name'], $preferredName) === 0): ?>
-                                <button type="button" class="inventory-category-tab" data-category="<?= (int)$category['category_id'] ?>" role="tab" aria-selected="false">
-                                    <?= htmlspecialchars($category['category_name']) ?>
-                                </button>
-                            <?php break; endif; ?>
-                        <?php endforeach; ?>
-                    <?php endforeach; ?>
-                </div>
+                
 
-                <!-- INVENTORY BULK ARCHIVE -->
+               
 
-                <div class="inventory-bulk-actions">
-
-                    <label class="inventory-select-all">
-                        <input
-                             type="checkbox"
-                             id="selectAllInventory"
-                    </label>
-
-                    <button
-                        type="button"
-                        class="inventory-multi-archive-btn"
-                        id="archiveSelectedInventoryBtn"
-                        disabled
-                    >
-                        <i class="fa-solid fa-box archive"></i>
-                        Archive Selected
-                        <span id="selectedInventoryCount">0</span>
-                    </button>    
-
-                </div>
-
-                <div class="inventory-summary">
-
-                    <div class="inventory-stat-card">
-                        <div class="inventory-stat-info">
-                            <span>Total Items</span>
-                            <strong><?= $totalItems ?></strong>
-                            <small>Total active inventory items</small>
-                        </div>
-                        <div class="inventory-stat-icon total">
-                            <i class="fa-solid fa-box"></i>
-                        </div>
-                    </div>
-
-                    <div class="inventory-stat-card">
-                        <div class="inventory-stat-info">
-                            <span>In Stock</span>
-                            <strong><?= $inStock ?></strong>
-                            <small>Items currently in stock</small>
-                        </div>
-                        <div class="inventory-stat-icon stock">
-                            <i class="fa-solid fa-boxes-stacked"></i>
-                        </div>
-                    </div>
-
-                    <div class="inventory-stat-card">
-                        <div class="inventory-stat-info">
-                            <span>Re-order Soon</span>
-                            <strong><?= $reorderSoon ?></strong>
-                            <small>Items at or below reorder level</small>
-                        </div>
-                        <div class="inventory-stat-icon reorder">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </div>
-                    </div>
-
-                    <div class="inventory-stat-card">
-                        <div class="inventory-stat-info">
-                            <span>Out of Stock</span>
-                            <strong><?= $outOfStock ?></strong>
-                            <small>Items needing immediate restock</small>
-                        </div>
-                        <div class="inventory-stat-icon out">
-                            <i class="fa-solid fa-circle-xmark"></i>
-                        </div>
-                    </div>
-
-                </div>
 
                 <div class="inventory-list-card">
 
@@ -337,12 +314,7 @@ function inventoryStatus($stock, $reorderLevel) {
                         <table class="inventory-table">
                             <thead>
                                 <tr>
-                                    <th class="inventory-checkbox-column">
-                                        <input
-                                            type="checkbox"
-                                            id="tableSelectAllInventory"
-                                            aria-label="Select all inventory items"
-                                    </th>
+                                    
                                     <th>ITEM ID</th>
                                     <th>ITEM NAME</th>
                                     <th>CATEGORY</th>
@@ -362,7 +334,7 @@ function inventoryStatus($stock, $reorderLevel) {
                             <?php if (empty($inventoryRows)): ?>
 
                                 <tr>
-                                    <td colspan="12">
+                                    <td colspan="11">
                                         <div class="inventory-empty">
                                             <i class="fa-solid fa-box-open"></i>
                                             <h4>No Inventory Items</h4>
@@ -377,17 +349,11 @@ function inventoryStatus($stock, $reorderLevel) {
 
                             <?php else: ?>
 
-<?php foreach ($inventoryRows as $item): ?>
+                                <?php foreach ($inventoryRows as $item): ?>
                                     <?php [$statusText, $statusClass] = inventoryStatus($item["total_stock"], $item["reorder_level"]); ?>
                                     <?php $searchText = strtolower($item["item_code"] . " " . $item["item_name"] . " " . $item["category_name"]); ?>
                                     <tr class="inventory-row" data-search="<?= htmlspecialchars($searchText) ?>" data-category="<?= (int)$item["category_id"] ?>">
-                                        <td class="inventory-checkbox-column">
-                                            <input
-                                                type="checkbox"
-                                                class="inventory-select"
-                                                value="<?= (int)$item["item_id"] ?>"
-                                            >    
-                                        </td>
+                                        
 
                                         <td>
                                             <span class="inventory-item-code">
@@ -413,11 +379,32 @@ function inventoryStatus($stock, $reorderLevel) {
                                         <td><span class="inventory-status <?= $statusClass ?>"><?= htmlspecialchars($statusText) ?></span></td>
                                         <td>
                                             <button type="button" class="inventory-more-btn" data-id="<?= (int)$item["item_id"] ?>" aria-expanded="false" aria-label="Inventory actions"><i class="fa-solid fa-ellipsis"></i></button>
+                                            
                                             <div class="inventory-action-menu">
-                                                <button type="button" data-action="view" data-id="<?= (int)$item["item_id"] ?>"><i class="fa-regular fa-eye"></i> View</button>
-                                                <button type="button" data-action="stock-in" data-id="<?= (int)$item["item_id"] ?>"><i class="fa-solid fa-arrow-down"></i> Stock In</button>
-                                                <button type="button" data-action="stock-out" data-id="<?= (int)$item["item_id"] ?>"><i class="fa-solid fa-arrow-up"></i> Stock Out</button>
-                                                <button type="button" data-action="edit" data-id="<?= (int)$item["item_id"] ?>"><i class="fa-solid fa-pen"></i> Edit</button>
+                                                <button type="button" data-action="view" data-id="<?= (int)$item["item_id"] ?>">
+                                                    <i class="fa-regular fa-eye"></i> View
+                                                </button>
+
+                                                <button type="button" data-action="stock-in" data-id="<?= (int)$item["item_id"] ?>">
+                                                    <i class="fa-solid fa-arrow-down"></i> Stock In
+                                                </button>
+
+                                                <button type="button" data-action="stock-out" data-id="<?= (int)$item["item_id"] ?>">
+                                                    <i class="fa-solid fa-arrow-up"></i> Stock Out
+                                                </button>
+
+                                                <button type="button" data-action="edit" data-id="<?= (int)$item["item_id"] ?>">
+                                                    <i class="fa-solid fa-pen"></i> Edit
+                                                </button>
+
+                                                <button 
+                                                    type="button" 
+                                                    data-action="archive" 
+                                                    data-id="<?= (int)$item["item_id"] ?>"
+                                                    data-name="<?= htmlspecialchars($item["item_name"], ENT_QUOTES) ?>"
+                                                >
+                                                    <i class="fa-solid fa-box-archive"></i> Archive
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -855,11 +842,11 @@ function inventoryStatus($stock, $reorderLevel) {
             <div>
 
                 <h3 id="inventoryArchiveTitle">
-                    Archive Inventory
+                    Archive Inventory Item
                 </h3>
 
                 <p>
-                    Are you sure you want to archive the selected inventory items?
+                    Are you sure you want to archive this inventory item?
                 </p>
 
             </div>
@@ -885,7 +872,7 @@ function inventoryStatus($stock, $reorderLevel) {
                 class="inventory-archive-selected-name"
                 id="inventoryArchiveSelectedCount"
             >
-                0 inventory items selected
+                Selected inventory item
             </div>
 
 

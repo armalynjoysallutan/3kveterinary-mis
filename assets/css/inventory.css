@@ -166,13 +166,121 @@
     border-color: #2563eb;
 }
 
-/* CATEGORY TABS */
-.inventory-category-tabs { width:100%; min-height:42px; margin-top:10px; display:flex; align-items:stretch; overflow-x:auto; border:1px solid #dfe3ea; border-radius:6px; background:#fff; scrollbar-width:thin; }
-.inventory-category-tab { position:relative; flex:0 0 auto; min-width:120px; height:40px; padding:0 18px; border:0; background:#fff; color:#111827; font-size:13px; font-weight:500; cursor:pointer; white-space:nowrap; }
-.inventory-category-tab:hover { color:#2563eb; background:#fafcff; }
-.inventory-category-tab.active { color:#2563eb; font-weight:600; }
-.inventory-category-tab.active::after { content:""; position:absolute; left:8px; right:8px; bottom:0; height:2px; background:#2563eb; border-radius:2px 2px 0 0; }
+/* =========================================================
+   INVENTORY FILTER
+========================================================= */
 
+.inventory-filter-wrapper {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.inventory-filter-btn {
+    height: 42px;
+    min-width: 130px;
+    padding: 0 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #dfe5ee;
+    border-radius: 8px;
+    background: #fff;
+    color: #344054;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.inventory-filter-btn:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: #f8fbff;
+}
+
+.inventory-filter-btn[aria-expanded="true"] {
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.inventory-filter-chevron {
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.inventory-filter-btn[aria-expanded="true"] .inventory-filter-chevron {
+    transform: rotate(180deg);
+}
+
+.inventory-filter-menu {
+    position: absolute;
+    top: calc(100% + 7px);
+    right: 0;
+    z-index: 10030;
+    width: 210px;
+    padding: 7px;
+    display: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    background: #fff;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14);
+}
+
+.inventory-filter-menu.show {
+    display: block;
+}
+
+.inventory-filter-menu-title {
+    padding: 8px 10px 7px;
+    color: #8a94a6;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .35px;
+}
+
+.inventory-filter-menu .inventory-category-tab {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    height: 36px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #344054;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.inventory-filter-menu .inventory-category-tab:hover {
+    background: #f4f7fb;
+    color: #2563eb;
+}
+
+.inventory-filter-menu .inventory-category-tab.active {
+    background: #eff6ff;
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.inventory-filter-menu .inventory-category-tab.active::after {
+    content: "✓";
+    position: absolute;
+    right: 10px;
+    bottom: auto;
+    left: auto;
+    height: auto;
+    background: none;
+    color: #2563eb;
+    font-size: 12px;
+}
 .inventory-summary {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2154,4 +2262,112 @@ body.inventory-modal-open {
 
 .inventory-action-menu.show {
     display: block;
+}
+
+/* =========================================================
+   INVENTORY TABLE - UPDATED COLUMN WIDTHS
+   Checkbox column has been removed
+   ========================================================= */
+
+.inventory-table th:nth-child(1),
+.inventory-table td:nth-child(1) {
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+}
+
+.inventory-table th:nth-child(2),
+.inventory-table td:nth-child(2) {
+    width: 210px !important;
+    min-width: 210px !important;
+    max-width: 210px !important;
+}
+
+.inventory-table th:nth-child(3),
+.inventory-table td:nth-child(3) {
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+}
+
+.inventory-table th:nth-child(4),
+.inventory-table td:nth-child(4) {
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+}
+
+.inventory-table th:nth-child(5),
+.inventory-table td:nth-child(5) {
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+}
+
+.inventory-table th:nth-child(6),
+.inventory-table td:nth-child(6) {
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
+
+.inventory-table th:nth-child(7),
+.inventory-table td:nth-child(7) {
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
+}
+
+.inventory-table th:nth-child(8),
+.inventory-table td:nth-child(8) {
+    width: 125px !important;
+    min-width: 125px !important;
+    max-width: 125px !important;
+}
+
+.inventory-table th:nth-child(9),
+.inventory-table td:nth-child(9) {
+    width: 125px !important;
+    min-width: 125px !important;
+    max-width: 125px !important;
+}
+
+.inventory-table th:nth-child(10),
+.inventory-table td:nth-child(10) {
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+}
+
+/* =========================================================
+   STOCK IN - PACKAGING INFORMATION
+   ========================================================= */
+
+.inventory-stock-in-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 22px 0 16px;
+    color: #344054;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.inventory-stock-in-divider::before,
+.inventory-stock-in-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e5e9f0;
+}
+
+.inventory-stock-in-divider span {
+    white-space: nowrap;
+}
+
+#stockInQuantity[readonly] {
+    background: #f8fafc;
+    color: #26354a;
+    font-weight: 700;
+    cursor: not-allowed;
 }

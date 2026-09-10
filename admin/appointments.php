@@ -259,7 +259,7 @@ if ($appointmentBreedCatalogJson === false) {
             <div class="card appointment-list-card">
                 <div class="section-header">
                     <h3>Appointment Lists</h3>
-                </div>
+                
 
                 <div class="appointment-status-filter">
                     <label for="appointmentStatusFilter">Status</label>
@@ -273,7 +273,7 @@ if ($appointmentBreedCatalogJson === false) {
                         <option value="Cancelled">Cancelled</option>
                     </select>
                 </div>
-
+            </div>
                 <div class="table-wrapper">
                     <table class="appointment-table">
                         <thead>
@@ -741,13 +741,41 @@ if ($appointmentBreedCatalogJson === false) {
                     <div class="form-group">
 
                         <label>
-                            Owner Name
+                            Last Name
                             <span class="required">*</span>
                         </label>
 
                         <input
                             type="text"
-                            id="ownerName">
+                            id="ownerLastName"
+                            placeholder="Enter last name">
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            First Name
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="ownerFirstName"
+                            placeholder="Enter first name">
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            Middle Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="ownerMiddleName"
+                            placeholder="Enter middle name">
 
                     </div>
 
@@ -894,7 +922,13 @@ if ($appointmentBreedCatalogJson === false) {
 
                         <div
                             id="otherBreedContainer"
-                            style="display:none; margin-top:5px;">
+                            style="display:none; margin-top:5px;"
+                        >
+
+                            <label for="otherBreed">
+                                Specify Breed
+                                <span class="required">*</span>
+                            </label>
 
                             <input
                                 type="text"
@@ -928,7 +962,7 @@ if ($appointmentBreedCatalogJson === false) {
                     <div class="form-group">
 
                         <label>
-                            Gender
+                            Sex
                             <span class="required">*</span>
                         </label>
 
@@ -953,7 +987,6 @@ if ($appointmentBreedCatalogJson === false) {
 
                         <label>
                             Weight (kg)
-                            <span class="required">*</span>
                         </label>
 
                         <input
@@ -968,14 +1001,13 @@ if ($appointmentBreedCatalogJson === false) {
                     <div class="form-group">
 
                         <label>
-                            Estimated Age
-                            <span class="required">*</span>
+                           Date of Birth
                         </label>
 
                         <input
-                            type="text"
-                            id="estimatedAge"
-                            placeholder="e.g. 2 Years or 8 Months">
+                            type="month"
+                            id="dateOfBirth">
+                            
 
                     </div>
 

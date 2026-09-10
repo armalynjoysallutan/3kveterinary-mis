@@ -40,6 +40,982 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["inventory_variable_ac
         exit();
     }
 
+        /* ==========================================================
+       WEBSITE PRODUCTS
+       Pet Food + Supplements only
+       Pet Food requires Dog/Cat classification.
+    ========================================================== */
+
+    if ($action === "get_website_product_items") {
+
+        $items = [];
+
+        $query = "
+            SELECT
+                i.item_id,
+                i.item_code,
+                i.item_name,
+                i.category_id,
+                c.category_name,
+                i.retail_price,
+                i.status
+            FROM inventory_items i
+            INNER JOIN inventory_categories c
+                ON c.category_id = i.category_id
+            WHERE i.status = 'Active'
+              AND LOWER(TRIM(c.category_name)) IN ('pet food', 'supplements', 'others')
+            ORDER BY c.category_name ASC, i.item_name ASC
+        ";
+
+        $result = mysqli_query($conn, $query);
+
+        if (!$result) {
+            inventory_variable_response(false, mysqli_error($conn));
+        }
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $items[] = $row;
+        }
+
+        inventory_variable_response(
+            true,
+            "Website product inventory items loaded successfully.",
+            ["items" => $items]
+        );
+    }
+
+
+    if ($action === "add_website_product") {
+
+        $itemId = (int)($_POST["item_id"] ?? 0);
+        $petType = trim($_POST["pet_type"] ?? "");
+        $description = trim($_POST["description"] ?? "");
+        $status = trim($_POST["status"] ?? "Visible");
+
+        if ($itemId <= 0) {
+            inventory_variable_response(false, "Please select an inventory item.");
+        }
+
+        if (!in_array($status, ["Visible", "Hidden"], true)) {
+            $status = "Visible";
+        }
+
+        /*
+         * Verify that the selected item is an Active
+         * Pet Food or Supplements inventory item.
+         */
+        $itemCheck = mysqli_prepare($conn, "
+            SELECT
+                i.item_id,
+                c.category_name
+            FROM inventory_items i
+            INNER JOIN inventory_categories c
+                ON c.category_id = i.category_id
+            WHERE i.item_id = ?
+              AND i.status = 'Active'
+              AND LOWER(TRIM(c.category_name)) IN ('pet food', 'supplements', 'others')
+            LIMIT 1
+        ");
+
+        if (!$itemCheck) {
+            inventory_variable_response(false, mysqli_error($conn));
+        }
+
+        mysqli_stmt_bind_param($itemCheck, "i", $itemId);
+        mysqli_stmt_execute($itemCheck);
+
+        $itemResult = mysqli_stmt_get_result($itemCheck);
+
+        if (!$itemResult || mysqli_num_rows($itemResult) === 0) {
+            mysqli_stmt_close($itemCheck);
+
+            inventory_variable_response(
+                false,
+                "The selected item is not an active Pet Food, Supplements, or Others inventory item."
+            );
+        }
+
+        $itemData = mysqli_fetch_assoc($itemResult);
+        mysqli_stmt_close($itemCheck);
+
+        $categoryName = strtolower(trim($itemData["category_name"]));
+
+        /*
+ * Handle website product image upload.
+ */
+
+$imagePath = null;
+
+if (
+    isset($_FILES["image"]) &&
+    $_FILES["image"]["error"] !== UPLOAD_ERR_NO_FILE
+) {
+
+    if ($_FILES["image"]["error"] !== UPLOAD_ERR_OK) {
+
+        inventory_variable_response(
+            false,
+            "There was a problem uploading the product image."
+        );
+
+    }
+
+    // Maximum file size: 5 MB
+    $maxFileSize = 5 * 1024 * 1024;
+
+    if ($_FILES["image"]["size"] > $maxFileSize) {
+
+        inventory_variable_response(
+            false,
+            "Product image must not exceed 5 MB."
+        );
+
+    }
+
+    $tmpFile = $_FILES["image"]["tmp_name"];
+
+    // Verify that the uploaded file is actually an image
+    $imageInfo = getimagesize($tmpFile);
+
+    if ($imageInfo === false) {
+
+        inventory_variable_response(
+            false,
+            "Please upload a valid image file."
+        );
+
+    }
+
+    $allowedMimeTypes = [
+        "image/jpeg" => "jpg",
+        "image/png"  => "png",
+        "image/webp" => "webp"
+    ];
+
+    $mimeType = $imageInfo["mime"] ?? "";
+
+    if (!isset($allowedMimeTypes[$mimeType])) {
+
+        inventory_variable_response(
+            false,
+            "Only JPG, PNG, and WebP images are allowed."
+        );
+
+    }
+
+    $extension = $allowedMimeTypes[$mimeType];
+
+    /*
+     * Physical upload folder.
+     * system_variables.php is inside /admin,
+     * so ../assets points to /assets.
+     */
+    $uploadDirectory =
+        __DIR__ .
+        "/../assets/uploads/website_products/";
+
+    if (!is_dir($uploadDirectory)) {
+
+        if (!mkdir($uploadDirectory, 0755, true)) {
+
+            inventory_variable_response(
+                false,
+                "Unable to create the product image upload folder."
+            );
+
+        }
+
+    }
+
+    /*
+     * Generate a unique filename.
+     */
+    $uniqueFileName =
+        "website_product_" .
+        $itemId .
+        "_" .
+        bin2hex(random_bytes(8)) .
+        "." .
+        $extension;
+
+    $destination =
+        $uploadDirectory .
+        $uniqueFileName;
+
+    if (!move_uploaded_file(
+        $tmpFile,
+        $destination
+    )) {
+
+        inventory_variable_response(
+            false,
+            "Unable to save the product image."
+        );
+
+    }
+
+    /*
+     * Path stored in the database.
+     */
+    $imagePath =
+        "assets/uploads/website_products/" .
+        $uniqueFileName;
+}
+
+        /*
+         * Pet Food must be classified as Dog or Cat.
+         * Supplements do not require pet_type.
+         */
+        if ($categoryName === "pet food") {
+
+            if (!in_array($petType, ["Dog", "Cat"], true)) {
+                inventory_variable_response(
+                    false,
+                    "Please select whether this Pet Food product is for Dog or Cat."
+                );
+            }
+
+        } else {
+            $petType = null;
+        }
+
+
+        /*
+         * Prevent the same inventory item from being
+         * added as a website product more than once.
+         */
+        $duplicateCheck = mysqli_prepare($conn, "
+            SELECT website_product_id
+            FROM website_products
+            WHERE item_id = ?
+            LIMIT 1
+        ");
+
+        if (!$duplicateCheck) {
+            inventory_variable_response(false, mysqli_error($conn));
+        }
+
+        mysqli_stmt_bind_param($duplicateCheck, "i", $itemId);
+        mysqli_stmt_execute($duplicateCheck);
+
+        $duplicateResult = mysqli_stmt_get_result($duplicateCheck);
+
+        if ($duplicateResult && mysqli_num_rows($duplicateResult) > 0) {
+            mysqli_stmt_close($duplicateCheck);
+
+            inventory_variable_response(
+                false,
+                "This inventory item is already added as a website product."
+            );
+        }
+
+        mysqli_stmt_close($duplicateCheck);
+
+
+        /*
+         * Insert website product.
+         */
+        $stmt = mysqli_prepare($conn, "
+            INSERT INTO website_products
+                (item_id, pet_type, description,image_path, status)
+            VALUES
+                (?, ?, ?, ?, ?)
+        ");
+
+        if (!$stmt) {
+            inventory_variable_response(false, mysqli_error($conn));
+        }
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "issss",
+            $itemId,
+            $petType,
+            $description,
+            $imagePath,
+            $status
+        );
+
+        if (!mysqli_stmt_execute($stmt)) {
+
+            $message = mysqli_error($conn);
+            mysqli_stmt_close($stmt);
+
+            inventory_variable_response(false, $message);
+        }
+
+        $newId = mysqli_insert_id($conn);
+
+        mysqli_stmt_close($stmt);
+
+        inventory_variable_response(
+            true,
+            "Website product added successfully.",
+            ["id" => $newId]
+        );
+    }
+
+        /* ==========================================================
+       WEBSITE PRODUCTS
+       EDIT WEBSITE PRODUCT
+    ========================================================== */
+
+    if ($action === "get_website_product") {
+
+        $websiteProductId =
+            (int)($_POST["website_product_id"] ?? 0);
+
+        if ($websiteProductId <= 0) {
+            inventory_variable_response(
+                false,
+                "Invalid website product ID."
+            );
+        }
+
+        $stmt = mysqli_prepare($conn, "
+            SELECT
+                wp.website_product_id,
+                wp.item_id,
+                wp.pet_type,
+                wp.description,
+                wp.image_path,
+                wp.status,
+                i.item_name,
+                c.category_name
+            FROM website_products wp
+            INNER JOIN inventory_items i
+                ON i.item_id = wp.item_id
+            INNER JOIN inventory_categories c
+                ON c.category_id = i.category_id
+            WHERE wp.website_product_id = ?
+            LIMIT 1
+        ");
+
+        if (!$stmt) {
+            inventory_variable_response(
+                false,
+                mysqli_error($conn)
+            );
+        }
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "i",
+            $websiteProductId
+        );
+
+        mysqli_stmt_execute($stmt);
+
+        $result = mysqli_stmt_get_result($stmt);
+
+        if (!$result || mysqli_num_rows($result) === 0) {
+
+            mysqli_stmt_close($stmt);
+
+            inventory_variable_response(
+                false,
+                "Website product not found."
+            );
+        }
+
+        $product = mysqli_fetch_assoc($result);
+
+        mysqli_stmt_close($stmt);
+
+        inventory_variable_response(
+            true,
+            "Website product loaded successfully.",
+            [
+                "product" => $product
+            ]
+        );
+    }
+
+
+    /* ==========================================================
+       WEBSITE PRODUCTS
+       UPDATE WEBSITE PRODUCT
+    ========================================================== */
+
+    if ($action === "edit_website_product") {
+
+        $websiteProductId =
+            (int)($_POST["website_product_id"] ?? 0);
+
+        $petType =
+            trim($_POST["pet_type"] ?? "");
+
+        $description =
+            trim($_POST["description"] ?? "");
+
+        $status =
+            trim($_POST["status"] ?? "Visible");
+
+
+        if ($websiteProductId <= 0) {
+
+            inventory_variable_response(
+                false,
+                "Invalid website product ID."
+            );
+        }
+
+
+        if (!in_array(
+            $status,
+            ["Visible", "Hidden"],
+            true
+        )) {
+
+            $status = "Visible";
+        }
+
+
+        /*
+         * Get the existing website product
+         * together with its inventory category.
+         */
+
+        $productCheck = mysqli_prepare($conn, "
+            SELECT
+                wp.website_product_id,
+                wp.item_id,
+                wp.pet_type,
+                wp.description,
+                wp.image_path,
+                wp.status,
+                i.item_name,
+                c.category_name
+            FROM website_products wp
+            INNER JOIN inventory_items i
+                ON i.item_id = wp.item_id
+            INNER JOIN inventory_categories c
+                ON c.category_id = i.category_id
+            WHERE wp.website_product_id = ?
+            LIMIT 1
+        ");
+
+
+        if (!$productCheck) {
+
+            inventory_variable_response(
+                false,
+                mysqli_error($conn)
+            );
+        }
+
+
+        mysqli_stmt_bind_param(
+            $productCheck,
+            "i",
+            $websiteProductId
+        );
+
+        mysqli_stmt_execute($productCheck);
+
+        $productResult =
+            mysqli_stmt_get_result($productCheck);
+
+
+        if (
+            !$productResult ||
+            mysqli_num_rows($productResult) === 0
+        ) {
+
+            mysqli_stmt_close($productCheck);
+
+            inventory_variable_response(
+                false,
+                "Website product not found."
+            );
+        }
+
+
+        $existingProduct =
+            mysqli_fetch_assoc($productResult);
+
+        mysqli_stmt_close($productCheck);
+
+
+        $itemId =
+            (int)$existingProduct["item_id"];
+
+        $categoryName =
+            strtolower(
+                trim($existingProduct["category_name"])
+            );
+
+        $oldImagePath =
+            $existingProduct["image_path"];
+
+
+        /*
+         * Only Pet Food requires Dog/Cat.
+         * Supplements and Others use NULL.
+         */
+
+        if ($categoryName === "pet food") {
+
+            if (!in_array(
+                $petType,
+                ["Dog", "Cat"],
+                true
+            )) {
+
+                inventory_variable_response(
+                    false,
+                    "Please select whether this Pet Food product is for Dog or Cat."
+                );
+            }
+
+        } else {
+
+            $petType = null;
+        }
+
+
+        /*
+         * Keep the existing image unless
+         * a new image was uploaded.
+         */
+
+        $newImagePath = $oldImagePath;
+
+        $newUploadedFile = null;
+
+
+        if (
+            isset($_FILES["image"]) &&
+            $_FILES["image"]["error"] !== UPLOAD_ERR_NO_FILE
+        ) {
+
+            if (
+                $_FILES["image"]["error"] !==
+                UPLOAD_ERR_OK
+            ) {
+
+                inventory_variable_response(
+                    false,
+                    "There was a problem uploading the product image."
+                );
+            }
+
+
+            // Maximum file size: 5 MB
+
+            $maxFileSize =
+                5 * 1024 * 1024;
+
+
+            if (
+                $_FILES["image"]["size"] >
+                $maxFileSize
+            ) {
+
+                inventory_variable_response(
+                    false,
+                    "Product image must not exceed 5 MB."
+                );
+            }
+
+
+            $tmpFile =
+                $_FILES["image"]["tmp_name"];
+
+
+            /*
+             * Verify that the uploaded file
+             * is actually an image.
+             */
+
+            $imageInfo =
+                getimagesize($tmpFile);
+
+
+            if ($imageInfo === false) {
+
+                inventory_variable_response(
+                    false,
+                    "Please upload a valid image file."
+                );
+            }
+
+
+            $allowedMimeTypes = [
+                "image/jpeg" => "jpg",
+                "image/png"  => "png",
+                "image/webp" => "webp"
+            ];
+
+
+            $mimeType =
+                $imageInfo["mime"] ?? "";
+
+
+            if (
+                !isset(
+                    $allowedMimeTypes[$mimeType]
+                )
+            ) {
+
+                inventory_variable_response(
+                    false,
+                    "Only JPG, PNG, and WebP images are allowed."
+                );
+            }
+
+
+            $extension =
+                $allowedMimeTypes[$mimeType];
+
+
+            /*
+             * Physical upload folder.
+             */
+
+            $uploadDirectory =
+                __DIR__ .
+                "/../assets/uploads/website_products/";
+
+
+            if (!is_dir($uploadDirectory)) {
+
+                if (
+                    !mkdir(
+                        $uploadDirectory,
+                        0755,
+                        true
+                    )
+                ) {
+
+                    inventory_variable_response(
+                        false,
+                        "Unable to create the product image upload folder."
+                    );
+                }
+            }
+
+
+            /*
+             * Generate a unique filename.
+             */
+
+            $uniqueFileName =
+                "website_product_" .
+                $itemId .
+                "_" .
+                bin2hex(
+                    random_bytes(8)
+                ) .
+                "." .
+                $extension;
+
+
+            $destination =
+                $uploadDirectory .
+                $uniqueFileName;
+
+
+            if (
+                !move_uploaded_file(
+                    $tmpFile,
+                    $destination
+                )
+            ) {
+
+                inventory_variable_response(
+                    false,
+                    "Unable to save the product image."
+                );
+            }
+
+
+            $newImagePath =
+                "assets/uploads/website_products/" .
+                $uniqueFileName;
+
+
+            /*
+             * Remember the newly uploaded physical
+             * file so it can be removed if the
+             * database update fails.
+             */
+
+            $newUploadedFile =
+                $destination;
+        }
+
+
+        /*
+         * Update the website product.
+         */
+
+        $stmt = mysqli_prepare($conn, "
+            UPDATE website_products
+            SET
+                pet_type = ?,
+                description = ?,
+                image_path = ?,
+                status = ?
+            WHERE website_product_id = ?
+        ");
+
+
+        if (!$stmt) {
+
+            if (
+                $newUploadedFile &&
+                file_exists($newUploadedFile)
+            ) {
+                unlink($newUploadedFile);
+            }
+
+            inventory_variable_response(
+                false,
+                mysqli_error($conn)
+            );
+        }
+
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "ssssi",
+            $petType,
+            $description,
+            $newImagePath,
+            $status,
+            $websiteProductId
+        );
+
+
+        if (!mysqli_stmt_execute($stmt)) {
+
+            $message =
+                mysqli_error($conn);
+
+            mysqli_stmt_close($stmt);
+
+
+            /*
+             * Remove newly uploaded image
+             * if database update failed.
+             */
+
+            if (
+                $newUploadedFile &&
+                file_exists($newUploadedFile)
+            ) {
+
+                unlink($newUploadedFile);
+            }
+
+
+            inventory_variable_response(
+                false,
+                $message
+            );
+        }
+
+
+        mysqli_stmt_close($stmt);
+
+
+        /*
+         * If a new image replaced the old one,
+         * remove the old physical file.
+         */
+
+        if (
+            $newUploadedFile &&
+            $oldImagePath
+        ) {
+
+            $oldImageFile =
+                __DIR__ .
+                "/../" .
+                $oldImagePath;
+
+
+            if (
+                file_exists($oldImageFile)
+            ) {
+
+                unlink($oldImageFile);
+            }
+        }
+
+
+        inventory_variable_response(
+            true,
+            "Website product updated successfully."
+        );
+    }
+
+
+    /* ==========================================================
+       WEBSITE PRODUCTS
+       DELETE WEBSITE PRODUCT
+    ========================================================== */
+
+    if ($action === "delete_website_product") {
+
+        $websiteProductId =
+            (int)($_POST["website_product_id"] ?? 0);
+
+
+        if ($websiteProductId <= 0) {
+
+            inventory_variable_response(
+                false,
+                "Invalid website product ID."
+            );
+        }
+
+
+        /*
+         * Get the image path first so we can
+         * remove the physical file after
+         * deleting the database record.
+         */
+
+        $productCheck = mysqli_prepare($conn, "
+            SELECT
+                image_path
+            FROM website_products
+            WHERE website_product_id = ?
+            LIMIT 1
+        ");
+
+
+        if (!$productCheck) {
+
+            inventory_variable_response(
+                false,
+                mysqli_error($conn)
+            );
+        }
+
+
+        mysqli_stmt_bind_param(
+            $productCheck,
+            "i",
+            $websiteProductId
+        );
+
+        mysqli_stmt_execute(
+            $productCheck
+        );
+
+
+        $productResult =
+            mysqli_stmt_get_result(
+                $productCheck
+            );
+
+
+        if (
+            !$productResult ||
+            mysqli_num_rows($productResult) === 0
+        ) {
+
+            mysqli_stmt_close(
+                $productCheck
+            );
+
+            inventory_variable_response(
+                false,
+                "Website product not found."
+            );
+        }
+
+
+        $product =
+            mysqli_fetch_assoc(
+                $productResult
+            );
+
+        mysqli_stmt_close(
+            $productCheck
+        );
+
+
+        $imagePath =
+            $product["image_path"];
+
+
+        /*
+         * Delete only the website_products record.
+         * The inventory_items record is NOT deleted.
+         */
+
+        $stmt = mysqli_prepare($conn, "
+            DELETE FROM website_products
+            WHERE website_product_id = ?
+        ");
+
+
+        if (!$stmt) {
+
+            inventory_variable_response(
+                false,
+                mysqli_error($conn)
+            );
+        }
+
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "i",
+            $websiteProductId
+        );
+
+
+        if (!mysqli_stmt_execute($stmt)) {
+
+            $message =
+                mysqli_error($conn);
+
+            mysqli_stmt_close($stmt);
+
+
+            inventory_variable_response(
+                false,
+                $message
+            );
+        }
+
+
+        mysqli_stmt_close($stmt);
+
+
+        /*
+         * Delete the uploaded image file,
+         * if one exists.
+         */
+
+        if ($imagePath) {
+
+            $imageFile =
+                __DIR__ .
+                "/../" .
+                $imagePath;
+
+
+            if (
+                file_exists($imageFile)
+            ) {
+
+                unlink($imageFile);
+            }
+        }
+
+
+        inventory_variable_response(
+            true,
+            "Website product deleted successfully."
+        );
+    }
+
     if ($action === "add_category") {
         $name = trim($_POST["category_name"] ?? "");
         $description = trim($_POST["description"] ?? "");
@@ -818,8 +1794,90 @@ if ($inventorySuppliersResult) {
     }
 }
 
-?>
+/* ==========================================================
+   WEBSITE PRODUCT INVENTORY ITEMS
+   Active Pet Food, Supplements and Others only.
+========================================================== */
 
+$websiteProductItems = [];
+
+$websiteProductItemsQuery = "
+    SELECT
+        i.item_id,
+        i.item_code,
+        i.item_name,
+        i.category_id,
+        c.category_name,
+        i.status
+    FROM inventory_items i
+    INNER JOIN inventory_categories c
+        ON c.category_id = i.category_id
+    WHERE i.status = 'Active'
+      AND LOWER(TRIM(c.category_name))
+          IN ('pet food', 'supplements', 'others')
+    ORDER BY
+        c.category_name ASC,
+        i.item_name ASC
+";
+
+$websiteProductItemsResult = mysqli_query(
+    $conn,
+    $websiteProductItemsQuery
+);
+
+if ($websiteProductItemsResult) {
+
+    while (
+        $websiteProductItemRow =
+        mysqli_fetch_assoc($websiteProductItemsResult)
+    ) {
+
+        $websiteProductItems[] =
+            $websiteProductItemRow;
+
+    }
+
+}
+
+
+/* ==========================================================
+   WEBSITE PRODUCTS
+   Products currently configured for the customer website.
+========================================================== */
+
+$websiteProductsList = [];
+
+$websiteProductsQuery = "
+    SELECT
+        wp.website_product_id,
+        wp.item_id,
+        wp.pet_type,
+        wp.description,
+        wp.image_path,
+        wp.status,
+        i.item_name,
+        i.item_code,
+        c.category_name
+    FROM website_products wp
+    INNER JOIN inventory_items i
+        ON i.item_id = wp.item_id
+    INNER JOIN inventory_categories c
+        ON c.category_id = i.category_id
+    ORDER BY
+        c.category_name ASC,
+        wp.pet_type ASC,
+        i.item_name ASC
+";
+
+$websiteProductsResult = mysqli_query($conn, $websiteProductsQuery);
+
+if ($websiteProductsResult) {
+    while ($websiteProductRow = mysqli_fetch_assoc($websiteProductsResult)) {
+        $websiteProductsList[] = $websiteProductRow;
+    }
+}
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -910,6 +1968,183 @@ if ($inventorySuppliersResult) {
                 grid-template-columns: 1fr;
             }
         }
+
+        /* =========================================================
+   WEBSITE PRODUCT MODAL
+========================================================= */
+
+.variable-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 9999;
+}
+
+.variable-modal-overlay.show {
+    display: flex !important;
+}
+
+.variable-modal {
+    width: 100%;
+    max-width: 620px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.20);
+}
+
+.variable-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.variable-modal-header h3 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.variable-modal-header p {
+    margin: 6px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.variable-modal-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+}
+
+.variable-modal-close:hover {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+#addWebsiteProductForm,
+#editWebsiteProductForm {
+    padding: 24px;
+}
+
+.variable-modal-field {
+    margin-bottom: 18px;
+}
+
+.variable-modal-field label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.variable-modal-field label span {
+    color: #ef4444;
+}
+
+.variable-modal-field select,
+.variable-modal-field textarea,
+.variable-modal-field input[type="file"] {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.variable-modal-field select,
+.variable-modal-field textarea {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #111827;
+    font-size: 14px;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.variable-modal-field select {
+    height: 42px;
+}
+
+.variable-modal-field textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.variable-modal-field select:focus,
+.variable-modal-field textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.10);
+}
+
+.variable-modal-field input[type="file"] {
+    padding: 9px 0;
+    font-size: 14px;
+    color: #374151;
+}
+
+.variable-modal-field small {
+    display: block;
+    margin-top: 6px;
+    color: #9ca3af;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.variable-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 6px;
+}
+
+.variable-modal-cancel,
+.variable-modal-submit {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.variable-modal-cancel {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.variable-modal-cancel:hover {
+    background: #e5e7eb;
+}
+
+.variable-modal-submit {
+    background: #4f46e5;
+    color: #ffffff;
+}
+
+.variable-modal-submit:hover {
+    background: #4338ca;
+}
     </style>
 
 </head>
@@ -1117,7 +2352,7 @@ if ($inventorySuppliersResult) {
                         <div class="variable-group-info">
 
                             <strong>
-                                Billing
+                                Services
                             </strong>
 
                             <small>
@@ -2091,6 +3326,14 @@ if (
                 Suppliers
             </button>
 
+            <button
+                type="button"
+                class="variable-tab"
+                data-tab="inventory-website-products"
+            >
+                Website Products
+            </button>    
+
         </div>
 
         <!-- INVENTORY CATEGORIES -->
@@ -2553,8 +3796,250 @@ if (
 
         </div>
 
-    </div>
+    
+    
+            <!-- INVENTORY WEBSITE PRODUCTS -->
+        <div
+            class="billing-tab-content"
+            id="inventory-website-products"
+        >
 
+            <div class="billing-section-header">
+
+                <div>
+                    <h3>
+                        Website Products
+                    </h3>
+
+                    <p>
+                        Manage pet food products displayed on the customer website.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="add-variable-btn"
+                    id="addWebsiteProductBtn"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Add Product
+                </button>
+
+            </div>
+
+
+            <div class="variable-table-wrapper">
+
+                <table class="variable-table">
+
+                    <thead>
+                        <tr>
+
+                            <th>
+                                Product
+                            </th>
+
+                            <th>
+                                Description
+                            </th>
+
+                            <th>
+                                Image
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+<?php if (count($websiteProductsList) > 0): ?>
+
+    <?php foreach ($websiteProductsList as $websiteProduct): ?>
+
+        <?php
+            $websiteProductId =
+                (int)$websiteProduct['website_product_id'];
+
+            $productName =
+                htmlspecialchars(
+                    $websiteProduct['item_name']
+                );
+
+            $categoryName =
+                htmlspecialchars(
+                    $websiteProduct['category_name']
+                );
+
+            $petType =
+                $websiteProduct['pet_type'] !== null
+                    ? htmlspecialchars($websiteProduct['pet_type'])
+                    : '—';
+
+            $description =
+                htmlspecialchars(
+                    $websiteProduct['description'] ?? ''
+                );
+
+            $imagePath =
+                htmlspecialchars(
+                    $websiteProduct['image_path'] ?? ''
+                );
+
+            $productStatus =
+                htmlspecialchars(
+                    $websiteProduct['status']
+                );
+        ?>
+
+        <tr>
+
+            <!-- PRODUCT -->
+            <td>
+                <strong>
+                    <?= $productName ?>
+                </strong>
+
+                <small
+                    style="
+                        display:block;
+                        margin-top:4px;
+                        color:#6b7280;
+                    "
+                >
+                    <?= $categoryName ?>
+                    <?php if ($websiteProduct['pet_type'] !== null): ?>
+                        · <?= $petType ?>
+                    <?php endif; ?>
+                </small>
+            </td>
+
+
+            <!-- DESCRIPTION -->
+            <td>
+                <?= $description !== ''
+                    ? $description
+                    : '<span style="color:#9ca3af;">No description</span>'
+                ?>
+            </td>
+
+
+            <!-- IMAGE -->
+            <td>
+
+                <?php if ($imagePath !== ''): ?>
+
+                    <img
+                        src="../<?= $imagePath ?>"
+                        alt="<?= $productName ?>"
+                        style="
+                            width:55px;
+                            height:55px;
+                            object-fit:cover;
+                            border-radius:8px;
+                            border:1px solid #e5e7eb;
+                        "
+                    >
+
+                <?php else: ?>
+
+                    <span style="color:#9ca3af;">
+                        No image
+                    </span>
+
+                <?php endif; ?>
+
+            </td>
+
+
+            <!-- STATUS -->
+            <td>
+
+                <span
+                    class="status <?= $productStatus === 'Visible' ? 'active' : '' ?>"
+                >
+                    <?= $productStatus ?>
+                </span>
+
+            </td>
+
+
+            <!-- ACTIONS -->
+            <td class="table-actions">
+
+                <button
+                    type="button"
+                    class="icon-action edit"
+                    title="Edit Website Product"
+                    data-id="<?= $websiteProductId ?>"
+                >
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-action delete"
+                    title="Delete Website Product"
+                    data-id="<?= $websiteProductId ?>"
+                >
+                    <i class="fa-regular fa-trash-can"></i>
+                </button>
+
+            </td>
+
+        </tr>
+
+    <?php endforeach; ?>
+
+<?php else: ?>
+
+    <tr>
+
+        <td
+            colspan="5"
+            style="
+                text-align:center;
+                padding:30px;
+            "
+        >
+            <span style="color:#6b7280;">
+                No website products added yet.
+            </span>
+        </td>
+
+    </tr>
+
+<?php endif; ?>
+
+</tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="inventory-variable-note">
+
+                <i class="fa-solid fa-circle-info"></i>
+
+                <span>
+                    Active Pet Food, Supplements, Others inventory items can be added as website products.
+                    Pet Food products must be classified as Dog or Cat.
+                </span>
+
+            </div>
+
+        </div>
+    </div>    
     <!-- BILLING CONTENT -->
 
     <div
@@ -3825,14 +5310,219 @@ if (
 
     </div>
 
+    <!-- ADD WEBSITE PRODUCT MODAL -->
+<div
+    class="variable-modal-overlay"
+    id="websiteProductModal"
+    style="display: none;"
+>
+    <div class="variable-modal">
 
-    <!-- DEFAULT EMPTY STATE -->
+        <!-- MODAL HEADER -->
+        <div class="variable-modal-header">
 
-    <div
-        class="variable-empty-state"
-        id="defaultVariableState"
-    >
+            <div>
+                <h3>Add Website Product</h3>
+                <p>
+                    Add a pet food or supplement product to the customer website.
+                </p>
+            </div>
 
+            <button
+                type="button"
+                class="variable-modal-close"
+                id="closeWebsiteProductModal"
+                aria-label="Close"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+        <!-- MODAL BODY -->
+        <form
+            id="addWebsiteProductForm"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <input
+                type="hidden"
+                name="inventory_variable_action"
+                value="add_website_product"
+            >
+
+            <!-- PRODUCT -->
+            <div class="variable-modal-field">
+
+                <label for="websiteProductItem">
+                    Product
+                    <span>*</span>
+                </label>
+
+                <select
+                    id="websiteProductItem"
+                    name="item_id"
+                    required
+                >
+                    <option value="">
+                        Select Product
+                    </option>
+
+                    <?php foreach ($websiteProductItems as $item): ?>
+
+                        <option
+                            value="<?= (int)$item["item_id"] ?>"
+                            data-category="<?= htmlspecialchars($item["category_name"], ENT_QUOTES) ?>"
+                        >
+                            <?= htmlspecialchars($item["item_name"]) ?>
+                            — <?= htmlspecialchars($item["category_name"]) ?>
+                        </option>
+
+                    <?php endforeach; ?>
+
+                </select>
+
+                <small>
+                    Only active Pet Food and Supplements inventory items are available.
+                </small>
+
+            </div>
+
+
+            <!-- PET TYPE -->
+            <div
+                class="variable-modal-field"
+                id="websiteProductPetTypeField"
+            >
+
+                <label for="websiteProductPetType">
+                    Pet Type
+                    <span>*</span>
+                </label>
+
+                <select
+                    id="websiteProductPetType"
+                    name="pet_type"
+                >
+                    <option value="">
+                        Select Pet Type
+                    </option>
+
+                    <option value="Dog">
+                        Dog
+                    </option>
+
+                    <option value="Cat">
+                        Cat
+                    </option>
+                </select>
+
+                <small>
+                    Required for Pet Food products only.
+                </small>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+            <div class="variable-modal-field">
+
+                <label for="websiteProductDescription">
+                    Description
+                </label>
+
+                <textarea
+                    id="websiteProductDescription"
+                    name="description"
+                    rows="4"
+                    placeholder="Enter product description..."
+                ></textarea>
+
+            </div>
+
+
+            <!-- IMAGE -->
+            <div class="variable-modal-field">
+
+                <label for="websiteProductImage">
+                    Product Image
+                </label>
+
+                <input
+                    type="file"
+                    id="websiteProductImage"
+                    name="image"
+                    accept="image/*"
+                >
+
+                <small>
+                    Upload an image for the product displayed on the customer website.
+                </small>
+
+            </div>
+
+
+            <!-- STATUS -->
+            <div class="variable-modal-field">
+
+                <label for="websiteProductStatus">
+                    Status
+                    <span>*</span>
+                </label>
+
+                <select
+                    id="websiteProductStatus"
+                    name="status"
+                    required
+                >
+                    <option value="Hidden">
+                        Hidden
+                    </option>
+
+                    <option value="Visible">
+                        Visible
+                    </option>
+                </select>
+
+            </div>
+
+
+            <!-- MODAL FOOTER -->
+            <div class="variable-modal-footer">
+
+                <button
+                    type="button"
+                    class="variable-modal-cancel"
+                    id="cancelWebsiteProductModal"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="variable-modal-submit"
+                    id="saveWebsiteProductBtn"
+                >
+                    <i class="fa-solid fa-check"></i>
+                    Add Product
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+<!-- DEFAULT EMPTY STATE -->
+<div
+    class="variable-empty-state"
+    id="defaultVariableState"
+>  
+
+    
         <div class="empty-state-icon">
 
             <i class="fa-solid fa-layer-group"></i>

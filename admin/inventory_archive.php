@@ -934,7 +934,45 @@ function archivedInventoryStockStatus(
 
                         </span>
 
+                        
+
                     </div>
+                    <div class="archive-toolbar">
+
+    <label class="archive-select-all">
+
+        <input
+            type="checkbox"
+            id="selectAllInventory"
+        >
+
+        <span>
+            Select All
+        </span>
+
+    </label>
+
+    <button
+        type="button"
+        class="restore-selected-btn"
+        id="restoreSelectedInventory"
+        disabled
+    >
+
+        <i class="fa-solid fa-rotate-left"></i>
+
+        Restore Selected
+
+        <span
+            class="selected-count"
+            id="inventorySelectedCount"
+        >
+            0
+        </span>
+
+    </button>
+
+</div>
 
 
                     <div
@@ -950,6 +988,7 @@ function archivedInventoryStockStatus(
                             <thead>
 
                                 <tr>
+                                    <th class="inventory-select-column"></th>
 
                                     <th>
                                         ITEM
@@ -1010,7 +1049,7 @@ function archivedInventoryStockStatus(
                                     class="inventory-archive-empty-row"
                                 >
 
-                                    <td colspan="10">
+                                    <td colspan="11">
 
                                         <div
                                             class="archive-empty-state"
@@ -1168,6 +1207,13 @@ function archivedInventoryStockStatus(
                                             'UTF-8'
                                         ) ?>"
                                     >
+                                        <td class="inventory-select-column">
+                                            <input
+                                                type="checkbox"
+                                                class="inventory-select-checkbox"
+                                                value="<?= $itemId ?>"
+                                            >
+                                        </td>    
 
 
                                         <!-- ITEM -->

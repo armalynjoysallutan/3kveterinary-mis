@@ -118,16 +118,13 @@ require_once __DIR__ . '/../config/database.php';
                     </div>
 
 
-                    <div class="settings-card-footer">
+                    <div 
+                        class="settings-card-footer"
+                        data-href="system_variables.php"
+                        
 
-                        <a
-                            href="system_variables.php"
-                            class="settings-open-btn blue-btn"
-                        >
-                            Open
-                        </a>
 
-                    </div>
+                    ></div>
 
                 </div>
 
@@ -159,16 +156,13 @@ require_once __DIR__ . '/../config/database.php';
                     </div>
 
 
-                    <div class="settings-card-footer">
+                    <div 
+                        class="settings-card-footer"
+                        data-href="audit_trail.php"
+                        
+                    ></div>
 
-                        <a
-                            href="audit_trail.php"
-                            class="settings-open-btn green-btn"
-                        >
-                            Open
-                        </a>
-
-                    </div>
+                   
 
                 </div>
 
@@ -199,16 +193,11 @@ require_once __DIR__ . '/../config/database.php';
                     </div>
 
 
-                    <div class="settings-card-footer">
-
-                        <a
-                            href="backup_restore.php"
-                            class="settings-open-btn purple-btn"
-                        >
-                            Open
-                        </a>
-
-                    </div>
+                    <div 
+                        class="settings-card-footer"
+                        data-href="backup_restore.php"
+                        
+                    ></div>
 
                 </div>
 
@@ -238,15 +227,10 @@ require_once __DIR__ . '/../config/database.php';
                     </div>
 
 
-                    <div class="settings-card-footer">
-
-                        <a
-                            href="account_management.php"
-                            class="settings-open-btn orange-btn"
-                        >
-                            Open
-                        </a>
-
+                    <div 
+                        class="settings-card-footer"
+                        data-href="account_management.php"
+                        
                     </div>
 
                 </div>

@@ -1,229 +1,152 @@
 /* =========================================================
    REPORTS MODULE JAVASCRIPT
-   File: admin/reports.js
-   Purpose: Render the Reports page charts
+   File: assets/js/reports.js
+   Purpose: Category -> Report selection, filter visibility,
+            date validation, and print handling.
    ========================================================= */
 
 document.addEventListener('DOMContentLoaded', function () {
-    /* =====================================================
-       1. GET REPORT DATA
-       ===================================================== */
-    const dataElement = document.getElementById('reportsData');
 
-    if (!dataElement || typeof Chart === 'undefined') {
-        return;
+    const categorySelect = document.getElementById('category');
+    const reportSelect = document.getElementById('report');
+
+    const statusField = document.querySelector('.filter-status');
+    const speciesField = document.querySelector('.filter-species');
+    const transactionField = document.querySelector('.filter-transaction');
+    const inventoryCategoryField = document.querySelector('.filter-inventory-category');
+
+    const reportOptions = {
+        records: [
+            { value: 'all_records', label: 'All Reports' },
+            { value: 'customer_records', label: 'Customer Records' },
+            { value: 'pet_records', label: 'Pet Records' },
+            { value: 'appointment_records', label: 'Appointment Records' },
+            { value: 'medical_records', label: 'Medical Records' }
+        ],
+        sales: [
+            { value: 'all_sales', label: 'All Reports' },
+            { value: 'sales_summary', label: 'Sales Summary' },
+            { value: 'sales_details', label: 'Sales Details' }
+        ],
+        inventory: [
+            { value: 'all_inventory', label: 'All Reports' },
+            { value: 'current_inventory', label: 'Current Inventory' },
+            { value: 'low_stock', label: 'Low Stock' },
+            { value: 'expiration', label: 'Expiration' }
+        ]
+    };
+
+    function showField(field, visible) {
+        if (field) {
+            field.style.display = visible ? 'block' : 'none';
+        }
     }
 
-    let data;
+    function populateReports(selectedValue) {
 
-    try {
-        data = JSON.parse(dataElement.textContent);
-    } catch (error) {
-        console.error('Unable to read reports data.', error);
-        return;
+        if (!reportSelect) {
+            return;
+        }
+
+        const category = categorySelect ? categorySelect.value : '';
+        const options = reportOptions[category] || [];
+
+        reportSelect.innerHTML = '';
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = category ? 'Select Report' : 'Select Category First';
+        reportSelect.appendChild(placeholder);
+
+        options.forEach(function (option) {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.value;
+            optionElement.textContent = option.label;
+
+            if (option.value === selectedValue) {
+                optionElement.selected = true;
+            }
+
+            reportSelect.appendChild(optionElement);
+        });
+
+        reportSelect.disabled = options.length === 0;
     }
 
-    /* =====================================================
-       2. GET CHART CANVASES
-       ===================================================== */
-    const recordsCanvas = document.getElementById('recordsChart');
-    const salesCanvas = document.getElementById('salesChart');
-    const inventoryCanvas = document.getElementById('inventoryChart');
+    function updateFilters() {
 
-    /* =====================================================
-       3. RECORDS CHART
-       ===================================================== */
-    if (recordsCanvas) {
-        new Chart(recordsCanvas, {
-            type: 'line',
+        const category = categorySelect ? categorySelect.value : '';
+        const report = reportSelect ? reportSelect.value : '';
 
-            data: {
-                labels: data.records.labels,
+        const isRecords = category === 'records';
+        const isPetRecords = report === 'pet_records';
+        const isMedicalRecords = report === 'medical_records';
+        const isSales = category === 'sales';
+        const isInventory = category === 'inventory';
 
-                datasets: [
-                    {
-                        data: data.records.values,
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, .08)',
-                        fill: true,
-                        tension: 0.35,
-                        borderWidth: 2,
-                        pointRadius: 2
-                    }
-                ]
-            },
+        showField(
+            statusField,
+            report === 'customer_records' ||
+            report === 'pet_records' ||
+            report === 'appointment_records' ||
+            report === 'all_records' ||
+            isSales
+        );
 
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
+        showField(
+            speciesField,
+            isPetRecords || isMedicalRecords || report === 'all_records'
+        );
 
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
+        showField(
+            transactionField,
+            report === 'sales_summary' || report === 'sales_details' || report === 'all_sales'
+        );
 
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 8
-                            }
-                        }
-                    },
+        showField(
+            inventoryCategoryField,
+            isInventory
+        );
+    }
 
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0,
-                            font: {
-                                size: 8
-                            }
-                        },
-                        grid: {
-                            color: '#edf1f6'
-                        }
-                    }
-                }
+    const initialCategory = window.reportCategory || '';
+    const initialReport = window.reportValue || '';
+
+    if (categorySelect) {
+        categorySelect.value = initialCategory;
+
+        categorySelect.addEventListener('change', function () {
+            populateReports('');
+            updateFilters();
+        });
+    }
+
+    populateReports(initialReport);
+    updateFilters();
+
+    const dateFrom = document.getElementById('date_from');
+    const dateTo = document.getElementById('date_to');
+
+    if (dateFrom && dateTo) {
+
+        dateFrom.addEventListener('change', function () {
+            if (dateTo.value && dateFrom.value > dateTo.value) {
+                dateTo.value = dateFrom.value;
+            }
+        });
+
+        dateTo.addEventListener('change', function () {
+            if (dateFrom.value && dateTo.value < dateFrom.value) {
+                dateFrom.value = dateTo.value;
             }
         });
     }
 
-    /* =====================================================
-       4. SALES CHART
-       ===================================================== */
-    if (salesCanvas) {
-        new Chart(salesCanvas, {
-            type: 'line',
+    const printButton = document.getElementById('printReportBtn');
 
-            data: {
-                labels: data.sales.labels,
-
-                datasets: [
-                    {
-                        data: data.sales.values,
-                        borderColor: '#16a36a',
-                        backgroundColor: 'rgba(22, 163, 106, .08)',
-                        fill: true,
-                        tension: 0.35,
-                        borderWidth: 2,
-                        pointRadius: 2
-                    }
-                ]
-            },
-
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return ' ₱' + Number(context.raw || 0).toLocaleString(
-                                    'en-PH',
-                                    {
-                                        minimumFractionDigits: 2
-                                    }
-                                );
-                            }
-                        }
-                    }
-                },
-
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 8
-                            }
-                        }
-                    },
-
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            font: {
-                                size: 8
-                            },
-                            callback: function (value) {
-                                return '₱' + Number(value).toLocaleString(
-                                    'en-PH',
-                                    {
-                                        notation: 'compact'
-                                    }
-                                );
-                            }
-                        },
-                        grid: {
-                            color: '#edf1f6'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    /* =====================================================
-       5. INVENTORY CHART
-       ===================================================== */
-    if (inventoryCanvas) {
-        new Chart(inventoryCanvas, {
-            type: 'doughnut',
-
-            data: {
-                labels: [
-                    'In Stock',
-                    'Low Stock',
-                    'Out of Stock',
-                    'Expiring Soon'
-                ],
-
-                datasets: [
-                    {
-                        data: data.inventory,
-                        backgroundColor: [
-                            '#16a36a',
-                            '#f59e0b',
-                            '#ef4444',
-                            '#8b5cf6'
-                        ],
-                        borderWidth: 0
-                    }
-                ]
-            },
-
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '65%',
-
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-
-                        labels: {
-                            boxWidth: 8,
-                            boxHeight: 8,
-                            padding: 8,
-
-                            font: {
-                                size: 8
-                            }
-                        }
-                    }
-                }
-            }
+    if (printButton) {
+        printButton.addEventListener('click', function () {
+            window.print();
         });
     }
 });

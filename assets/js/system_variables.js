@@ -6783,38 +6783,40 @@ document.addEventListener("DOMContentLoaded", function () {
         overlay.id = id;
 
         overlay.innerHTML = `
-            <div class="service-modal" role="dialog" aria-modal="true">
-                <div class="service-modal-header">
-                    <div class="service-modal-title">
-                        <div class="service-modal-title-icon">
-                            <i class="fa-solid fa-circle-question"></i>
-                        </div>
-                        <div>
-                            <h3>${escapeHtml(title)}</h3>
-                            <p>${escapeHtml(message)}</p>
-                        </div>
-                    </div>
-                    <button type="button" class="service-modal-close" data-cancel-confirm>
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+    <div class="service-modal" role="dialog" aria-modal="true">
+        <div class="service-modal-header">
+            <div class="service-modal-title">
+                <div class="service-modal-title-icon">
+                    <i class="fa-solid fa-circle-question"></i>
                 </div>
-
-                <div class="service-modal-body">
-                    <div class="service-modal-message" style="display:block;">
-                        ${escapeHtml(message)}
-                    </div>
-                </div>
-
-                <div class="service-modal-footer">
-                    <button type="button" class="service-modal-btn cancel" data-cancel-confirm>
-                        Cancel
-                    </button>
-                    <button type="button" class="service-modal-btn save" data-confirm-action>
-                        ${escapeHtml(confirmText)}
-                    </button>
+                <div>
+                    <h3>${escapeHtml(title)}</h3>
+                    <p>Please confirm this action.</p>
                 </div>
             </div>
-        `;
+
+            <button type="button" class="service-modal-close" data-cancel-confirm>
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="service-modal-body">
+            <div class="service-modal-message" style="display:block;">
+                ${escapeHtml(message)}
+            </div>
+        </div>
+
+        <div class="service-modal-footer">
+            <button type="button" class="service-modal-btn cancel" data-cancel-confirm>
+                Cancel
+            </button>
+
+            <button type="button" class="service-modal-btn save" data-confirm-action>
+                ${escapeHtml(confirmText)}
+            </button>
+        </div>
+    </div>
+`;
 
         document.body.appendChild(overlay);
         overlay.classList.add("show");
@@ -6834,6 +6836,11 @@ document.addEventListener("DOMContentLoaded", function () {
             if (event.target === overlay) overlay.remove();
         });
     }
+
+    window.showConfirmModal = showConfirmModal;
+    window.showMessageModal = showMessageModal;
+    
+
 
     function getSpeciesOptions(selectedId) {
         let options = "";
@@ -8250,5 +8257,830 @@ document.addEventListener("DOMContentLoaded", function () {
                 deleteInventoryVariable("supplier", button);
             });
         });
+
+});
+
+/* =========================================================
+   WEBSITE PRODUCTS - ADD MODAL
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const addWebsiteProductBtn =
+        document.getElementById("addWebsiteProductBtn");
+
+    const websiteProductModal =
+        document.getElementById("websiteProductModal");
+
+    const closeWebsiteProductModal =
+        document.getElementById("closeWebsiteProductModal");
+
+    const cancelWebsiteProductModal =
+        document.getElementById("cancelWebsiteProductModal");
+
+    const websiteProductItem =
+        document.getElementById("websiteProductItem");
+
+    const websiteProductPetTypeField =
+        document.getElementById("websiteProductPetTypeField");
+
+    const websiteProductPetType =
+        document.getElementById("websiteProductPetType");    
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHECK REQUIRED ELEMENTS
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        !addWebsiteProductBtn ||
+        !websiteProductModal
+    ) {
+        return;
+    }
+
+    /* =========================================================
+      PET TYPE BEHAVIOR
+       ========================================================= */
+
+ function updateWebsiteProductPetType() {
+
+    if (!websiteProductItem) {
+        return;
+    }
+
+    const selectedOption =
+        websiteProductItem.options[
+            websiteProductItem.selectedIndex
+        ];
+
+    if (!selectedOption || !selectedOption.value) {
+
+        websiteProductPetTypeField.style.display = "block";
+        websiteProductPetType.required = false;
+        websiteProductPetType.value = "";
+
+        return;
+    }
+
+    const category =
+        (
+            selectedOption.dataset.category || ""
+        ).trim().toLowerCase();
+
+
+    if (category === "pet food") {
+
+        websiteProductPetTypeField.style.display = "block";
+
+        websiteProductPetType.required = true;
+
+    } else {
+
+        websiteProductPetTypeField.style.display = "none";
+
+        websiteProductPetType.required = false;
+        websiteProductPetType.value = "";
+
+    }
+
+}
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | OPEN MODAL
+    |--------------------------------------------------------------------------
+    */
+
+    function openWebsiteProductModal() {
+
+        websiteProductModal.style.display = "flex";
+
+        requestAnimationFrame(function () {
+            websiteProductModal.classList.add("show");
+        });
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CLOSE MODAL
+    |--------------------------------------------------------------------------
+    */
+
+    function closeModal() {
+
+        websiteProductModal.classList.remove("show");
+
+        setTimeout(function () {
+            websiteProductModal.style.display = "none";
+        }, 200);
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADD PRODUCT BUTTON
+    |--------------------------------------------------------------------------
+    */
+
+    addWebsiteProductBtn.addEventListener(
+        "click",
+        function () {
+
+            openWebsiteProductModal();
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | X BUTTON
+    |--------------------------------------------------------------------------
+    */
+
+    if (closeWebsiteProductModal) {
+
+        closeWebsiteProductModal.addEventListener(
+            "click",
+            closeModal
+        );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CANCEL BUTTON
+    |--------------------------------------------------------------------------
+    */
+
+    if (cancelWebsiteProductModal) {
+
+        cancelWebsiteProductModal.addEventListener(
+            "click",
+            closeModal
+        );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CLICK OUTSIDE MODAL
+    |--------------------------------------------------------------------------
+    */
+
+    websiteProductModal.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target === websiteProductModal
+            ) {
+
+                closeModal();
+
+            }
+
+        }
+    );
+
+    if (websiteProductItem) {
+        websiteProductItem.addEventListener(
+            "change",
+            updateWebsiteProductPetType
+        );
+        
+        updateWebsiteProductPetType();
+    }    
+
+
+
+});
+
+/* =========================================================
+   WEBSITE PRODUCTS - SAVE PRODUCT
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const addWebsiteProductForm =
+        document.getElementById("addWebsiteProductForm");
+
+    const websiteProductModal =
+        document.getElementById("websiteProductModal");
+
+    const saveWebsiteProductBtn =
+        document.getElementById("saveWebsiteProductBtn");
+
+
+    if (!addWebsiteProductForm) {
+        return;
+    }
+
+
+    addWebsiteProductForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            if (saveWebsiteProductBtn) {
+
+                saveWebsiteProductBtn.disabled = true;
+
+                saveWebsiteProductBtn.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+            }
+
+
+            const formData =
+                new FormData(addWebsiteProductForm);
+
+
+            try {
+
+                const response = await fetch(
+                    window.location.href,
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!result.success) {
+
+                    alert(
+                        result.message ||
+                        "Unable to add website product."
+                    );
+
+                    return;
+
+                }
+
+
+                alert(
+                    result.message ||
+                    "Website product added successfully."
+                );
+
+
+                if (websiteProductModal) {
+
+                    websiteProductModal.classList.remove("show");
+
+                    setTimeout(function () {
+
+                        websiteProductModal.style.display =
+                            "none";
+
+                    }, 200);
+
+                }
+
+
+                /*
+                 * Reload the page so the newly added
+                 * product appears in the Website Products table.
+                 */
+
+                window.location.reload();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Website Product Error:",
+                    error
+                );
+
+                alert(
+                    "Something went wrong while adding the website product."
+                );
+
+
+            } finally {
+
+                if (saveWebsiteProductBtn) {
+
+                    saveWebsiteProductBtn.disabled = false;
+
+                    saveWebsiteProductBtn.innerHTML =
+                        '<i class="fa-solid fa-check"></i> Add Product';
+
+                }
+
+            }
+
+        }
+    );
+
+});
+
+/* =========================================================
+   WEBSITE PRODUCTS - EDIT PRODUCT
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const editButtons = document.querySelectorAll(
+        '.icon-action.edit[title="Edit Website Product"]'
+    );
+
+    editButtons.forEach(function (button) {
+
+        button.addEventListener("click", async function () {
+
+            const productId = button.dataset.id;
+
+            if (!productId) {
+                alert("Website product ID is missing.");
+                return;
+            }
+
+            try {
+
+                const formData = new FormData();
+
+                formData.append(
+                    "inventory_variable_action",
+                    "get_website_product"
+                );
+
+                formData.append(
+                    "website_product_id",
+                    productId
+                );
+
+                const response = await fetch(
+                    window.location.href,
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    alert(
+                        result.message ||
+                        "Unable to load website product."
+                    );
+                    return;
+                }
+
+                const product = result.product;
+
+                /* Remove old edit modal if there is one */
+                const oldModal = document.getElementById(
+                    "editWebsiteProductModal"
+                );
+
+                if (oldModal) {
+                    oldModal.remove();
+                }
+
+                const isPetFood =
+                    String(product.category_name || "")
+                        .toLowerCase() === "pet food";
+
+                const petTypeDisplay =
+                    isPetFood ? "block" : "none";
+
+                const petTypeRequired =
+                    isPetFood ? "required" : "";
+
+                const currentImage =
+                    product.image_path
+                        ? '<img src="../' +
+                          escapeWebsiteProductHtml(product.image_path) +
+                          '" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb;">'
+                        : '<span style="color:#9ca3af;">No image</span>';
+
+                const overlay = document.createElement("div");
+
+                overlay.id = "editWebsiteProductModal";
+                overlay.className = "variable-modal-overlay";
+
+                overlay.innerHTML =
+                    '<div class="variable-modal">' +
+
+                        '<div class="variable-modal-header">' +
+
+                            '<div>' +
+                                '<h3>Edit Website Product</h3>' +
+                                '<p>Update the website product information.</p>' +
+                            '</div>' +
+
+                            '<button type="button" ' +
+                                'class="variable-modal-close" ' +
+                                'id="closeEditWebsiteProductModal">' +
+                                '<i class="fa-solid fa-xmark"></i>' +
+                            '</button>' +
+
+                        '</div>' +
+
+                        '<form id="editWebsiteProductForm" enctype="multipart/form-data">' +
+
+                            '<input type="hidden" ' +
+                                'name="inventory_variable_action" ' +
+                                'value="edit_website_product">' +
+
+                            '<input type="hidden" ' +
+                                'name="website_product_id" ' +
+                                'value="' + productId + '">' +
+
+                            '<div class="variable-modal-field">' +
+                                '<label>Product</label>' +
+                                '<input type="text" value="' +
+                                    escapeWebsiteProductHtml(product.item_name || "") +
+                                    '" readonly>' +
+                                '<small>Product name comes from the inventory item.</small>' +
+                            '</div>' +
+
+                            '<div class="variable-modal-field">' +
+                                '<label>Category</label>' +
+                                '<input type="text" value="' +
+                                    escapeWebsiteProductHtml(product.category_name || "") +
+                                    '" readonly>' +
+                            '</div>' +
+
+                            '<div class="variable-modal-field" ' +
+                                'id="editWebsiteProductPetTypeField" ' +
+                                'style="display:' + petTypeDisplay + ';">' +
+
+                                '<label>Pet Type</label>' +
+
+                                '<select name="pet_type" ' +
+                                    'id="editWebsiteProductPetType" ' +
+                                    petTypeRequired + '>' +
+
+                                    '<option value="">Select Pet Type</option>' +
+
+                                    '<option value="Dog" ' +
+                                        (product.pet_type === "Dog" ? "selected" : "") +
+                                    '>Dog</option>' +
+
+                                    '<option value="Cat" ' +
+                                        (product.pet_type === "Cat" ? "selected" : "") +
+                                    '>Cat</option>' +
+
+                                '</select>' +
+
+                            '</div>' +
+
+                            '<div class="variable-modal-field">' +
+                                '<label>Description</label>' +
+                                '<textarea name="description" rows="4" ' +
+                                    'placeholder="Enter product description">' +
+                                    escapeWebsiteProductHtml(product.description || "") +
+                                '</textarea>' +
+                            '</div>' +
+
+                            '<div class="variable-modal-field">' +
+                                '<label>Current Image</label>' +
+                                '<div style="margin:8px 0 12px;">' +
+                                    currentImage +
+                                '</div>' +
+
+                                '<label>Replace Image</label>' +
+                                '<input type="file" name="image" ' +
+                                    'accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">' +
+
+                                '<small>Leave empty to keep the current image. Maximum file size: 5MB.</small>' +
+                            '</div>' +
+
+                            '<div class="variable-modal-field">' +
+                                '<label>Status</label>' +
+
+                                '<select name="status" required>' +
+
+                                    '<option value="Visible" ' +
+                                        (product.status === "Visible" ? "selected" : "") +
+                                    '>Visible</option>' +
+
+                                    '<option value="Hidden" ' +
+                                        (product.status === "Hidden" ? "selected" : "") +
+                                    '>Hidden</option>' +
+
+                                '</select>' +
+
+                            '</div>' +
+
+                            '<div class="variable-modal-footer">' +
+
+                                '<button type="button" ' +
+                                    'class="variable-modal-cancel" ' +
+                                    'id="cancelEditWebsiteProductModal">' +
+                                    'Cancel' +
+                                '</button>' +
+
+                                '<button type="submit" ' +
+                                    'class="variable-modal-submit" ' +
+                                    'id="saveEditWebsiteProductBtn">' +
+                                    '<i class="fa-solid fa-check"></i> Save Changes' +
+                                '</button>' +
+
+                            '</div>' +
+
+                        '</form>' +
+
+                    '</div>';
+
+                document.body.appendChild(overlay);
+
+                requestAnimationFrame(function () {
+                    overlay.classList.add("show");
+                });
+
+
+                /* CLOSE MODAL */
+
+                function closeEditModal() {
+
+                    overlay.classList.remove("show");
+
+                    setTimeout(function () {
+                        overlay.remove();
+                    }, 200);
+
+                }
+
+                document.getElementById(
+                    "closeEditWebsiteProductModal"
+                ).addEventListener(
+                    "click",
+                    closeEditModal
+                );
+
+                document.getElementById(
+                    "cancelEditWebsiteProductModal"
+                ).addEventListener(
+                    "click",
+                    closeEditModal
+                );
+
+                overlay.addEventListener(
+                    "click",
+                    function (event) {
+
+                        if (event.target === overlay) {
+                            closeEditModal();
+                        }
+
+                    }
+                );
+
+
+                /* SAVE CHANGES */
+
+                const editForm = document.getElementById(
+                    "editWebsiteProductForm"
+                );
+
+                const saveButton = document.getElementById(
+                    "saveEditWebsiteProductBtn"
+                );
+
+                editForm.addEventListener(
+                    "submit",
+                    async function (event) {
+
+                        event.preventDefault();
+
+                        saveButton.disabled = true;
+
+                        saveButton.innerHTML =
+                            '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+                        const saveData = new FormData(editForm);
+
+                        try {
+
+                            const saveResponse = await fetch(
+                                window.location.href,
+                                {
+                                    method: "POST",
+                                    body: saveData
+                                }
+                            );
+
+                            const saveResult =
+                                await saveResponse.json();
+
+                            if (!saveResult.success) {
+
+                                alert(
+                                    saveResult.message ||
+                                    "Unable to update website product."
+                                );
+
+                                return;
+                            }
+
+                            alert(
+                                saveResult.message ||
+                                "Website product updated successfully."
+                            );
+
+                            window.location.reload();
+
+                        } catch (error) {
+
+                            console.error(
+                                "Edit Website Product Error:",
+                                error
+                            );
+
+                            alert(
+                                "Something went wrong while updating the website product."
+                            );
+
+                        } finally {
+
+                            saveButton.disabled = false;
+
+                            saveButton.innerHTML =
+                                '<i class="fa-solid fa-check"></i> Save Changes';
+
+                        }
+
+                    }
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Get Website Product Error:",
+                    error
+                );
+
+                alert(
+                    "Something went wrong while loading the website product."
+                );
+
+            }
+
+        });
+
+    });
+
+});
+
+
+/* =========================================================
+   WEBSITE PRODUCTS - HTML ESCAPE
+========================================================= */
+
+function escapeWebsiteProductHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+/* =========================================================
+   WEBSITE PRODUCTS - DELETE
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const deleteButtons = document.querySelectorAll(
+        '.icon-action.delete[title="Delete Website Product"]'
+    );
+
+    deleteButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const productId = button.dataset.id;
+
+            if (!productId) {
+                showMessageModal(
+                    "error",
+                    "Unable to Delete Website Product",
+                    "Website product ID is missing."
+                );
+                return;
+            }
+
+            const row = button.closest("tr");
+
+            let productName = "this website product";
+
+            if (row) {
+                const firstCell = row.querySelector("td");
+
+                if (firstCell) {
+                    const strong =
+                        firstCell.querySelector("strong");
+
+                    if (strong) {    
+                        productName =
+                            strong.textContent.trim() ||
+                            "this website product";
+
+                    } else {
+                        productName =
+                        firstCell.textContent.trim() ||
+                        "this website product";
+                    }            
+                }
+            }
+
+            window.showConfirmModal(
+                "Delete Website Product?",
+                `Are you sure you want to delete "${productName}"? This action cannot be undone.`,
+                "Delete",
+                async function () {
+
+                    button.disabled = true;
+
+                    const formData = new FormData();
+
+                    formData.append(
+                        "inventory_variable_action",
+                        "delete_website_product"
+                    );
+
+                    formData.append(
+                        "website_product_id",
+                        productId
+                    );
+
+                    try {
+
+                        const response = await fetch(
+                            window.location.href,
+                            {
+                                method: "POST",
+                                body: formData
+                            }
+                        );
+
+                        const result =
+                            await response.json();
+
+                        if (!result.success) {
+                            throw new Error(
+                                result.message ||
+                                "Unable to delete website product."
+                            );
+                        }
+
+                        showMessageModal(
+                            "success",
+                            "Website Product Deleted",
+                            result.message ||
+                            "Website product deleted successfully."
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 900);
+
+                    } catch (error) {
+
+                        console.error(
+                            "Delete Website Product Error:",
+                            error
+                        );
+
+                        window.showMessageModal(
+                            "error",
+                            "Unable to Delete Website Product",
+                            error.message ||
+                            "Something went wrong while deleting the website product."
+                        );
+
+                        button.disabled = false;
+                    }
+
+                }
+            );
+
+        });
+
+    });
 
 });

@@ -94,7 +94,9 @@ if (!empty($_POST["services"]) && is_array($_POST["services"])) {
         );
 
         if (is_array($decodedService)) {
-            $decodedService["service_source"] = "Additional";
+            $decodedService["service_source"] = 
+                $decodedService["service_source"] ?? "Additional";
+
             $medicalRecordServices[] = $decodedService;
         }
     }
@@ -400,7 +402,9 @@ if ($appointmentId > 0) {
                 quantity,
                 unit_price,
                 amount,
-                service_source
+                service_source,
+                next_visit,
+                no_days_return
             )
             VALUES (
                 ?,
@@ -411,7 +415,9 @@ if ($appointmentId > 0) {
                 1,
                 0.00,
                 0.00,
-                'Appointment'
+                'Appointment',
+                ?,
+                ?
             )
         ";
 
@@ -444,14 +450,30 @@ if ($appointmentId > 0) {
             trim(
                 $appointmentService["service"] ?? ""
             );
+        
+        $appointmentNextVisit =
+    !empty(
+        $appointmentServiceData["next_visit"] ?? ""
+    )
+        ? $appointmentServiceData["next_visit"]
+        : $nextVisit;
+
+$appointmentNoDaysReturn =
+    isset(
+        $appointmentServiceData["no_days_return"]
+    )
+        ? (int) $appointmentServiceData["no_days_return"]
+        : $noDaysReturn;    
 
         mysqli_stmt_bind_param(
             $insertServiceStmt,
-            "issd",
+            "issdsi",
             $medicalRecordId,
             $appointmentCategory,
             $appointmentServiceName,
-            $weight
+            $weight,
+            $appointmentNextVisit,
+            $appointmentNoDaysReturn
         );
 
         if (!mysqli_stmt_execute(
@@ -504,19 +526,23 @@ if (!empty($medicalRecordServices)) {
             quantity,
             unit_price,
             amount,
-            service_source
-        )
-        VALUES (
-            ?,
-            NULLIF(?, 0),
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            'Additional'
-        )
+            service_source,
+                        next_visit,
+                        no_days_return
+                    )
+                    VALUES (
+                        ?,
+                        NULLIF(?, 0),
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        'Additional',
+                        ?,
+                        ?
+                    )
     ";
 
     $additionalServiceStmt =
@@ -544,6 +570,13 @@ if (!empty($medicalRecordServices)) {
     ) {
 
         if (!is_array($serviceData)) {
+            continue;
+        }
+
+        if (
+            ($serviceData["service_source"] ?? "Additional")
+            !== "Additional"
+        ) {
             continue;
         }
 
@@ -588,6 +621,15 @@ if (!empty($medicalRecordServices)) {
                 $quantity * $unitPrice,
                 2
             );
+        $serviceNextVisit =
+    !empty($serviceData["next_visit"])
+        ? $serviceData["next_visit"]
+        : null;
+
+$serviceNoDaysReturn =
+    isset($serviceData["no_days_return"])
+        ? (int) $serviceData["no_days_return"]
+        : null;    
 
         if (
             $serviceName === "" ||
@@ -599,7 +641,7 @@ if (!empty($medicalRecordServices)) {
 
         mysqli_stmt_bind_param(
             $additionalServiceStmt,
-            "iissdddd",
+            "iissddddsi",
             $medicalRecordId,
             $serviceId,
             $serviceCategory,
@@ -607,7 +649,9 @@ if (!empty($medicalRecordServices)) {
             $serviceWeight,
             $quantity,
             $unitPrice,
-            $amount
+            $amount,
+            $serviceNextVisit,
+            $serviceNoDaysReturn
         );
 
         if (!mysqli_stmt_execute(

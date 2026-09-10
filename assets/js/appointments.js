@@ -1684,14 +1684,25 @@ const successModalDone =
 
 function showAppointmentSuccess(){
 
-    if(appointmentSuccessModal){
+    const successModal =
+        document.getElementById(
+            "appointmentSuccessModal"
+        );
 
-        appointmentSuccessModal.classList.add(
-            "show"
+    if(successModal){
+
+        // Ilipat sa body para siguradong nasa ibabaw
+        document.body.appendChild(successModal);
+
+        successModal.classList.add("show");
+
+    }else{
+
+        console.error(
+            "Success modal not found."
         );
 
     }
-
 }
 
 
@@ -1870,9 +1881,19 @@ if(saveAppointment){
 
 
         // Owner Information
+        const ownerLastName = document.getElementById("ownerLastName").value.trim();
+        const ownerFirstName = document.getElementById("ownerFirstName").value.trim();
+        const ownerMiddleName = document.getElementById("ownerMiddleName").value.trim();
+
+        const ownerName = [
+            ownerLastName,
+            ownerFirstName,
+            ownerMiddleName
+        ].filter(Boolean).join(", ");  
+
         formData.append(
             "ownerName",
-            document.getElementById("ownerName").value
+            ownerName
         );
 
         formData.append(
@@ -1928,8 +1949,8 @@ if(saveAppointment){
         );
 
         formData.append(
-            "estimatedAge",
-            document.getElementById("estimatedAge").value
+            "dateOfBirth",
+            document.getElementById("dateOfBirth").value
         );
 
 
@@ -1954,13 +1975,16 @@ if(saveAppointment){
 
             if(result.success){
 
-                resetAppointmentForm();
-
                // Close Add Appointment modal
                modal.classList.remove("show");
 
                // Show custom success modal
                showAppointmentSuccess();
+
+               // Reset form AFTER showing success modal
+               setTimeout(function(){
+                    resetAppointmentForm();
+                }, 100);
 
             }else{
 
@@ -2039,7 +2063,15 @@ function toggleClientType(){
 
         // Owner
         document.getElementById(
-            "ownerName"
+            "ownerLastName"
+        ).value = "";
+
+        document.getElementById(
+            "ownerFirstName"
+        ).value = "";
+
+        document.getElementById(
+            "ownerMiddleName"
         ).value = "";
 
         document.getElementById(
@@ -2081,7 +2113,7 @@ function toggleClientType(){
         ).value = "";
 
         document.getElementById(
-            "estimatedAge"
+            "dateOfBirth"
         ).value = "";
 
 
@@ -2175,7 +2207,7 @@ function toggleClientType(){
         ).value = "";
 
         document.getElementById(
-            "estimatedAge"
+            "dateOfBirth"
         ).value = "";
 
         // ===========================
@@ -2286,7 +2318,7 @@ function setPetFieldsEditable(editable){
     document.getElementById("weight").readOnly =
         !editable;
 
-    document.getElementById("estimatedAge").readOnly =
+    document.getElementById("dateOfBirth").readOnly =
         !editable;
 
 }
@@ -2296,7 +2328,8 @@ function setPetFieldsEditable(editable){
 // ===========================
 
 const newClientOwnerFields = [
-    document.getElementById("ownerName"),
+    document.getElementById("ownerLastName"),
+    document.getElementById("ownerFirstName"),
     document.getElementById("contactNumber"),
     document.getElementById("address")
 ];
@@ -2377,7 +2410,7 @@ function clearPetFields(){
 
     document.getElementById("weight").value = "";
 
-    document.getElementById("estimatedAge").value = "";
+    document.getElementById("dateOfBirth").value = "";
 
     document.getElementById(
         "otherBreedContainer"
@@ -2669,10 +2702,7 @@ if(isExistingClient){
                 "gender"
             ),
 
-            document.getElementById(
-                "estimatedAge"
-            )
-
+           
         ];
 
 
@@ -2730,7 +2760,11 @@ if(isExistingClient){
         const newClientFields = [
 
             document.getElementById(
-                "ownerName"
+                "ownerLastName"
+            ),
+
+             document.getElementById(
+                "ownerFirstName"
             ),
 
             document.getElementById(
@@ -2761,10 +2795,7 @@ if(isExistingClient){
                 "gender"
             ),
 
-            document.getElementById(
-                "estimatedAge"
-            )
-
+           
         ];
 
 
@@ -2840,7 +2871,7 @@ if(isExistingClient){
 // ===========================
 
 const requiredFields = document.querySelectorAll(
-    "#serviceCategory, #service, #appointmentDate, #appointmentTime, #appointmentType, #reason, #ownerName, #contactNumber, #address, #petName, #species, #breed, #color, #gender, #estimatedAge, #otherBreed"
+    "#serviceCategory, #service, #appointmentDate, #appointmentTime, #appointmentType, #reason, #ownerLastName, #ownerFirstName, #contactNumber, #petName, #species, #breed, #color, #gender, #otherBreed"
 );
 
 requiredFields.forEach(function(field){
@@ -3874,8 +3905,8 @@ existingPet.addEventListener(
     document.getElementById("weight").value =
         selectedPet.weight || "";
 
-    document.getElementById("estimatedAge").value =
-        selectedPet.estimated_age || "";
+    document.getElementById("dateOfBirth").value =
+        selectedPet.date_of_birth || "";
 
 
     // ===========================
@@ -3948,7 +3979,7 @@ breed.disabled = true;
 
     document.getElementById("weight").readOnly = true;
 
-    document.getElementById("estimatedAge").readOnly = true;
+    document.getElementById("dateOfBirth").readOnly = true;
 
 });
 
@@ -3994,7 +4025,15 @@ function resetAppointmentForm(){
     // ===========================
 
     document.getElementById(
-        "ownerName"
+        "ownerLastName"
+    ).value = "";
+
+    document.getElementById(
+        "ownerFirstName"
+    ).value = "";
+
+    document.getElementById(
+        "ownerMiddleName"
     ).value = "";
 
     document.getElementById(
@@ -4053,7 +4092,7 @@ function resetAppointmentForm(){
     ).value = "";
 
     document.getElementById(
-        "estimatedAge"
+        "dateOfBirth"
     ).value = "";
 
 

@@ -219,6 +219,320 @@ mysqli_begin_transaction(
 
 
 try {
+    /* =====================================================
+   INVENTORY DEDUCTION
+   FEFO — FIRST EXPIRY, FIRST OUT
+
+   Only:
+   - Medicine
+   - Supplements
+   - Pet Food
+
+   are automatically deducted through Billing.
+====================================================== */
+
+$productItemsSql = "
+    SELECT
+        bi.billing_item_id,
+        bi.inventory_item_id,
+        bi.item_name,
+        bi.quantity
+    FROM billing_items bi
+
+    INNER JOIN inventory_items ii
+        ON ii.item_id = bi.inventory_item_id
+
+    WHERE bi.billing_id = ?
+      AND bi.item_type = 'Product'
+      AND bi.inventory_item_id IS NOT NULL
+      AND ii.category_id IN (1, 2, 3)
+
+    ORDER BY bi.billing_item_id ASC
+";
+
+$productItemsStmt = mysqli_prepare(
+    $conn,
+    $productItemsSql
+);
+
+if (!$productItemsStmt) {
+    throw new Exception(
+        "Unable to load billing products."
+    );
+}
+
+mysqli_stmt_bind_param(
+    $productItemsStmt,
+    "i",
+    $billingId
+);
+
+mysqli_stmt_execute(
+    $productItemsStmt
+);
+
+$productItemsResult =
+    mysqli_stmt_get_result(
+        $productItemsStmt
+    );
+
+
+while (
+    $productItem =
+        mysqli_fetch_assoc(
+            $productItemsResult
+        )
+) {
+
+    $inventoryItemId =
+        (int)$productItem["inventory_item_id"];
+
+    $remainingToDeduct =
+        (float)$productItem["quantity"];
+
+
+    /* -------------------------------------------------
+       GET AVAILABLE BATCHES
+       FEFO:
+       1. Expiration date earliest first
+       2. No-expiration batches last
+       3. Earlier received first
+       4. Stock ID as final tie-breaker
+    ------------------------------------------------- */
+
+    $batchSql = "
+        SELECT
+            stock_id,
+            batch_number,
+            quantity,
+            expiration_date,
+            date_received
+        FROM inventory_stock
+        WHERE item_id = ?
+          AND quantity > 0
+        ORDER BY
+            (expiration_date IS NULL) ASC,
+            expiration_date ASC,
+            date_received ASC,
+            stock_id ASC
+        FOR UPDATE
+    ";
+
+    $batchStmt = mysqli_prepare(
+        $conn,
+        $batchSql
+    );
+
+    if (!$batchStmt) {
+        throw new Exception(
+            "Unable to load inventory batches."
+        );
+    }
+
+    mysqli_stmt_bind_param(
+        $batchStmt,
+        "i",
+        $inventoryItemId
+    );
+
+    mysqli_stmt_execute(
+        $batchStmt
+    );
+
+    $batchResult =
+        mysqli_stmt_get_result(
+            $batchStmt
+        );
+
+
+    while (
+        $batch =
+            mysqli_fetch_assoc(
+                $batchResult
+            )
+    ) {
+
+        if ($remainingToDeduct <= 0) {
+            break;
+        }
+
+        $available =
+            (float)$batch["quantity"];
+
+        if ($available <= 0) {
+            continue;
+        }
+
+
+        /* ---------------------------------------------
+           Determine how much to deduct from this batch
+        --------------------------------------------- */
+
+        $deductQuantity =
+            min(
+                $remainingToDeduct,
+                $available
+            );
+
+
+        $newQuantity =
+            $available - $deductQuantity;
+
+
+        /* ---------------------------------------------
+           UPDATE REMAINING BATCH STOCK
+        --------------------------------------------- */
+
+        $updateStockSql = "
+            UPDATE inventory_stock
+            SET quantity = ?
+            WHERE stock_id = ?
+              AND item_id = ?
+        ";
+
+        $updateStockStmt =
+            mysqli_prepare(
+                $conn,
+                $updateStockSql
+            );
+
+        if (!$updateStockStmt) {
+            throw new Exception(
+                "Unable to update inventory stock."
+            );
+        }
+
+        mysqli_stmt_bind_param(
+            $updateStockStmt,
+            "dii",
+            $newQuantity,
+            $batch["stock_id"],
+            $inventoryItemId
+        );
+
+        if (
+            !mysqli_stmt_execute(
+                $updateStockStmt
+            )
+        ) {
+            throw new Exception(
+                "Failed to deduct inventory stock."
+            );
+        }
+
+        mysqli_stmt_close(
+            $updateStockStmt
+        );
+
+
+        /* ---------------------------------------------
+           RECORD STOCK OUT
+        --------------------------------------------- */
+
+        $stockOutDate =
+            date("Y-m-d");
+
+        $reason =
+            "Dispensed/Sold";
+
+        $referenceNumber =
+            "Billing #" . $billingId;
+
+        $remarks =
+            "Automatic inventory deduction from Billing #" .
+            $billingId .
+            " — FEFO batch " .
+            $batch["batch_number"];
+
+
+        $insertStockOutSql = "
+            INSERT INTO inventory_stock_out
+            (
+                stock_id,
+                quantity,
+                stock_out_date,
+                reason,
+                reference_number,
+                remarks
+            )
+            VALUES
+            (
+                ?,
+                ?,
+                ?,
+                ?,
+                NULLIF(?, ''),
+                NULLIF(?, '')
+            )
+        ";
+
+        $insertStockOutStmt =
+            mysqli_prepare(
+                $conn,
+                $insertStockOutSql
+            );
+
+        if (!$insertStockOutStmt) {
+            throw new Exception(
+                "Unable to record inventory Stock Out."
+            );
+        }
+
+        mysqli_stmt_bind_param(
+            $insertStockOutStmt,
+            "idssss",
+            $batch["stock_id"],
+            $deductQuantity,
+            $stockOutDate,
+            $reason,
+            $referenceNumber,
+            $remarks
+        );
+
+        if (
+            !mysqli_stmt_execute(
+                $insertStockOutStmt
+            )
+        ) {
+            throw new Exception(
+                "Failed to record inventory Stock Out."
+            );
+        }
+
+        mysqli_stmt_close(
+            $insertStockOutStmt
+        );
+
+
+        $remainingToDeduct -=
+            $deductQuantity;
+    }
+
+
+    mysqli_stmt_close(
+        $batchStmt
+    );
+
+
+    /* ---------------------------------------------
+       INSUFFICIENT STOCK
+    --------------------------------------------- */
+
+    if ($remainingToDeduct > 0.0001) {
+
+        throw new Exception(
+            "Insufficient inventory stock for " .
+            $productItem["item_name"] .
+            ". Available stock is not enough to complete this sale."
+        );
+    }
+}
+
+mysqli_stmt_close(
+    $productItemsStmt
+);
+
+
 
 
     /* =====================================================
@@ -276,15 +590,17 @@ try {
         $billingStmt
     );
 
+if (!empty($billing["appointment_id"])) {
 
-    /* =====================================================
-       UPDATE MEDICAL RECORD
-       LINK BILLING + SAVE ACTUAL AMOUNT PAID
-       -----------------------------------------------------
-       Medical records are created before billing, so the
-       medical record may not have billing_id yet. We link
-       it using the shared appointment_id.
-    ====================================================== */
+     /* =====================================================
+   UPDATE MEDICAL RECORD
+   LINK BILLING + SAVE ACTUAL AMOUNT PAID
+   -----------------------------------------------------
+   Only appointment-based billing has a medical record.
+   Purchase-only billing has no appointment.
+  ====================================================== */
+
+ if (!empty($billing["appointment_id"])) {
 
     $updateMedicalRecord = "
         UPDATE medical_records
@@ -332,30 +648,34 @@ try {
         $medicalRecordStmt
     );
 
+}    
+}
+
+if (!empty($billing["appointment_id"])) {
 
     /* =====================================================
-       UPDATE APPOINTMENT
-       COMPLETED = FINAL APPOINTMENT STATUS
-    ====================================================== */
+   UPDATE APPOINTMENT
+   COMPLETED = FINAL APPOINTMENT STATUS
+   -----------------------------------------------------
+   Only appointment-based billing has an appointment.
+   Purchase-only billing has no appointment.
+   ====================================================== */
+
+if (!empty($billing["appointment_id"])) {
 
     $updateAppointment = "
         UPDATE appointments
-
         SET
             status = 'Completed',
-            billing_created = 1,
-            is_archived = 1
-
+            billing_created = 1
         WHERE appointment_id = ?
     ";
-
 
     $appointmentStmt =
         mysqli_prepare(
             $conn,
             $updateAppointment
         );
-
 
     if (!$appointmentStmt) {
 
@@ -365,13 +685,11 @@ try {
 
     }
 
-
     mysqli_stmt_bind_param(
         $appointmentStmt,
         "i",
         $billing["appointment_id"]
     );
-
 
     if (
         !mysqli_stmt_execute(
@@ -385,11 +703,11 @@ try {
 
     }
 
-
     mysqli_stmt_close(
         $appointmentStmt
     );
-
+}
+}
 
     /* =====================================================
        COMMIT
@@ -417,19 +735,6 @@ logAudit(
     (string) $billingId
 );
 
-// =========================================================
-// AUDIT LOG — BILLING AUTOMATICALLY ARCHIVED
-// =========================================================
-
-logAudit(
-    $conn,
-    "Billing",
-    "Archived",
-    "Billing #" .
-        $billingId .
-        " was automatically archived after payment was confirmed.",
-    (string) $billingId
-);
 
 
     echo json_encode([

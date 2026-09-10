@@ -2,6 +2,7 @@
 
 session_start();
 
+
 if (
     !isset($_SESSION["account_id"]) ||
     !isset($_SESSION["role"]) ||
@@ -41,6 +42,7 @@ $sql = "
         b.created_at,
 
         c.owner_name,
+        b.buyer_name,
 
         p.pet_name,
 
@@ -49,13 +51,13 @@ $sql = "
 
     FROM billing b
 
-    INNER JOIN customers c
+    LEFT JOIN customers c
         ON b.customer_id = c.customer_id
 
-    INNER JOIN pets p
+    LEFT JOIN pets p
         ON b.pet_id = p.pet_id
 
-    INNER JOIN appointments a
+    LEFT JOIN appointments a
         ON b.appointment_id = a.appointment_id
 
     WHERE b.billing_id = ?
@@ -136,6 +138,30 @@ if ($itemStmt) {
     }
 }
 
+/* =========================================================
+   SEPARATE SERVICES AND PRODUCTS
+========================================================= */
+
+$serviceItems = [];
+$productItems = [];
+
+foreach ($items as $item) {
+
+    if (
+        strtolower(
+            trim($item["item_type"] ?? "")
+        ) === "product"
+    ) {
+
+        $productItems[] = $item;
+
+    } else {
+
+        $serviceItems[] = $item;
+
+    }
+}
+
 
 /* =========================================================
    BILLING NUMBER
@@ -159,40 +185,72 @@ $billingNumber =
 
 
 /* =========================================================
-   APPOINTMENT REFERENCE
+   APPOINTMENT / PURCHASE REFERENCE
 ========================================================= */
 
-$appointmentReference =
-    "APT-" .
-    str_pad(
-        $billing["appointment_id"],
-        4,
-        "0",
-        STR_PAD_LEFT
-    );
+if (!empty($billing["appointment_id"])) {
+
+    $appointmentReference =
+        "APT-" .
+        str_pad(
+            $billing["appointment_id"],
+            4,
+            "0",
+            STR_PAD_LEFT
+        );
+
+} else {
+
+    $appointmentReference =
+        "WALK-IN SALE";
+
+}
 
 
 /* =========================================================
    DATE / TIME
 ========================================================= */
 
-$formattedDate =
-    date(
-        "F d, Y",
-        strtotime(
-            $billing["appointment_date"]
-        )
-    );
+if (
+    !empty($billing["appointment_date"])
+) {
 
-$formattedTime =
-    date(
-        "g:i A",
-        strtotime(
-            $billing["appointment_time"]
-        )
-    );
+    $formattedDate =
+        date(
+            "F d, Y",
+            strtotime(
+                $billing["appointment_date"]
+            )
+        );
 
+    $formattedTime =
+        !empty($billing["appointment_time"])
+            ? date(
+                "g:i A",
+                strtotime(
+                    $billing["appointment_time"]
+                )
+            )
+            : "—";
 
+} else {
+
+    /*
+     * Purchase Billing has no appointment.
+     * Use billing creation date instead.
+     */
+
+    $formattedDate =
+        date(
+            "F d, Y",
+            strtotime(
+                $billing["created_at"]
+            )
+        );
+
+    $formattedTime = "—";
+
+}
 /* =========================================================
    GET ACTIVE BILLING SERVICES
    ---------------------------------------------------------
@@ -349,6 +407,77 @@ if (
                 $service["price_increment"] !== null
                     ? (float)$service["price_increment"]
                     : null
+        ];
+    }
+}
+
+/* =========================================================
+   GET ACTIVE INVENTORY ITEMS FOR BILLING
+   Medicine, Supplements, and Pet Food only
+========================================================= */
+
+$billingInventoryItems = [];
+
+$billingInventorySql = "
+    SELECT
+        i.item_id,
+        i.item_code,
+        i.item_name,
+        i.category_id,
+        c.category_name,
+        i.retail_price,
+        u.unit_name,
+        u.abbreviation,
+
+        COALESCE(
+            (
+                SELECT SUM(s.quantity)
+                FROM inventory_stock s
+                WHERE s.item_id = i.item_id
+            ),
+            0
+        ) AS current_stock
+
+    FROM inventory_items i
+
+    INNER JOIN inventory_categories c
+        ON c.category_id = i.category_id
+
+    LEFT JOIN inventory_units u
+        ON u.unit_id = i.unit_id    
+
+    WHERE i.status = 'Active'
+        AND c.status = 'Active'
+        AND c.category_id IN (1, 2, 3)
+
+    ORDER BY
+        c.category_name ASC,
+        i.item_name ASC
+";
+
+$billingInventoryResult = mysqli_query(
+    $conn,
+    $billingInventorySql
+);
+
+if ($billingInventoryResult) {
+
+    while ($row = mysqli_fetch_assoc(
+        $billingInventoryResult
+    )) {
+
+        $billingInventoryItems[] = [
+            "item_id" => (int) $row["item_id"],
+            "item_code" => $row["item_code"],
+            "item_name" => $row["item_name"],
+            "category_id" => (int) $row["category_id"],
+            "category_name" => $row["category_name"],
+            "retail_price" => (float) $row["retail_price"],
+            "unit_name" => $row["unit_name"],
+            "abbreviation" => $row["abbreviation"],
+            "current_stock" => (float) $row["current_stock"],
+                
+            
         ];
     }
 }
@@ -621,10 +750,17 @@ if (
                                 <strong>
 
                                     <?= htmlspecialchars(
-                                        $billing[
-                                            "owner_name"
-                                        ]
-                                    ) ?>
+                                        !empty($billing["owner_name"])
+                                            ? $billing["owner_name"]
+                                            : (
+                                                !empty($billing["buyer_name"])
+                                                    ? $billing["buyer_name"]
+                                                    : "Walk-in Customer"
+                                            )
+                                    ) ?>        
+
+                                        
+                                        
 
                                 </strong>
 
@@ -660,9 +796,10 @@ if (
                                 <strong>
 
                                     <?= htmlspecialchars(
-                                        $billing[
-                                            "pet_name"
-                                        ]
+                                        !empty($billing["pet_name"])
+                                            ? $billing["pet_name"]
+                                            : "No Pet"
+                                        
                                     ) ?>
 
                                 </strong>
@@ -789,215 +926,265 @@ if (
 
                         <!-- SERVICES HEADER -->
 
-                        <div
-                            class="section-title"
-                        >
+<div class="section-title">
+
+    <div>
+
+        <i class="fa-solid fa-paw"></i>
+
+        <span>
+            Services
+        </span>
+
+    </div>
+
+</div>
 
 
-                            <div>
+<!-- SERVICES TABLE -->
 
-                                <i
-                                    class="fa-solid fa-paw"
-                                ></i>
+<div class="service-table-wrapper">
+
+    <table class="statement-table">
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    DESCRIPTION
+                </th>
+
+                <th>
+                    QTY
+                </th>
+
+                <th>
+                    UNIT PRICE
+                </th>
+
+                <th>
+                    TOTAL
+                </th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <?php if (empty($serviceItems)): ?>
+
+                <tr>
+
+                    <td
+                        colspan="4"
+                        class="no-items"
+                    >
+                        No services added.
+                    </td>
+
+                </tr>
+
+            <?php else: ?>
+
+                <?php foreach ($serviceItems as $item): ?>
+
+                    <tr>
+
+                        <td>
+
+                            <span class="item-type">
+                                <?= htmlspecialchars(
+                                    $item["item_type"]
+                                ) ?>
+                            </span>
+
+                            <?= htmlspecialchars(
+                                $item["item_name"]
+                            ) ?>
+
+                        </td>
+
+                        <td>
+
+                            <?= number_format(
+                                (float)$item["quantity"],
+                                0
+                            ) ?>
+
+                        </td>
+
+                        <td>
+
+                            ₱<?= number_format(
+                                (float)$item["unit_price"],
+                                2
+                            ) ?>
+
+                        </td>
+
+                        <td>
+
+                            ₱<?= number_format(
+                                (float)$item["amount"],
+                                2
+                            ) ?>
+
+                        </td>
+
+                    </tr>
+
+                <?php endforeach; ?>
+
+            <?php endif; ?>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<!-- PRODUCTS HEADER -->
+
+<div class="section-title product-section-title">
+
+    <div>
+
+        <i class="fa-solid fa-box"></i>
+
+        <span>
+            Products
+        </span>
+
+    </div>
 
 
-                                <span>
-                                    Services
-                                </span>
+    <button
+        type="button"
+        class="add-service-btn"
+        id="openAddServiceBtn"
+    >
 
-                            </div>
+        <i class="fa-solid fa-plus"></i>
+
+        Add Item
+
+    </button>
+
+</div>
 
 
-                            <button
-                                type="button"
-                                class="add-service-btn"
-                                id="openAddServiceBtn"
+<!-- PRODUCTS TABLE -->
+
+<div class="service-table-wrapper">
+
+    <table class="statement-table">
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    DESCRIPTION
+                </th>
+
+                <th>
+                    QTY
+                </th>
+
+                <th>
+                    UNIT PRICE
+                </th>
+
+                <th>
+                    TOTAL
+                </th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <?php if (empty($productItems)): ?>
+
+                <tr>
+
+                    <td
+                        colspan="4"
+                        class="no-items"
+                    >
+                        No products added.
+                    </td>
+
+                </tr>
+
+            <?php else: ?>
+
+                <?php foreach ($productItems as $item): ?>
+
+                    <tr>
+
+                        <td>
+
+                            <span class="item-type">
+                                PRODUCT
+                            </span>
+
+                            <?= htmlspecialchars(
+                                $item["item_name"]
+                            ) ?>
+
+                        </td>
+
+
+                        <td>
+
+                            <input
+                                type="number"
+                                class="billing-product-quantity"
+                                min="1"
+                                step="1"
+                                value="<?= (float)$item["quantity"] ?>"
+                                data-item-id="<?= (int)$item["billing_item_id"] ?>"
                             >
 
-                                <i
-                                    class="fa-solid fa-plus"
-                                ></i>
+                        </td>
 
-                                Add Service
 
-                            </button>
+                        <td>
 
+                            ₱<?= number_format(
+                                (float)$item["unit_price"],
+                                2
+                            ) ?>
 
-                        </div>
+                        </td>
 
 
-                        <!-- SERVICES TABLE -->
-
-                        <div
-                            class="service-table-wrapper"
-                        >
-
-
-                            <table
-                                class="statement-table"
-                            >
-
-
-                                <thead>
-
-                                    <tr>
-
-                                        <th>
-                                            DESCRIPTION
-                                        </th>
-
-                                        <th>
-                                            QTY
-                                        </th>
-
-                                        <th>
-                                            UNIT PRICE
-                                        </th>
-
-                                        <th>
-                                            TOTAL
-                                        </th>
-
-                                    </tr>
-
-                                </thead>
-
-
-                                <tbody
-                                    id="billingItemsBody"
-                                >
-
-
-                                    <?php if (
-                                        empty($items)
-                                    ): ?>
-
-
-                                        <tr>
-
-                                            <td
-                                                colspan="4"
-                                                class="no-items"
-                                            >
-
-                                                No services added.
-
-                                            </td>
-
-                                        </tr>
-
-
-                                    <?php else: ?>
-
-
-                                        <?php foreach (
-                                            $items as $item
-                                        ): ?>
-
-
-                                            <tr>
-
-
-                                                <td>
-
-                                                    <span
-                                                        class="item-type"
-                                                    >
-
-                                                        <?= htmlspecialchars(
-                                                            $item[
-                                                                "item_type"
-                                                            ]
-                                                        ) ?>
-
-                                                    </span>
-
-
-                                                    <?= htmlspecialchars(
-                                                        $item[
-                                                            "item_name"
-                                                        ]
-                                                    ) ?>
-
-                                                </td>
-
-
-                                                <td>
-
-                                                    <?= number_format(
-                                                        (float)
-                                                        $item[
-                                                            "quantity"
-                                                        ],
-                                                        0
-                                                    ) ?>
-
-                                                </td>
-
-
-                                                <td>
-
-                                                    ₱<?= number_format(
-                                                        (float)
-                                                        $item[
-                                                            "unit_price"
-                                                        ],
-                                                        2
-                                                    ) ?>
-
-                                                </td>
-
-
-                                                <td>
-
-                                                    ₱<?= number_format(
-                                                        (float)
-                                                        $item[
-                                                            "amount"
-                                                        ],
-                                                        2
-                                                    ) ?>
-
-                                                </td>
-
-
-                                            </tr>
-
-
-                                        <?php endforeach; ?>
-
-
-                                    <?php endif; ?>
-
-
-                                </tbody>
-
-
-                            </table>
-
-
-                        </div>
-
-
-                        <!-- NOTES -->
-
-                        <div
-                            class="notes-box"
-                        >
+                        <td>
 
                             <strong>
-                                Notes
+                                ₱<?= number_format(
+                                    (float)$item["amount"],
+                                    2
+                                ) ?>
                             </strong>
 
+                        </td>
 
-                            <p>
-                                Thank you for trusting 3K Pet Solution Animal Clinic!
-                            </p>
+                    </tr>
 
-                        </div>
+                <?php endforeach; ?>
 
+            <?php endif; ?>
 
-                    </div>
+        </tbody>
+
+    </table>
+
+</div>
 
 
                     <!-- RIGHT SIDE -->
@@ -1115,16 +1302,54 @@ if (
                             </div>
 
 
-                            <button
-                                type="button"
-                                class="confirm-payment-btn"
-                                id="confirmPaymentBtn"
-                                data-id="<?= $billingId ?>"
-                            >
+                            <?php
+$isPaid = strtolower(
+    trim(
+        $billing["payment_status"] ?? ""
+    )
+) === "paid";
+?>
 
-                                Confirm Payment
+<button
+    type="button"
+    class="confirm-payment-btn"
+    id="confirmPaymentBtn"
+    data-id="<?= $billingId ?>"
+>
+    Confirm Payment
+</button>
 
-                            </button>
+<?php if ($isPaid): ?>
+
+    <div class="billing-document-actions">
+
+        <button
+            type="button"
+            class="billing-print-btn"
+            id="printReceiptBtn"
+        >
+            <i class="fa-solid fa-print"></i>
+            Print Receipt
+        </button>
+
+        <button
+            type="button"
+            class="billing-download-btn"
+            id="downloadBillingBtn"
+            data-id="<?= $billingId ?>"
+            data-number="<?= htmlspecialchars(
+                $billingNumber,
+                ENT_QUOTES,
+                "UTF-8"
+            ) ?>"
+        >
+            <i class="fa-solid fa-download"></i>
+            Download
+        </button>
+
+    </div>
+
+<?php endif; ?>
 
 
                         </div>
@@ -1149,7 +1374,7 @@ if (
 
 
 <!-- =========================================================
-     ADD SERVICE MODAL
+     ADD ITEM MODAL
 ========================================================= -->
 
 <div
@@ -1157,103 +1382,63 @@ if (
     id="serviceModal"
 >
 
-
-    <div
-        class="service-modal"
-    >
-
+    <div class="service-modal">
 
         <!-- MODAL HEADER -->
 
-        <div
-            class="service-modal-header"
-        >
-
+        <div class="service-modal-header">
 
             <div>
 
                 <h3>
-                    Add Service
+                    Add Items
                 </h3>
 
-
                 <p>
-                    Add an additional service to this billing.
+                    Add multiple medicines, pet food, or supplements to this bill.
                 </p>
 
             </div>
-
 
             <button
                 type="button"
                 id="closeServiceModal"
                 class="modal-close-btn"
             >
-
-                <i
-                    class="fa-solid fa-xmark"
-                ></i>
-
+                <i class="fa-solid fa-xmark"></i>
             </button>
-
 
         </div>
 
 
         <!-- FORM -->
 
-        <div
-            class="service-form"
-        >
+        <div class="service-form">
 
+            <!-- ITEM CATEGORY -->
 
-            <div
-                class="form-group"
-            >
+            <div class="form-group">
 
-                <label>
-                    Service Category
+                <label for="itemCategory">
+                    Item Category
                 </label>
 
-
-                <select
-                    id="serviceCategory"
-                >
+                <select id="itemCategory">
 
                     <option value="">
                         Select Category
                     </option>
 
-                    <option value="Consultation">
-                        Consultation
+                    <option value="Medicine">
+                        Medicine
                     </option>
 
-                    <option value="Vaccination">
-                        Vaccination
+                    <option value="Pet Food">
+                        Pet Food
                     </option>
 
-                    <option value="Deworming">
-                        Deworming
-                    </option>
-
-                    <option value="Laboratory Exam">
-                        Laboratory Exam
-                    </option>
-
-                    <option value="Treatment">
-                        Treatment
-                    </option>
-
-                    <option value="Medication">
-                        Medication
-                    </option>
-
-                    <option value="Specialties">
-                        Specialties (Surgery Procedures)
-                    </option>
-
-                    <option value="Others">
-                        Others
+                    <option value="Supplements">
+                        Supplements
                     </option>
 
                 </select>
@@ -1261,113 +1446,176 @@ if (
             </div>
 
 
-            <div
-                class="form-group"
-            >
+            <!-- SEARCH ITEM -->
 
-                <label>
-                    Service
+            <div class="form-group">
+
+                <label for="itemSearch">
+                    Search Item
                 </label>
 
-
-                <select
-                    id="serviceItem"
-                    disabled
+                <input
+                    type="text"
+                    id="itemSearch"
+                    placeholder="Search item..."
+                    autocomplete="off"
                 >
-
-                    <option value="">
-                        Select Category First
-                    </option>
-
-                </select>
 
             </div>
 
+
+            <!-- SEARCH RESULTS -->
 
             <div
-                class="service-form-row"
+                id="itemSearchResults"
+                class="item-search-results"
             >
 
-
-                <div
-                    class="form-group"
-                >
-
-                    <label>
-                        Quantity
-                    </label>
-
-
-                    <input
-                        type="number"
-                        id="serviceQuantity"
-                        min="1"
-                        value="1"
-                    >
-
+                <div class="item-search-empty">
+                    Select an item category first.
                 </div>
-
-
-                <div
-                    class="form-group"
-                >
-
-                    <label>
-                        Unit Price
-                    </label>
-
-
-                    <input
-                        type="number"
-                        id="servicePrice"
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                    >
-
-                </div>
-
 
             </div>
 
+
+            <!-- SELECTED ITEM -->
+
+            <div
+                id="selectedItemInfo"
+                class="selected-item-info"
+                style="display: none;"
+            >
+
+                <div class="selected-item-name">
+                    <strong id="selectedItemName"></strong>
+                </div>
+
+                <div class="selected-item-stock">
+                    Stock:
+                    <span id="selectedItemStock">0</span>
+                </div>
+
+                <div class="selected-item-stock">
+                    Unit:
+                    <span id="selectedItemUnit">--</span>
+                </div>
+
+            </div>
+
+
+            <!-- QUANTITY -->
+
+            <div class="form-group">
+
+                <label for="itemQuantity">
+                    Quantity
+                </label>
+
+                <input
+                    type="number"
+                    id="itemQuantity"
+                    min="1"
+                    value="1"
+                >
+
+            </div>
+
+
+            <!-- UNIT PRICE -->
+
+            <div class="form-group">
+
+                <label for="itemPrice">
+                    Unit Price
+                </label>
+
+                <input
+                    type="number"
+                    id="itemPrice"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    readonly
+                >
+
+            </div>
+
+
+            <!-- =================================================
+                 TEMPORARY ITEMS TO ADD
+            ================================================== -->
+
+            <div
+                id="pendingItemsSection"
+                class="pending-items-section"
+                style="display: none;"
+            >
+
+                <div class="pending-items-header">
+
+                    <strong>
+                        Items to Add
+                    </strong>
+
+                </div>
+
+
+                <div
+                    id="pendingItemsList"
+                    class="pending-items-list"
+                >
+                </div>
+
+
+                <div class="pending-items-total">
+
+                    <span>
+                        Total to Add
+                    </span>
+
+                    <strong id="pendingItemsTotal">
+                        ₱0.00
+                    </strong>
+
+                </div>
+
+            </div>
 
         </div>
 
 
         <!-- MODAL ACTIONS -->
 
-        <div
-            class="service-modal-actions"
-        >
-
+        <div class="service-modal-actions">
 
             <button
                 type="button"
                 class="modal-cancel-btn"
                 id="cancelServiceBtn"
             >
-
                 Cancel
-
             </button>
-
 
             <button
                 type="button"
                 class="modal-add-btn"
                 id="addServiceBtn"
             >
-
-                Add to Bill
-
+                Add Item
             </button>
 
+            <button
+                type="button"
+                class="modal-add-btn"
+                id="savePendingItemsBtn"
+                style="display: none;"
+            >
+                Add Items
+            </button>
 
         </div>
 
-
     </div>
-
 
 </div>
 
@@ -1382,6 +1630,12 @@ if (
 <!-- BILLING STATEMENT DATA -->
 
 <script>
+
+    window.currentBillingId =
+        <?= (int)$billingId ?>; 
+        
+
+
     window.billingServices =
         <?= json_encode(
             $billingServices,
@@ -1399,6 +1653,16 @@ if (
             JSON_HEX_AMP |
             JSON_HEX_QUOT
         ) ?>;
+
+    window.billingInventoryItems =
+        <?= json_encode(
+            $billingInventoryItems,
+            JSON_HEX_TAG |
+            JSON_HEX_APOS |
+            JSON_HEX_AMP |
+            JSON_HEX_QUOT
+        ) ?>;
+
 </script>
 
 

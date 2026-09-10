@@ -10,7 +10,7 @@ require_once __DIR__ . '/../config/database.php';
 
 /* =========================================================
    BILLING ARCHIVE
-   Paid billing records are automatically considered archived.
+   Downloaded billing records are automatically considered archived.
    ========================================================= */
 
 $archivedBillings = [];
@@ -34,7 +34,7 @@ $sql = "
         ON b.customer_id = c.customer_id
     LEFT JOIN pets p
         ON b.pet_id = p.pet_id
-    WHERE LOWER(TRIM(b.payment_status)) = 'paid'
+    WHERE LOWER(TRIM(b.billing_status)) = 'archive'
     ORDER BY b.created_at DESC, b.billing_id DESC
 ";
 

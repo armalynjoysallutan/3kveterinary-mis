@@ -172,6 +172,7 @@ function showBillingConfirm(
 document.addEventListener(
     "DOMContentLoaded",
     function () {
+        console.log("BILLING JS LOADED");
 
 
         /* =====================================================
@@ -198,26 +199,52 @@ document.addEventListener(
                 "cancelServiceBtn"
             );
 
-        const serviceCategory =
+        const itemCategory =
             document.getElementById(
-                "serviceCategory"
+                "itemCategory"
             );
 
-        const serviceItem =
+        const itemSearch =
             document.getElementById(
-                "serviceItem"
+                "itemSearch"
             );
 
-        const serviceQuantity =
+        const itemSearchResults =
             document.getElementById(
-                "serviceQuantity"
+                "itemSearchResults"
             );
 
-        const servicePrice =
+        const selectedItemInfo =
             document.getElementById(
-                "servicePrice"
+                "selectedItemInfo"
             );
 
+        const selectedItemName =
+            document.getElementById(
+                "selectedItemName"
+            );
+        const selectedItemStock =
+            document.getElementById(
+                "selectedItemStock"
+            );
+            
+        const selectedItemUnit =
+            document.getElementById(
+                "selectedItemUnit"
+            );    
+            
+        const itemQuantity =
+            document.getElementById(
+                "itemQuantity"
+            );
+            
+        const itemPrice =
+            document.getElementById(
+                "itemPrice"
+            );
+            
+        let selectedInventoryItem = null;    
+            
         const addServiceBtn =
             document.getElementById(
                 "addServiceBtn"
@@ -365,9 +392,8 @@ if (
                 "click",
                 function () {
 
-                    serviceModal.classList.add(
-                        "show"
-                    );
+                    serviceModal.classList.add("show");
+                    document.body.style.overflow = "hidden";
 
                 }
             );
@@ -388,6 +414,7 @@ if (
                 );
 
             }
+            document.body.style.overflow = "";
 
         }
 
@@ -421,1238 +448,958 @@ if (
         );
 
 
-        /* =====================================================
-   DATABASE-DRIVEN CATEGORY + SERVICE
-====================================================== */
 
+/* =====================================================
+   ITEM CATEGORY + SEARCH
+===================================================== */
 
-/*
-|--------------------------------------------------------------------------
-| BUILD CATEGORY LIST
-|--------------------------------------------------------------------------
-*/
+function renderInventorySearchResults() {
 
-function loadBillingCategories() {
+    if (!itemSearchResults) {
+        return;
+    }
 
-    if (!serviceCategory) {
+    const category =
+        itemCategory?.value?.trim() || "";
+
+    const search =
+        itemSearch?.value
+            ?.trim()
+            .toLowerCase() || "";
+
+    selectedInventoryItem = null;
+
+    if (selectedItemInfo) {
+        selectedItemInfo.style.display =
+            "none";
+    }
+
+    if (!category) {
+
+        itemSearchResults.innerHTML = `
+            <div class="item-search-empty">
+                Select an item category first.
+            </div>
+        `;
+
         return;
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | CLEAR CURRENT HARDCODED OPTIONS
-    |--------------------------------------------------------------------------
-    */
-
-    serviceCategory.innerHTML = "";
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | DEFAULT OPTION
-    |--------------------------------------------------------------------------
-    */
-
-    const defaultCategory =
-        document.createElement("option");
-
-
-    defaultCategory.value = "";
-
-    defaultCategory.textContent =
-        "Select Category";
-
-
-    serviceCategory.appendChild(
-        defaultCategory
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | GET CATEGORIES FROM SERVICES
-    |--------------------------------------------------------------------------
-    */
-
-    const categories = [];
-
-
-    if (
+    const inventoryItems =
         Array.isArray(
-            window.billingServices
+            window.billingInventoryItems
         )
-    ) {
+            ? window.billingInventoryItems
+            : [];
 
-        window.billingServices.forEach(
-            function (service) {
 
-                if (
-                    service.category_name &&
-                    !categories.includes(
-                        service.category_name
+    const filteredItems =
+        inventoryItems.filter(
+            function (item) {
+
+                const itemCategoryName =
+                    (
+                        item.category_name || ""
                     )
-                ) {
+                    .toLowerCase();
 
-                    categories.push(
-                        service.category_name
-                    );
+                const itemName =
+                    (
+                        item.item_name || ""
+                    )
+                    .toLowerCase();
 
-                }
+                return (
+                    itemCategoryName ===
+                        category.toLowerCase()
+                    &&
+                    (
+                        !search ||
+                        itemName.includes(search)
+                    )
+                );
 
             }
         );
 
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ADD SERVICE CATEGORIES
-    |--------------------------------------------------------------------------
-    */
-
-    categories.forEach(
-        function (category) {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                category;
-
-
-            option.textContent =
-                category;
-
-
-            serviceCategory.appendChild(
-                option
-            );
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ADD MEDICATION CATEGORY
-    |--------------------------------------------------------------------------
-    */
 
     if (
-        Array.isArray(
-            window.billingMedications
-        ) &&
-        window.billingMedications.length > 0
+        filteredItems.length === 0
     ) {
 
-        const medicationOption =
-            document.createElement(
-                "option"
-            );
+        itemSearchResults.innerHTML = `
+            <div class="item-search-empty">
+                No matching items found.
+            </div>
+        `;
 
-
-        medicationOption.value =
-            "Medication";
-
-
-        medicationOption.textContent =
-            "Medication";
-
-
-        serviceCategory.appendChild(
-            medicationOption
-        );
-
-    }
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| PET WEIGHT FIELD
-|--------------------------------------------------------------------------
-*/
-
-function getPetWeightGroup() {
-
-    return document.getElementById(
-        "billingPetWeightGroup"
-    );
-
-}
-
-
-function createPetWeightField() {
-
-    const existing =
-        getPetWeightGroup();
-
-
-    if (existing) {
-        return existing;
+        return;
     }
 
 
-    const group =
-        document.createElement(
-            "div"
-        );
-
-
-    group.className =
-        "form-group";
-
-
-    group.id =
-        "billingPetWeightGroup";
-
-
-    group.innerHTML = `
-
-        <label>
-            Pet Weight
-            <span class="required">*</span>
-        </label>
-
-        <div
-            style="
-                display:flex;
-                align-items:center;
-                gap:8px;
-            "
-        >
-
-            <input
-                type="number"
-                id="billingPetWeight"
-                min="0"
-                step="0.01"
-                placeholder="Enter pet weight"
-            >
-
-            <span>
-                kg
-            </span>
-
-        </div>
-
-    `;
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | INSERT BEFORE QUANTITY / PRICE ROW
-    |--------------------------------------------------------------------------
-    */
-
-    const quantityRow =
-        serviceQuantity
-            ?.closest(
-                ".service-form-row"
-            );
-
-
-    if (quantityRow) {
-
-        quantityRow.parentNode.insertBefore(
-            group,
-            quantityRow
-        );
-
-    }
-
-
-    return group;
-
-}
-
-
-function showPetWeightField() {
-
-    const group =
-        createPetWeightField();
-
-
-    group.style.display =
-        "block";
-
-}
-
-
-function hidePetWeightField() {
-    // Pet weight is required for every visit.
-    // It is never hidden because the current weight
-    // must be recorded on every checkup.
-    const group = getPetWeightGroup();
-
-    if (group) {
-        group.style.display = "block";
-    }
-}
-
-/*
-|--------------------------------------------------------------------------
-| CALCULATE WEIGHT-BASED PRICE
-|--------------------------------------------------------------------------
-*/
-
-function calculateWeightBasedPrice(
-    service,
-    weight
-) {
-
-    const baseMin =
-        parseFloat(
-            service.base_min_weight ??
-            service.baseMinWeight
-        );
-
-    const baseMax =
-        parseFloat(
-            service.base_max_weight ??
-            service.baseMaxWeight
-        );
-
-    const basePrice =
-        parseFloat(
-            service.base_price ??
-            service.basePrice
-        );
-
-    const weightIncrement =
-        parseFloat(
-            service.weight_increment ??
-            service.weightIncrement
-        );
-
-    const priceIncrement =
-        parseFloat(
-            service.price_increment ??
-            service.priceIncrement
-        );
-
-
-    console.log(
-        "WEIGHT PRICING DEBUG:",
-        {
-            weight: weight,
-            baseMin: baseMin,
-            baseMax: baseMax,
-            basePrice: basePrice,
-            weightIncrement: weightIncrement,
-            priceIncrement: priceIncrement
-        }
-    );
-
-
-    if (
-        Number.isNaN(weight) ||
-        weight < 0
-    ) {
-
-        return null;
-
-    }
-
-
-    if (
-        Number.isNaN(baseMin) ||
-        Number.isNaN(baseMax) ||
-        Number.isNaN(basePrice) ||
-        Number.isNaN(weightIncrement) ||
-        Number.isNaN(priceIncrement)
-    ) {
-
-        console.error(
-            "Incomplete pricing rule:",
-            service
-        );
-
-        return null;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | BASE WEIGHT RANGE
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-        weight >= baseMin &&
-        weight <= baseMax
-    ) {
-
-        return basePrice;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ABOVE BASE MAXIMUM
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-        weight > baseMax
-    ) {
-
-        const additionalWeight =
-            weight - baseMax;
-
-
-        const additionalIncrements =
-            Math.ceil(
-                additionalWeight /
-                weightIncrement
-            );
-
-
-        return (
-            basePrice +
-            (
-                additionalIncrements *
-                priceIncrement
-            )
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | BELOW STARTING WEIGHT
-    |--------------------------------------------------------------------------
-    */
-
-    return basePrice;
-
-}
-
-/*
-|--------------------------------------------------------------------------
-| FIND SELECTED SERVICE
-|--------------------------------------------------------------------------
-*/
-
-function getSelectedBillingService() {
-
-    const category =
-        serviceCategory?.value;
-
-
-    const serviceName =
-        serviceItem?.value;
-
-
-    if (
-        !category ||
-        !serviceName
-    ) {
-
-        return null;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | MEDICATION
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-        category ===
-        "Medication"
-    ) {
-
-        if (
-            !Array.isArray(
-                window.billingMedications
-            )
-        ) {
-
-            return null;
-
-        }
-
-
-        return (
-            window.billingMedications
-                .find(
-                    function (medication) {
-
-                        return (
-                            medication.medication_name ===
-                            serviceName
-                        );
-
-                    }
-                )
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SERVICES
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-        !Array.isArray(
-            window.billingServices
-        )
-    ) {
-
-        return null;
-
-    }
-
-
-    return (
-        window.billingServices
-            .find(
-                function (service) {
-
-                    return (
-                        service.category_name ===
-                            category
-                        &&
-                        service.service_name ===
-                            serviceName
-                    );
+    itemSearchResults.innerHTML =
+        filteredItems
+            .map(
+                function (item) {
+
+                    const stock =
+                        Number(
+                            item.current_stock
+                        ) || 0;
+
+                    const price =
+                        Number(
+                            item.retail_price
+                        ) || 0;
+
+                    return `
+                        <div
+                            class="inventory-search-item"
+                            data-item-id="${item.item_id}"
+                        >
+
+                            <div class="inventory-item-main">
+
+                                <strong>
+                                    ${item.item_name}
+                                </strong>
+
+                                <small>
+                                    ${item.item_code}
+                                </small>
+
+                            </div>
+
+                            <div class="inventory-item-meta">
+
+                                <span>
+                                    Stock:
+                                    ${stock}
+                                </span>
+
+                                <span>
+                                    Unit:
+                                    ${item.abbreviation || item.unit_name || "--"}
+                                </span>
+
+                                <strong>
+                                    ₱${price.toFixed(2)}
+                                </strong>
+
+                            </div>
+
+                        </div>
+                    `;
 
                 }
             )
-    );
+            .join("");
 
 }
 
 
 /* =====================================================
-   CATEGORY CHANGE
-====================================================== */
+   ITEM CATEGORY CHANGE
+===================================================== */
 
-serviceCategory?.addEventListener(
+itemCategory?.addEventListener(
     "change",
     function () {
+        console.log("CATEGORY CHANGED!");
+        console.log("SELECTED CATEGORY:", itemCategory.value);
 
-        const category =
-            this.value;
-
-
-        serviceItem.innerHTML =
-            "";
-
-
-        servicePrice.value =
-            "";
-
-
-        hidePetWeightField();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | NO CATEGORY
-        |--------------------------------------------------------------------------
-        */
-
-        if (!category) {
-
-            serviceItem.disabled =
-                true;
-
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                "";
-
-
-            option.textContent =
-                "Select Category First";
-
-
-            serviceItem.appendChild(
-                option
-            );
-
-
-            return;
-
+        if (itemSearch) {
+            itemSearch.value = "";
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | ENABLE SERVICE
-        |--------------------------------------------------------------------------
-        */
-
-        serviceItem.disabled =
-            false;
-
-
-        const defaultOption =
-            document.createElement(
-                "option"
-            );
-
-
-        defaultOption.value =
-            "";
-
-
-        defaultOption.textContent =
-            "Select Service";
-
-
-        serviceItem.appendChild(
-            defaultOption
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | GET SERVICES
-        |--------------------------------------------------------------------------
-        */
-
-        let services = [];
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | MEDICATIONS
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            category ===
-            "Medication"
-        ) {
-
-            if (
-                Array.isArray(
-                    window.billingMedications
-                )
-            ) {
-
-                services =
-                    window.billingMedications.map(
-                        function (medication) {
-
-                            return {
-
-                                name:
-                                    medication.medication_name,
-
-                                pricingType:
-                                    "Fixed",
-
-                                fixedPrice:
-                                    medication.unit_price
-
-                            };
-
-                        }
-                    );
-
-            }
-
+        if (itemPrice) {
+            itemPrice.value = "";
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | NORMAL SERVICES
-        |--------------------------------------------------------------------------
-        */
-
-        else {
-
-            services =
-                window.billingServices
-                    ?.filter(
-                        function (service) {
-
-                            return (
-                                service.category_name ===
-                                category
-                            );
-
-                        }
-                    )
-                    .map(
-                        function (service) {
-
-                            return {
-
-                                name:
-                                    service.service_name,
-
-                                pricingType:
-                                    service.pricing_type,
-
-                                fixedPrice:
-                                    service.fixed_price,
-
-                                baseMinWeight:
-                                    service.base_min_weight,
-
-                                baseMaxWeight:
-                                    service.base_max_weight,
-
-                                basePrice:
-                                    service.base_price,
-
-                                weightIncrement:
-                                    service.weight_increment,
-
-                                priceIncrement:
-                                    service.price_increment
-
-                            };
-
-                        }
-                    ) || [];
-
+        if (itemQuantity) {
+            itemQuantity.value = 1;
         }
 
+        selectedInventoryItem = null;
 
-        /*
-        |--------------------------------------------------------------------------
-        | BUILD SERVICE OPTIONS
-        |--------------------------------------------------------------------------
-        */
+        if (selectedItemInfo) {
+            selectedItemInfo.style.display =
+                "none";
+        }
 
-        services.forEach(
-            function (service) {
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                option.value =
-                    service.name;
-
-
-                option.textContent =
-                    service.name;
-
-
-                option.dataset.pricingType =
-                    service.pricingType;
-
-
-                if (
-                    service.fixedPrice !== null &&
-                    service.fixedPrice !== undefined
-                ) {
-
-                    option.dataset.price =
-                        service.fixedPrice;
-
-                }
-
-
-                serviceItem.appendChild(
-                    option
-                );
-
-            }
-        );
+        renderInventorySearchResults();
 
     }
 );
 
 
 /* =====================================================
-   SERVICE CHANGE
-====================================================== */
+   ITEM SEARCH INPUT
+===================================================== */
 
-serviceItem?.addEventListener(
-    "change",
-    function () {
-
-        const service =
-            getSelectedBillingService();
-
-
-        servicePrice.value =
-            "";
-
-
-        hidePetWeightField();
-
-
-        if (!service) {
-
-            return;
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | MEDICATION
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            serviceCategory.value ===
-            "Medication"
-        ) {
-
-            servicePrice.value =
-                parseFloat(
-                    service.unit_price
-                ).toFixed(2);
-
-
-            servicePrice.readOnly =
-                true;
-
-
-            return;
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | FIXED PRICE SERVICE
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            service.pricing_type ===
-            "Fixed"
-        ) {
-
-            if (
-                service.fixed_price !==
-                null &&
-                service.fixed_price !==
-                undefined
-            ) {
-
-                servicePrice.value =
-                    parseFloat(
-                        service.fixed_price
-                    ).toFixed(2);
-
-            }
-
-
-            servicePrice.readOnly =
-                true;
-
-
-            return;
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | WEIGHT-BASED SERVICE
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            service.pricing_type ===
-            "Weight-Based"
-        ) {
-
-            showPetWeightField();
-
-
-            servicePrice.readOnly =
-                true;
-
-
-            servicePrice.value =
-                "";
-
-
-            const weightInput =
-                document.getElementById(
-                    "billingPetWeight"
-                );
-
-
-            weightInput?.addEventListener(
+itemSearch?.addEventListener(
     "input",
     function () {
 
-        const weight =
-            parseFloat(
-                this.value
+        renderInventorySearchResults();
+
+    }
+);
+
+
+/* =====================================================
+   SELECT INVENTORY ITEM
+===================================================== */
+
+itemSearchResults?.addEventListener(
+    "click",
+    function (event) {
+
+        const itemElement =
+            event.target.closest(
+                ".inventory-search-item"
+            );
+
+        if (!itemElement) {
+            return;
+        }
+
+
+        const itemId =
+            Number(
+                itemElement.dataset.itemId
             );
 
 
-        const calculatedPrice =
-            calculateWeightBasedPrice(
-                service,
-                weight
+        const inventoryItems =
+            Array.isArray(
+                window.billingInventoryItems
+            )
+                ? window.billingInventoryItems
+                : [];
+
+
+        const item =
+            inventoryItems.find(
+                function (inventoryItem) {
+
+                    return (
+                        Number(
+                            inventoryItem.item_id
+                        ) === itemId
+                    );
+
+                }
+            );
+
+
+        if (!item) {
+            return;
+        }
+
+
+        selectedInventoryItem =
+            item;
+
+
+        if (selectedItemName) {
+
+            selectedItemName.textContent =
+                item.item_name;
+
+        }
+
+
+        if (selectedItemStock) {
+
+            selectedItemStock.textContent =
+                Number(
+                    item.current_stock
+                ) || 0;
+
+        }
+
+        if (selectedItemUnit) {
+            selectedItemUnit.textContent =
+            item.abbreviation ||
+            item.unit_name ||
+            "—";
+        }    
+
+
+        if (itemPrice) {
+
+            itemPrice.value =
+                Number(
+                    item.retail_price
+                ).toFixed(2);
+
+        }
+
+
+        if (selectedItemInfo) {
+
+            selectedItemInfo.style.display =
+                "block";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   MULTIPLE ITEMS - TEMPORARY LIST
+===================================================== */
+
+let pendingBillingItems = [];
+
+const pendingItemsSection =
+    document.getElementById(
+        "pendingItemsSection"
+    );
+
+const pendingItemsList =
+    document.getElementById(
+        "pendingItemsList"
+    );
+
+const pendingItemsTotal =
+    document.getElementById(
+        "pendingItemsTotal"
+    );
+
+const savePendingItemsBtn =
+    document.getElementById(
+        "savePendingItemsBtn"
+    );
+
+
+/* =====================================================
+   RENDER PENDING ITEMS
+===================================================== */
+
+function renderPendingBillingItems() {
+
+    if (!pendingItemsList) {
+        return;
+    }
+
+    if (pendingBillingItems.length === 0) {
+
+        pendingItemsList.innerHTML = "";
+
+        if (pendingItemsSection) {
+            pendingItemsSection.style.display =
+                "none";
+        }
+
+        if (savePendingItemsBtn) {
+            savePendingItemsBtn.style.display =
+                "none";
+        }
+
+        if (pendingItemsTotal) {
+            pendingItemsTotal.textContent =
+                "₱0.00";
+        }
+
+        return;
+    }
+
+
+    if (pendingItemsSection) {
+        pendingItemsSection.style.display =
+            "block";
+    }
+
+    if (savePendingItemsBtn) {
+        savePendingItemsBtn.style.display =
+            "inline-flex";
+    }
+
+
+    pendingItemsList.innerHTML =
+        pendingBillingItems
+            .map(function (item, index) {
+
+                const amount =
+                    item.quantity *
+                    item.unit_price;
+
+
+                return `
+                    <div class="pending-item-row">
+
+                        <div class="pending-item-details">
+
+                            <strong>
+                                ${item.item_name}
+                            </strong>
+
+                            <small>
+                                ${item.item_category}
+                            </small>
+
+                            <span>
+                                ${item.quantity}
+                                ×
+                                ₱${item.unit_price.toFixed(2)}
+                            </span>
+
+                        </div>
+
+
+                        <div class="pending-item-right">
+
+                            <strong>
+                                ₱${amount.toFixed(2)}
+                            </strong>
+
+                            <button
+                                type="button"
+                                class="remove-pending-item"
+                                data-index="${index}"
+                                title="Remove item"
+                            >
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+
+                        </div>
+
+                    </div>
+                `;
+
+            })
+            .join("");
+
+
+    const total =
+        pendingBillingItems.reduce(
+            function (sum, item) {
+
+                return (
+                    sum +
+                    (
+                        item.quantity *
+                        item.unit_price
+                    )
+                );
+
+            },
+            0
+        );
+
+
+    if (pendingItemsTotal) {
+
+        pendingItemsTotal.textContent =
+            "₱" +
+            total.toLocaleString(
+                "en-PH",
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            );
+
+    }
+
+}
+
+
+/* =====================================================
+   REMOVE PENDING ITEM
+===================================================== */
+
+pendingItemsList?.addEventListener(
+    "click",
+    function (event) {
+
+        const removeBtn =
+            event.target.closest(
+                ".remove-pending-item"
+            );
+
+        if (!removeBtn) {
+            return;
+        }
+
+
+        const index =
+            Number(
+                removeBtn.dataset.index
             );
 
 
         if (
-            calculatedPrice === null
+            Number.isNaN(index)
         ) {
-
-            servicePrice.value =
-                "";
-
             return;
-
         }
 
 
-        servicePrice.value =
-            Number(
-                calculatedPrice
-            ).toFixed(2);
-
-    }
-);
-
-            return;
-
-        }
+        pendingBillingItems.splice(
+            index,
+            1
+        );
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | DEFAULT / VARIABLE
-        |--------------------------------------------------------------------------
-        */
-
-        servicePrice.readOnly =
-            false;
+        renderPendingBillingItems();
 
     }
 );
 
 
-/*
-|--------------------------------------------------------------------------
-| INITIALIZE CATEGORIES
-|--------------------------------------------------------------------------
-*/
-
-createPetWeightField();
-
-loadBillingCategories();
-
-    /* =====================================================
-   ADD SERVICE
+/* =====================================================
+   ADD ITEM TO TEMPORARY LIST
 ===================================================== */
 
 addServiceBtn?.addEventListener(
     "click",
-    async function () {
+    function () {
 
-        const category =
-            serviceCategory.value;
+        if (!selectedInventoryItem) {
 
+            alert(
+                "Please select an item."
+            );
 
-        const service =
-            serviceItem.value;
+            return;
+        }
 
 
         const quantity =
-            parseFloat(
-                serviceQuantity.value
-            );
+            Number(
+                itemQuantity?.value
+            ) || 0;
 
 
-        const price =
-            parseFloat(
-                servicePrice.value
-            );
+        const unitPrice =
+            Number(
+                itemPrice?.value
+            ) || 0;
 
 
-        const weightInput =
-            document.getElementById(
-                "billingPetWeight"
-            );
+        const stock =
+            Number(
+                selectedInventoryItem.current_stock
+            ) || 0;
 
 
-        const petWeight =
-            parseFloat(
-                weightInput?.value
-            );
+        if (quantity <= 0) {
 
-
-        /* =========================
-           VALIDATION
-        ========================= */
-
-        if (!category) {
-
-            await showBillingAlert(
-                "Please select a service category.",
-                "warning",
-                "Required Information"
+            alert(
+                "Please enter a valid quantity."
             );
 
             return;
-
         }
 
 
-        if (!service) {
+        if (quantity > stock) {
 
-            await showBillingAlert(
-                "Please select a service.",
-                "warning",
-                "Required Information"
+            alert(
+                "Quantity exceeds available stock."
             );
 
             return;
-
         }
+
+
+        if (unitPrice < 0) {
+
+            alert(
+                "Invalid unit price."
+            );
+
+            return;
+        }
+
+
+        const itemId =
+            Number(
+                selectedInventoryItem.item_id
+            );
 
 
         /*
-        |--------------------------------------------------------------------------
-        | PET WEIGHT IS REQUIRED
-        |--------------------------------------------------------------------------
-        */
+         * Check whether this product
+         * is already in the temporary list.
+         */
 
-        if (
-            isNaN(petWeight) ||
-            petWeight <= 0
-        ) {
+        const existingItem =
+            pendingBillingItems.find(
+                function (item) {
 
-            await showBillingAlert(
-                "Please enter the pet weight.",
-                "warning",
-                "Pet Weight Required"
+                    return (
+                        Number(
+                            item.item_id
+                        ) === itemId
+                    );
+
+                }
             );
 
 
-            weightInput?.focus();
+        if (existingItem) {
+
+            const newQuantity =
+                existingItem.quantity +
+                quantity;
 
 
-            return;
+            if (newQuantity > stock) {
+
+                alert(
+                    "The total quantity exceeds available stock."
+                );
+
+                return;
+            }
+
+
+            existingItem.quantity =
+                newQuantity;
+
+
+            existingItem.amount =
+                newQuantity *
+                existingItem.unit_price;
+
+        } else {
+
+            pendingBillingItems.push({
+
+                item_id:
+                    itemId,
+
+                item_code:
+                    selectedInventoryItem.item_code || "",
+
+                item_name:
+                    selectedInventoryItem.item_name || "",
+
+                item_category:
+                    selectedInventoryItem.category_name || "",
+
+                quantity:
+                    quantity,
+
+                unit_price:
+                    unitPrice,
+
+                amount:
+                    quantity *
+                    unitPrice
+
+            });
 
         }
 
 
-        if (
-            !quantity ||
-            quantity <= 0
-        ) {
+        renderPendingBillingItems();
 
-            await showBillingAlert(
-                "Please enter a valid quantity.",
-                "warning",
-                "Invalid Quantity"
-            );
 
-            return;
+        /*
+         * Reset only the product
+         * selection fields.
+         *
+         * The modal stays open so the
+         * user can immediately select
+         * another product.
+         */
+
+        if (itemSearch) {
+            itemSearch.value = "";
+        }
+
+        if (itemPrice) {
+            itemPrice.value = "";
+        }
+
+        if (itemQuantity) {
+            itemQuantity.value = 1;
+        }
+
+        selectedInventoryItem = null;
+
+
+        if (selectedItemInfo) {
+
+            selectedItemInfo.style.display =
+                "none";
 
         }
 
 
+        renderInventorySearchResults();
+
+    }
+);
+
+
+/* =====================================================
+   FINAL SAVE - ADD ALL ITEMS
+===================================================== */
+
+savePendingItemsBtn?.addEventListener(
+    "click",
+    async function () {
+
         if (
-            isNaN(price) ||
-            price < 0
+            pendingBillingItems.length === 0
         ) {
 
-            await showBillingAlert(
-                "Please enter a valid price.",
-                "warning",
-                "Invalid Price"
+            alert(
+                "Please add at least one item."
             );
 
             return;
-
         }
 
-
-        /* =========================
-           GET BILLING ID
-        ========================= */
 
         const billingId =
-            confirmPaymentBtn?.dataset.id;
+            window.currentBillingId;
 
 
         if (!billingId) {
 
-            await showBillingAlert(
-                "Billing ID not found.",
-                "error",
-                "Billing Error"
+            alert(
+                "Billing ID is missing."
             );
 
             return;
-
         }
 
 
-        /* =========================
-           CALCULATE AMOUNT
-        ========================= */
-
-        const amount =
-            quantity * price;
-
-
-        /* =========================
-           DISABLE BUTTON
-        ========================= */
-
-        addServiceBtn.disabled =
+        savePendingItemsBtn.disabled =
             true;
 
 
-        addServiceBtn.innerHTML =
+        savePendingItemsBtn.innerHTML =
             '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
 
 
         try {
 
-            const response =
-                await fetch(
-                    "../process/add_billing_item.php",
-                    {
+            /*
+             * Add every temporary item
+             * to the current billing.
+             */
 
-                        method:
-                            "POST",
-
-                        headers: {
-
-                            "Content-Type":
-                                "application/x-www-form-urlencoded"
-
-                        },
-
-                        body:
-                            new URLSearchParams({
-
-                                billing_id:
-                                    billingId,
-
-                                item_type:
-                                    category,
-
-                                item_name:
-                                    service,
-
-                                quantity:
-                                    quantity,
-
-                                unit_price:
-                                    price,
-
-                                pet_weight:
-                                    petWeight
-
-                            })
-
-                    }
-                );
-
-
-            const result =
-                await response.json();
-
-
-            if (
-                !result.success
+            for (
+                const item
+                of pendingBillingItems
             ) {
 
-                await showBillingAlert(
-                    result.message ||
-                    "Unable to add service.",
-                    "error",
-                    "Unable to Add Service"
-                );
+                const response =
+                    await fetch(
+                        "../process/add_billing_item.php",
+                        {
+                            method: "POST",
 
-                return;
+                            headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded"
+                            },
+
+                            body:
+                                new URLSearchParams({
+
+                                    billing_id:
+                                        String(
+                                            billingId
+                                        ),
+
+                                    item_type:
+                                        "Product",
+
+                                    item_id:
+                                        String(
+                                            item.item_id
+                                        ),
+
+                                    item_name:
+                                        item.item_name,
+
+                                    quantity:
+                                        String(
+                                            item.quantity
+                                        ),
+
+                                    unit_price:
+                                        String(
+                                            item.unit_price
+                                        )
+
+                                })
+
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!result.success) {
+
+                    throw new Error(
+                        result.message ||
+                        "Unable to add item."
+                    );
+
+                }
 
             }
 
 
-            /* =========================
-               SUCCESS
-            ========================= */
+            pendingBillingItems = [];
+
 
             await showBillingAlert(
-                service +
-                " has been added to the bill.",
+                "All selected items were added successfully.",
                 "success",
-                "Service Added"
+                "Items Added"
             );
 
 
-            /*
-             * Reload the statement so:
-             * - new item appears
-             * - subtotal updates
-             * - total updates
-             * - pet weight is saved
-             */
-
-            window.location.reload();
-
-        }
+            location.reload();
 
 
-        catch (error) {
+        } catch (error) {
 
             console.error(
-                "Add service error:",
+                "ADD MULTIPLE ITEMS ERROR:",
                 error
             );
 
 
             await showBillingAlert(
-                "Something went wrong while adding the service.",
+                error.message ||
+                "Unable to add items. Please try again.",
                 "error",
-                "Add Service Failed"
+                "Add Items Failed"
             );
 
-        }
 
+        } finally {
 
-        finally {
-
-            addServiceBtn.disabled =
+            savePendingItemsBtn.disabled =
                 false;
 
-
-            addServiceBtn.innerHTML =
-                '<i class="fa-solid fa-plus"></i> Add to Bill';
+            savePendingItemsBtn.innerHTML =
+                "Add Items";
 
         }
 
     }
 );
 
+/* =====================================================
+   PRODUCT QUANTITY UPDATE
+===================================================== */
+
+document
+    .querySelectorAll(".billing-product-quantity")
+    .forEach(function (input) {
+
+        input.addEventListener(
+            "change",
+            async function () {
+
+                const billingItemId =
+                    this.dataset.itemId;
+
+                let quantity =
+                    Number(this.value);
+
+
+                if (
+                    !billingItemId ||
+                    !Number.isFinite(quantity) ||
+                    quantity < 1
+                ) {
+
+                    this.value = 1;
+
+                    return;
+                }
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "../process/update_billing_item.php",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/x-www-form-urlencoded"
+                                },
+
+                                body:
+                                    new URLSearchParams({
+
+                                        billing_item_id:
+                                            billingItemId,
+
+                                        quantity:
+                                            String(quantity)
+
+                                    })
+                            }
+                        );
+
+
+                    const result =
+                        await response.json();
+
+
+                    if (!result.success) {
+
+                        await showBillingAlert(
+                            result.message ||
+                                "Unable to update quantity.",
+                            "error",
+                            "Quantity Update Failed"
+                        );
+
+                        location.reload();
+
+                        return;
+                    }
+
+
+                    location.reload();
+
+
+                } catch (error) {
+
+                    console.error(
+                        "QUANTITY UPDATE ERROR:",
+                        error
+                    );
+
+
+                    await showBillingAlert(
+                        "Something went wrong while updating the quantity.",
+                        "error",
+                        "Quantity Update Failed"
+                    );
+
+                    location.reload();
+
+                }
+
+            }
+        );
+
+    });
 
         /* =====================================================
            GET GRAND TOTAL
@@ -1849,5 +1596,269 @@ addServiceBtn?.addEventListener(
             }
         );
 
+
+        /* =========================================================
+   PRINT BILLING RECEIPT
+========================================================= */
+
+const printReceiptBtn =
+    document.getElementById(
+        "printReceiptBtn"
+    );
+
+
+if (printReceiptBtn) {
+
+    printReceiptBtn.addEventListener(
+        "click",
+        function () {
+
+            window.print();
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   DOWNLOAD BILLING STATEMENT
+========================================================= */
+
+const downloadBillingBtn =
+    document.getElementById(
+        "downloadBillingBtn"
+    );
+
+
+if (downloadBillingBtn) {
+
+    downloadBillingBtn.addEventListener(
+        "click",
+        async function () {
+
+            const button = this;
+
+            const billingId =
+                button.dataset.id;
+
+            const billingNumber =
+                button.dataset.number ||
+                ("BILL-" + billingId);
+
+
+            if (!billingId) {
+
+                showBillingAlert(
+                    "Billing ID is missing.",
+                    "error",
+                    "Download Error"
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+                button.disabled = true;
+
+                button.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i> Downloading...';
+
+
+                /*
+                 * Clone the current billing statement.
+                 * Remove buttons/scripts so the downloaded
+                 * document is a clean billing document.
+                 */
+
+                const documentClone =
+                    document.documentElement.cloneNode(
+                        true
+                    );
+
+
+                documentClone
+                    .querySelectorAll(
+                        "script"
+                    )
+                    .forEach(
+                        script =>
+                            script.remove()
+                    );
+
+
+                documentClone
+                    .querySelectorAll(
+                        ".billing-document-actions"
+                    )
+                    .forEach(
+                        element =>
+                            element.remove()
+                    );
+
+
+                documentClone
+                    .querySelectorAll(
+                        ".sidebar, .topbar, nav"
+                    )
+                    .forEach(
+                        element =>
+                            element.remove()
+                    );
+
+
+                /*
+                 * Create downloadable HTML.
+                 */
+
+                const htmlContent =
+                    "<!DOCTYPE html>\n" +
+                    documentClone.outerHTML;
+
+
+                const blob =
+                    new Blob(
+                        [htmlContent],
+                        {
+                            type:
+                                "text/html;charset=utf-8"
+                        }
+                    );
+
+
+                const url =
+                    URL.createObjectURL(
+                        blob
+                    );
+
+
+                const link =
+                    document.createElement(
+                        "a"
+                    );
+
+
+                link.href = url;
+
+
+                link.download =
+                    billingNumber +
+                    "-Billing-Statement.html";
+
+
+                document.body.appendChild(
+                    link
+                );
+
+
+                link.click();
+
+
+                link.remove();
+
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+
+                /*
+                 * Tell the server that the
+                 * billing document was downloaded.
+                 */
+
+                const response =
+                    await fetch(
+                        "../process/mark_billing_downloaded.php",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded"
+                            },
+
+                            body:
+                                new URLSearchParams({
+                                    billing_id:
+                                        billingId
+                                })
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!result.success) {
+
+                    throw new Error(
+                        result.message ||
+                        "Unable to archive billing."
+                    );
+
+                }
+
+
+                await showBillingAlert(
+
+                    "Billing statement downloaded successfully and has been archived.",
+
+                    "success",
+
+                    "Download Complete"
+
+                );
+
+
+                /*
+                 * Return to Billing.
+                 */
+
+                window.location.href =
+                    "billing.php";
+
+
+            } catch (error) {
+
+                console.error(
+                    "Billing download error:",
+                    error
+                );
+
+
+                showBillingAlert(
+
+                    error.message ||
+                    "Something went wrong while downloading the billing statement.",
+
+                    "error",
+
+                    "Download Error"
+
+                );
+
+
+                button.disabled =
+                    false;
+
+
+                button.innerHTML =
+                    '<i class="fa-solid fa-download"></i> Download';
+
+            }
+
+        }
+    );
+
+}
+
     }
+
+
 );

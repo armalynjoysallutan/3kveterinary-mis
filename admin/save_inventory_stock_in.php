@@ -24,8 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $itemId = (int)($_POST['item_id'] ?? 0);
-$batchNumber = trim($_POST['batch_number'] ?? '');
+$batchNumber = '';
 $quantity = (float)($_POST['quantity'] ?? 0);
+$packagingType = trim($_POST['packaging_type'] ?? '');
+$packageQuantity = (float)($_POST['package_quantity'] ?? 0);
+$unitsPerPackage = (float)($_POST['units_per_package'] ?? 0);
 $expirationDate = trim($_POST['expiration_date'] ?? '');
 $dateReceived = trim($_POST['date_received'] ?? '');
 $referenceNumber = trim($_POST['reference_number'] ?? '');
@@ -35,12 +38,26 @@ if ($itemId <= 0) {
     stockInResponse(false, 'Invalid inventory item.');
 }
 
-if ($batchNumber === '') {
-    stockInResponse(false, 'Batch number is required.');
-}
-
 if ($quantity <= 0) {
     stockInResponse(false, 'Quantity must be greater than 0.');
+}
+
+if ($packagingType === '') {
+    stockInResponse(false, 'Packaging type is required.');
+}
+
+if ($packageQuantity <= 0) {
+    stockInResponse(false, 'Number of packages must be greater than 0.');
+}
+
+if ($unitsPerPackage <= 0) {
+    stockInResponse(false, 'Units per package must be greater than 0.');
+}
+
+$calculatedQuantity = $packageQuantity * $unitsPerPackage;
+
+if (abs($calculatedQuantity - $quantity) > 0.0001) {
+    stockInResponse(false, 'Actual quantity does not match the packaging details.');
 }
 
 if ($dateReceived === '') {
@@ -110,113 +127,152 @@ try {
     $existingStock = $stockResult ? mysqli_fetch_assoc($stockResult) : null;
     mysqli_stmt_close($stockStmt);
 
-    $stockId = 0;
+        // =========================================================
+    // CREATE A NEW BATCH FOR EVERY STOCK-IN DELIVERY
+    // =========================================================
 
-    if ($existingStock) {
-        $stockId = (int)$existingStock['stock_id'];
-        $oldExpiry = $existingStock['expiration_date'];
-        $newExpiry = $expirationDate !== '' ? $expirationDate : null;
+    // =========================================================
+// AUTO-GENERATE BATCH NUMBER
+// Format: BAT-YEAR-###
+// Sequence is per inventory item and resets every year.
+// =========================================================
 
-        // Do not allow the same item + batch to have conflicting expiration dates.
-        if ($oldExpiry !== null && $newExpiry !== null && $oldExpiry !== $newExpiry) {
-            throw new Exception(
-                'This batch already has expiration date ' . date('M d, Y', strtotime($oldExpiry)) .
-                '. Use the same batch expiration date or create a new batch number.'
-            );
+$currentYear = date('Y');
+$batchPrefix = 'BAT-' . $currentYear . '-';
+
+$batchStmt = mysqli_prepare(
+    $conn,
+    "SELECT batch_number
+     FROM inventory_stock
+     WHERE item_id = ?
+       AND batch_number LIKE CONCAT(?, '%')
+     FOR UPDATE"
+);
+
+if (!$batchStmt) {
+    throw new Exception(mysqli_error($conn));
+}
+
+mysqli_stmt_bind_param(
+    $batchStmt,
+    'is',
+    $itemId,
+    $batchPrefix
+);
+
+mysqli_stmt_execute($batchStmt);
+
+$batchResult = mysqli_stmt_get_result($batchStmt);
+
+$maxSequence = 0;
+
+while ($batchRow = mysqli_fetch_assoc($batchResult)) {
+
+    $existingBatchNumber = $batchRow['batch_number'];
+
+    $parts = explode('-', $existingBatchNumber);
+    $lastPart = end($parts);
+
+    if (ctype_digit($lastPart)) {
+        $sequence = (int)$lastPart;
+
+        if ($sequence > $maxSequence) {
+            $maxSequence = $sequence;
         }
-
-        $newQuantity = (float)$existingStock['quantity'] + $quantity;
-
-        if ($oldExpiry === null && $newExpiry !== null) {
-            if ($supplierId === null) {
-                $updateStock = mysqli_prepare($conn,
-                    "UPDATE inventory_stock
-                     SET quantity = ?, expiration_date = ?, date_received = ?, supplier_id = NULL, unit_cost = ?
-                     WHERE stock_id = ?"
-                );
-                if (!$updateStock) throw new Exception(mysqli_error($conn));
-                mysqli_stmt_bind_param($updateStock, 'dssdi', $newQuantity, $newExpiry, $dateReceived, $unitCost, $stockId);
-            } else {
-                $updateStock = mysqli_prepare($conn,
-                    "UPDATE inventory_stock
-                     SET quantity = ?, expiration_date = ?, date_received = ?, supplier_id = ?, unit_cost = ?
-                     WHERE stock_id = ?"
-                );
-                if (!$updateStock) throw new Exception(mysqli_error($conn));
-                mysqli_stmt_bind_param($updateStock, 'dssidi', $newQuantity, $newExpiry, $dateReceived, $supplierId, $unitCost, $stockId);
-            }
-        } else {
-            if ($supplierId === null) {
-                $updateStock = mysqli_prepare($conn,
-                    "UPDATE inventory_stock
-                     SET quantity = ?, date_received = ?, supplier_id = NULL, unit_cost = ?
-                     WHERE stock_id = ?"
-                );
-                if (!$updateStock) throw new Exception(mysqli_error($conn));
-                mysqli_stmt_bind_param($updateStock, 'dsdi', $newQuantity, $dateReceived, $unitCost, $stockId);
-            } else {
-                $updateStock = mysqli_prepare($conn,
-                    "UPDATE inventory_stock
-                     SET quantity = ?, date_received = ?, supplier_id = ?, unit_cost = ?
-                     WHERE stock_id = ?"
-                );
-                if (!$updateStock) throw new Exception(mysqli_error($conn));
-                mysqli_stmt_bind_param($updateStock, 'dsidi', $newQuantity, $dateReceived, $supplierId, $unitCost, $stockId);
-            }
-        }
-
-        if (!mysqli_stmt_execute($updateStock)) {
-            $message = mysqli_error($conn);
-            mysqli_stmt_close($updateStock);
-            throw new Exception($message);
-        }
-        mysqli_stmt_close($updateStock);
-    } else {
-        $newExpiry = $expirationDate !== '' ? $expirationDate : null;
-
-        if ($supplierId === null && $newExpiry === null) {
-            $insertStock = mysqli_prepare($conn,
-                "INSERT INTO inventory_stock
-                 (item_id, batch_number, quantity, expiration_date, date_received, supplier_id, unit_cost)
-                 VALUES (?, ?, ?, NULL, ?, NULL, ?)"
-            );
-            if (!$insertStock) throw new Exception(mysqli_error($conn));
-            mysqli_stmt_bind_param($insertStock, 'isdsd', $itemId, $batchNumber, $quantity, $dateReceived, $unitCost);
-        } elseif ($supplierId === null) {
-            $insertStock = mysqli_prepare($conn,
-                "INSERT INTO inventory_stock
-                 (item_id, batch_number, quantity, expiration_date, date_received, supplier_id, unit_cost)
-                 VALUES (?, ?, ?, ?, ?, NULL, ?)"
-            );
-            if (!$insertStock) throw new Exception(mysqli_error($conn));
-            mysqli_stmt_bind_param($insertStock, 'isdssd', $itemId, $batchNumber, $quantity, $newExpiry, $dateReceived, $unitCost);
-        } elseif ($newExpiry === null) {
-            $insertStock = mysqli_prepare($conn,
-                "INSERT INTO inventory_stock
-                 (item_id, batch_number, quantity, expiration_date, date_received, supplier_id, unit_cost)
-                 VALUES (?, ?, ?, NULL, ?, ?, ?)"
-            );
-            if (!$insertStock) throw new Exception(mysqli_error($conn));
-            mysqli_stmt_bind_param($insertStock, 'isdsid', $itemId, $batchNumber, $quantity, $dateReceived, $supplierId, $unitCost);
-        } else {
-            $insertStock = mysqli_prepare($conn,
-                "INSERT INTO inventory_stock
-                 (item_id, batch_number, quantity, expiration_date, date_received, supplier_id, unit_cost)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)"
-            );
-            if (!$insertStock) throw new Exception(mysqli_error($conn));
-            mysqli_stmt_bind_param($insertStock, 'isdssid', $itemId, $batchNumber, $quantity, $newExpiry, $dateReceived, $supplierId, $unitCost);
-        }
-
-        if (!mysqli_stmt_execute($insertStock)) {
-            $message = mysqli_error($conn);
-            mysqli_stmt_close($insertStock);
-            throw new Exception($message);
-        }
-        mysqli_stmt_close($insertStock);
-
-        $stockId = mysqli_insert_id($conn);
     }
+}
+
+mysqli_stmt_close($batchStmt);
+
+$nextSequence = $maxSequence + 1;
+
+$batchNumber = $batchPrefix . str_pad(
+    $nextSequence,
+    3,
+    '0',
+    STR_PAD_LEFT
+);
+
+    // Validate packaging details.
+    if ($packagingType === '') {
+        throw new Exception('Packaging type is required.');
+    }
+
+    if ($packageQuantity <= 0) {
+        throw new Exception('Number of packages must be greater than 0.');
+    }
+
+    if ($unitsPerPackage <= 0) {
+        throw new Exception('Units per package must be greater than 0.');
+    }
+
+    // Calculate the actual inventory quantity.
+    $calculatedQuantity = $packageQuantity * $unitsPerPackage;
+
+    if (abs($calculatedQuantity - $quantity) > 0.0001) {
+        throw new Exception(
+            'Actual quantity does not match the packaging details.'
+        );
+    }
+
+    $newExpiry = $expirationDate !== ''
+        ? $expirationDate
+        : null;
+
+    /*
+     * IMPORTANT:
+     * quantity_received = total units received in this delivery
+     * quantity          = current/remaining stock for this batch
+     */
+
+    $insertStock = mysqli_prepare(
+        $conn,
+        "INSERT INTO inventory_stock
+        (
+            item_id,
+            batch_number,
+            packaging_type,
+            package_quantity,
+            units_per_package,
+            quantity_received,
+            quantity,
+            expiration_date,
+            date_received,
+            supplier_id,
+            unit_cost
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    );
+
+    if (!$insertStock) {
+        throw new Exception(mysqli_error($conn));
+    }
+
+    mysqli_stmt_bind_param(
+        $insertStock,
+        'issddddssid',
+        $itemId,
+        $batchNumber,
+        $packagingType,
+        $packageQuantity,
+        $unitsPerPackage,
+        $quantity,
+        $quantity,
+        $newExpiry,
+        $dateReceived,
+        $supplierId,
+        $unitCost
+    );
+
+    if (!mysqli_stmt_execute($insertStock)) {
+        $message = mysqli_error($conn);
+        mysqli_stmt_close($insertStock);
+        throw new Exception($message);
+    }
+
+    mysqli_stmt_close($insertStock);
+
+    $stockId = mysqli_insert_id($conn);
 
     // Log every Stock In transaction separately.
     $logStmt = mysqli_prepare($conn,

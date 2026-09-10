@@ -41,6 +41,9 @@ $billingId = isset($_POST["billing_id"])
     ? (int) $_POST["billing_id"]
     : 0;
 
+$inventoryItemId = isset($_POST["item_id"])
+    ? (int) $_POST["item_id"]
+    : 0;
 $itemType = isset($_POST["item_type"])
     ? trim($_POST["item_type"])
     : "";
@@ -57,9 +60,7 @@ $unitPrice = isset($_POST["unit_price"])
     ? (float) $_POST["unit_price"]
     : 0;
 
-$petWeight = isset($_POST["pet_weight"])
-    ? (float) $_POST["pet_weight"]
-    : 0;
+
 
 
 /* =========================================================
@@ -81,7 +82,7 @@ if ($itemType === "") {
 
     echo json_encode([
         "success" => false,
-        "message" => "Service category is required."
+        "message" => "Item category is required."
     ]);
 
     exit();
@@ -92,7 +93,7 @@ if ($itemName === "") {
 
     echo json_encode([
         "success" => false,
-        "message" => "Service name is required."
+        "message" => "Item name is required."
     ]);
 
     exit();
@@ -121,21 +122,7 @@ if ($unitPrice < 0) {
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| PET WEIGHT IS REQUIRED FOR EVERY CHECKUP
-|--------------------------------------------------------------------------
-*/
 
-if ($petWeight <= 0) {
-
-    echo json_encode([
-        "success" => false,
-        "message" => "Pet weight is required."
-    ]);
-
-    exit();
-}
 
 
 /* =========================================================
@@ -257,60 +244,62 @@ try {
         );
 
 
-    /* =====================================================
-       ADD BILLING ITEM
-    ===================================================== */
+   /* =====================================================
+   ADD BILLING ITEM
+===================================================== */
 
-    $insertSql = "
-        INSERT INTO billing_items
-        (
-            billing_id,
-            item_type,
-            item_name,
-            quantity,
-            unit,
-            unit_price,
-            amount
-        )
-        VALUES
-        (
-            ?,
-            ?,
-            ?,
-            ?,
-            NULL,
-            ?,
-            ?
-        )
-    ";
-
-
-    $insertStmt =
-        mysqli_prepare(
-            $conn,
-            $insertSql
-        );
+$insertSql = "
+    INSERT INTO billing_items
+    (
+        billing_id,
+        inventory_item_id,
+        item_type,
+        item_name,
+        quantity,
+        unit,
+        unit_price,
+        amount
+    )
+    VALUES
+    (
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        NULL,
+        ?,
+        ?
+    )
+";
 
 
-    if (!$insertStmt) {
-
-        throw new Exception(
-            "Unable to prepare billing item."
-        );
-    }
-
-
-    mysqli_stmt_bind_param(
-        $insertStmt,
-        "issddd",
-        $billingId,
-        $itemType,
-        $itemName,
-        $quantity,
-        $unitPrice,
-        $amount
+$insertStmt =
+    mysqli_prepare(
+        $conn,
+        $insertSql
     );
 
+
+if (!$insertStmt) {
+
+    throw new Exception(
+        "Unable to prepare billing item."
+    );
+}
+
+
+mysqli_stmt_bind_param(
+    $insertStmt,
+    "iissddd",
+    $billingId,
+    $inventoryItemId,
+    $itemType,
+    $itemName,
+    $quantity,
+    $unitPrice,
+    $amount
+);
 
     if (
         !mysqli_stmt_execute(
@@ -319,7 +308,7 @@ try {
     ) {
 
         throw new Exception(
-            "Failed to add service."
+            "Failed to add item."
         );
     }
 
@@ -402,14 +391,12 @@ try {
        UPDATE BILLING
        
        Save:
-       - latest pet weight for this billing/checkup
        - total amount
     ===================================================== */
 
     $updateBillingSql = "
         UPDATE billing
         SET
-            pet_weight = ?,
             total_amount = ?
         WHERE billing_id = ?
     ";
@@ -432,8 +419,7 @@ try {
 
     mysqli_stmt_bind_param(
         $updateBillingStmt,
-        "ddi",
-        $petWeight,
+        "di",
         $newTotal,
         $billingId
     );
@@ -456,63 +442,7 @@ try {
     );
 
 
-    /* =====================================================
-       UPDATE PET'S CURRENT WEIGHT
-       
-       This keeps the latest weight in the pet record.
-    ===================================================== */
-
-    $petId =
-        (int) $billing["pet_id"];
-
-
-    $updatePetSql = "
-        UPDATE pets
-        SET
-            weight = ?
-        WHERE pet_id = ?
-    ";
-
-
-    $updatePetStmt =
-        mysqli_prepare(
-            $conn,
-            $updatePetSql
-        );
-
-
-    if (!$updatePetStmt) {
-
-        throw new Exception(
-            "Unable to update pet weight."
-        );
-    }
-
-
-    mysqli_stmt_bind_param(
-        $updatePetStmt,
-        "di",
-        $petWeight,
-        $petId
-    );
-
-
-    if (
-        !mysqli_stmt_execute(
-            $updatePetStmt
-        )
-    ) {
-
-        throw new Exception(
-            "Failed to update pet weight."
-        );
-    }
-
-
-    mysqli_stmt_close(
-        $updatePetStmt
-    );
-
+   
 
     /* =====================================================
        COMMIT
@@ -529,9 +459,9 @@ try {
 
     echo json_encode([
         "success" => true,
-        "message" => "Service added successfully.",
-        "total" => $newTotal,
-        "pet_weight" => $petWeight
+        "message" => "Item added successfully.",
+        "total" => $newTotal
+        
     ]);
 
 

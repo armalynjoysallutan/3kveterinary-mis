@@ -130,7 +130,9 @@ $serviceSql = "
         pet_weight,
         unit_price,
         amount,
-        service_source
+        service_source,
+        next_visit,
+        no_days_return
     FROM medical_record_services
     WHERE medical_record_id = ?
     ORDER BY medical_record_service_id ASC
